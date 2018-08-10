@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block css %}
+  {{ block.super }}
+  <link href="{% static "filingcabinet/dc/viewer-datauri.css" %}" media="screen" rel="stylesheet" type="text/css">
+  <link href="{% static "filingcabinet/dc/print.css" %}" media="print" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body %}
+<div id="document-viewer"></div>
+{% endblock %}
+
+
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% static "filingcabinet/dc/viewer.js" %}" type="text/javascript"></script>
+  <script src="{% static "filingcabinet/dc/templates.js" %}" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    window.currentDocument = DV.load(
+      '{% url "document_json" object.pk %}',
+      {
+        container: '#document-viewer',
+        sidebar: false
+      }
+    );
+  </script>
+{% endblock %}

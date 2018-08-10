@@ -1,0 +1,4 @@
+include README.md LICENSE.txt
+recursive-include filingcabinet/templates *
+recursive-include filingcabinet/static *
+recursive-include filingcabinet/locale *.po
