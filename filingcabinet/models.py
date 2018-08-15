@@ -30,11 +30,6 @@ class DocumentManager(models.Manager):
         }
         pdf_path = doc.get_file_path()
 
-        if doc.original:
-            pdf_file = doc.original
-        elif doc.pdf_file:
-            pdf_file = doc.pdf_file
-
         pdf = PDFProcessor(pdf_path, language=doc.language, config=config)
 
         doc.num_pages = pdf.num_pages
