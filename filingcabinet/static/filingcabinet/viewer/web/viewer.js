@@ -10149,7 +10149,7 @@ function getDefaultPreferences() {
       "disableFontFace": false,
       "textLayerMode": 1,
       "useOnlyCssZoom": false,
-      "externalLinkTarget": 0,
+      "externalLinkTarget": 2, // PDFJS.LinkTarget.BLANK
       "renderer": "canvas",
       "renderInteractiveForms": false,
       "enablePrintAutoRotate": false,
