@@ -146,6 +146,9 @@ class AbstractDocument(models.Model):
             'pk': self.pk
         })
 
+    def get_absolute_domain_url(self):
+        return settings.SITE_URL + self.get_absolute_url()
+
     @property
     def has_original(self):
         if not hasattr(self, 'original_id'):
@@ -161,6 +164,9 @@ class AbstractDocument(models.Model):
             return self.original.get_file_path()
         return ''
 
+    def get_internal_url(self):
+        return
+
     def get_file_url(self):
         if self.pdf_file:
             return self.pdf_file.url
@@ -173,6 +179,11 @@ class AbstractDocument(models.Model):
         path, _ = os.path.splitext(doc_path)
         return get_page_image_filename(
             path, '{page}', size_name='{size}'
+        )
+
+    def get_cover_image(self):
+        return settings.MEDIA_URL + self.get_page_image_url_template().format(
+            page=1, size='small'
         )
 
 
@@ -229,6 +240,12 @@ class Page(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.document, self.number)
+
+    def get_image_url(self, size='{size}'):
+        templ = self.document.get_page_image_url_template()
+        return settings.MEDIA_URL + templ.format(
+            page=self.number, size=size
+        )
 
 
 def get_page_annotation_filename(instance, filename):
