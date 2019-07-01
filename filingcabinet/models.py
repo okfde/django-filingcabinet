@@ -6,7 +6,6 @@ from django.conf.locale import LANG_INFO
 from django.utils import timezone
 from django.db import models
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.core.files.base import ContentFile
@@ -90,7 +89,6 @@ class TaggedDocument(TaggedItemBase):
         verbose_name_plural = _('Document Tags')
 
 
-@python_2_unicode_compatible
 class AbstractDocument(models.Model):
     LANGUAGE_CHOICES = [(k, LANG_INFO[k]['name']) for k in LANG_INFO
                         if 'name' in LANG_INFO[k]]
@@ -189,7 +187,6 @@ def get_page_filename(instance, filename, size=''):
     return get_page_image_filename(path, instance.number, size_name=size)
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     SIZES = (
         # Wide in px
@@ -244,7 +241,6 @@ def get_page_annotation_filename(instance, filename):
     )
 
 
-@python_2_unicode_compatible
 class PageAnnotation(models.Model):
     page = models.ForeignKey(
         Page, null=True, on_delete=models.SET_NULL
