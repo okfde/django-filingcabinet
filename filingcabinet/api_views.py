@@ -1,5 +1,7 @@
-from rest_framework import serializers
-from rest_framework import viewsets
+from django.db.models import Q
+from django.template.defaultfilters import slugify
+
+from rest_framework import viewsets, mixins, serializers, permissions
 
 from . import get_document_model
 from .models import Page
@@ -69,15 +71,51 @@ class DocumentDetailSerializer(PagesMixin, DocumentSerializer):
         )
 
 
-class DocumentViewSet(viewsets.ReadOnlyModelViewSet):
+class UpdateDocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_document_model()
+        fields = ('title', 'description')
+
+    def update(self, instance, validated_data):
+        if validated_data.get('title'):
+            validated_data['slug'] = slugify(validated_data['title'])
+        return super().update(instance, validated_data)
+
+
+class IsUserOrReadOnly(permissions.BasePermission):
+    """
+    Object-level permission to only allow owners of an object to edit it.
+    Assumes the model instance has an `owner` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if obj.user == request.user:
+            return True
+
+        if request.method in permissions.SAFE_METHODS:
+            return obj.public
+
+        return False
+
+
+class DocumentViewSet(mixins.ListModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      viewsets.GenericViewSet):
     serializer_action_classes = {
         'list': DocumentSerializer,
-        'retrieve': DocumentDetailSerializer
+        'retrieve': DocumentDetailSerializer,
+        'update': UpdateDocumentSerializer
     }
-    queryset = get_document_model().objects.filter(public=True)
+    permission_classes = (IsUserOrReadOnly,)
 
     def get_serializer_class(self):
         try:
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
             return DocumentSerializer
+
+    def get_queryset(self):
+        return get_document_model().objects.filter(
+            Q(public=True) | Q(user=self.request.user)
+        )
