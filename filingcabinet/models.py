@@ -41,6 +41,8 @@ class DocumentManager(models.Manager):
                 number=page_no,
                 defaults={'content': text}
             )
+            page.width = img.width
+            page.height = img.width
 
             page.image.save(
                 'page.gif',
@@ -216,6 +218,9 @@ class Page(models.Model):
         on_delete=models.CASCADE
     )
     number = models.IntegerField(default=1)
+
+    width = models.IntegerField(null=True)
+    height = models.IntegerField(null=True)
 
     content = models.TextField(blank=True)
     image = models.ImageField(
