@@ -277,6 +277,7 @@ class PageAnnotation(models.Model):
     left = models.IntegerField(null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
+    highlight = models.TextField(blank=True)
     image = models.ImageField(upload_to=get_page_annotation_filename,
                               storage=OverwriteStorage(),
                               max_length=255, blank=True)
