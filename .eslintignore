@@ -1,0 +1,2 @@
+filingcabinet/static/js/*.js
+node_modules/**/*.js

@@ -5,3 +5,4 @@ dist/
 *.pyc
 tmp/
 example_project/
+node_modules/
