@@ -1,20 +1,17 @@
 from django.apps import apps as django_apps
 from django.core.exceptions import ImproperlyConfigured
 
-from .settings import (
-    FILINGCABINET_DOCUMENT_MODEL,
-    FILINGCABINET_DOCUMENTCOLLECTION_MODEL
-)
-
-
 __version__ = '0.0.1'
 
 
 def get_document_model():
+    from .settings import FILINGCABINET_DOCUMENT_MODEL
+
     return get_model(FILINGCABINET_DOCUMENT_MODEL)
 
 
 def get_documentcollection_model():
+    from .settings import FILINGCABINET_DOCUMENTCOLLECTION_MODEL
     return get_model(FILINGCABINET_DOCUMENTCOLLECTION_MODEL)
 
 
