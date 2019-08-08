@@ -105,6 +105,7 @@ class AbstractDocument(models.Model):
         max_length=255,
         storage=OverwriteStorage(),
         upload_to=get_document_path, blank=True)
+    file_size = models.BigIntegerField(null=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
