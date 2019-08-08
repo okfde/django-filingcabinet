@@ -32,28 +32,35 @@ class DocumentManager(models.Manager):
         pdf = PDFProcessor(pdf_path, language=doc.language, config=config)
 
         doc.num_pages = pdf.num_pages
+        doc.file_size = os.path.getsize(pdf_path)
         doc.save()
 
-        page_generator = zip(pdf.get_images(), pdf.get_text())
-        for page_no, (img, text) in enumerate(page_generator, 1):
+        for page_no, image in pdf.get_all_images():
+            text = pdf.get_text_for_page(page_no, image)
             page, created = Page.objects.update_or_create(
                 document=doc,
                 number=page_no,
                 defaults={'content': text}
             )
-            page.width = img.width
-            page.height = img.width
+            dims = image.size
+            page.width = dims[0]
+            page.height = dims[1]
+            if page.image:
+                page.image.delete(save=False)
 
             page.image.save(
-                'page.gif',
-                ContentFile(img.make_blob('gif')),
+                'page.png',
+                ContentFile(image.make_blob('png')),
                 save=False
             )
             for size_name, width in Page.SIZES:
-                img.transform(resize='{}x'.format(width))
-                getattr(page, 'image_%s' % size_name).save(
-                    'page.gif',
-                    ContentFile(img.make_blob('gif')),
+                image.transform(resize='{}x'.format(width))
+                field_file = getattr(page, 'image_%s' % size_name)
+                if field_file:
+                    field_file.delete(save=False)
+                field_file.save(
+                    'page.png',
+                    ContentFile(image.make_blob('png')),
                     save=False
                 )
             page.save()
@@ -71,7 +78,7 @@ def get_document_path(instance, filename):
                         hex_name_46, hex_name, slug + ext)
 
 
-def get_page_image_filename(prefix, page_no, size_name=None, filetype='gif'):
+def get_page_image_filename(prefix, page_no, size_name=None, filetype='png'):
     return '{prefix}-p{page}-{size}.{filetype}'.format(
         prefix=prefix,
         size=size_name,
@@ -178,7 +185,7 @@ class AbstractDocument(models.Model):
         return ''
 
     def get_page_image_url_template(self):
-        doc_path = get_document_path(self, 'page.gif')
+        doc_path = get_document_path(self, 'page.png')
         path, _ = os.path.splitext(doc_path)
         return get_page_image_filename(
             path, '{page}', size_name='{size}'
@@ -196,7 +203,7 @@ class Document(AbstractDocument):
 
 
 def get_page_filename(instance, filename, size=''):
-    doc_path = get_document_path(instance.document, 'page.gif')
+    doc_path = get_document_path(instance.document, 'page.png')
     path, ext = os.path.splitext(doc_path)
     return get_page_image_filename(path, instance.number, size_name=size)
 
@@ -253,12 +260,17 @@ class Page(models.Model):
             page=self.number, size=size
         )
 
+    def dim_ratio_percent(self):
+        if self.width and self.height:
+            return str(self.height / self.width * 100)
+        return str(70)
+
 
 def get_page_annotation_filename(instance, filename):
     # UUID field is already filled
     filename = instance.page.image.name
     base_name, _ = os.path.splitext(filename)
-    return '%s-annotation-%s.gif' % (
+    return '%s-annotation-%s.png' % (
         base_name,
         instance.pk
     )
@@ -300,7 +312,7 @@ class PageAnnotation(models.Model):
                 self.left, self.top, self.width, self.height
             )
             self.image.save(
-                'page_annotation.gif',
+                'page_annotation.png',
                 ContentFile(image_bytes),
                 save=False
             )
