@@ -14,6 +14,8 @@ class PageInline(admin.StackedInline):
 class DocumentBaseAdmin(admin.ModelAdmin):
     inlines = [PageInline]
     save_on_top = True
+    search_fields = ('title',)
+    date_hierarchy = 'created_at'
     list_display = ('title', 'created_at', 'num_pages', 'public')
     raw_id_fields = ('user',)
     readonly_fields = ('uid',)
