@@ -387,7 +387,6 @@ def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
 
     base_arguments = [
         'pdftoppm', '-png', '-r', str(dpi),
-        '-forcenum',
     ]
 
     if pages is not None:
