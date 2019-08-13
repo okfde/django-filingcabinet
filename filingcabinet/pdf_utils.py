@@ -1,10 +1,11 @@
+import contextlib
+import glob
 import io
 import logging
 import os
 import shutil
 import subprocess
 import tempfile
-import glob
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
@@ -70,10 +71,10 @@ class PDFProcessor(object):
 
     def get_all_images(self, resolution=300):
         white = wand.color.Color('#fff')
-        image_generator = convert_pdf_to_images(self.filename, dpi=resolution)
-        for i, image_filename in enumerate(image_generator):
-            with Image(filename=image_filename, background=white) as img:
-                yield i + 1, img
+        with get_images_from_pdf(self.filename, dpi=resolution) as images:
+            for i, image_filename in enumerate(images):
+                with Image(filename=image_filename, background=white) as img:
+                    yield i + 1, img
 
     def get_text_for_page(self, page_no, image=None):
         text = self._get_text_for_page(page_no)
@@ -215,7 +216,6 @@ def shell_call(arguments, outpath, output_file=None, timeout=50):
     env.update({'HOME': outpath})
 
     logging.info("Running: %s", arguments)
-    logging.info("Env: %s", env)
     out, err = '', ''
     p = None
     try:
@@ -360,23 +360,60 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     return writer.getvalue()
 
 
-def convert_pdf_to_images(filename, dpi=300, timeout=5 * 60):
+@contextlib.contextmanager
+def get_images_from_pdf(filename, pages=None, dpi=300, timeout=5 * 60):
     try:
         temp_dir = tempfile.mkdtemp()
-        temp_out = os.path.join(temp_dir, 'image')
-        arguments = [
-            'pdftoppm', filename, temp_out, '-png', '-r', str(dpi),
-            '-forcenum',
-        ]
-        shell_call(
-            arguments, temp_dir, output_file=None, timeout=timeout
-        )
-        images = glob.glob(temp_out + '-*.png')
-        images.sort()
-        for image in images:
-            yield image
+        yield run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout)
     except Exception as err:
         logging.error("Error during command overwrite %s", err)
     finally:
         # Delete all temporary files
         shutil.rmtree(temp_dir)
+
+
+def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
+    temp_out = os.path.join(temp_dir, 'image')
+
+    base_arguments = [
+        'pdftoppm', '-png', '-r', str(dpi),
+        '-forcenum',
+    ]
+
+    if pages is not None:
+        pages = list(pages)
+        pages.sort()
+        page_iterator = get_continuous_pages(pages)
+    else:
+        page_iterator = ((None, None) for _ in (None,))
+
+    for first, last in page_iterator:
+        arguments = list(base_arguments)
+        if first is not None:
+            arguments.extend(['-f', str(first), '-l', str(last)])
+
+        arguments.extend([filename, temp_out])
+        shell_call(
+            arguments, temp_dir, output_file=None, timeout=timeout
+        )
+
+    images = glob.glob(temp_out + '-*.png')
+    images.sort()
+    return images
+
+
+def get_continuous_pages(pages):
+    first, last = None, None
+
+    for page in pages:
+        if first is None:
+            first = page
+            last = page
+            continue
+        if page - last > 1:
+            yield (first, last)
+            first = page
+            last = page
+            continue
+        last = page
+    yield (first, last)
