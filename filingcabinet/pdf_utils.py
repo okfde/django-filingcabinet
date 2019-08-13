@@ -16,6 +16,7 @@ from wand.image import Image
 from wand.color import Color
 
 from PyPDF2 import PdfFileReader
+from PyPDF2.utils import PdfReadError
 from PIL import Image as PILImage
 
 try:
@@ -51,10 +52,19 @@ TESSERACT_LANGUAGE = {
 class PDFProcessor(object):
     def __init__(self, filename, language=None, config=None):
         self.filename = filename
-        self.pdf_reader = PdfFileReader(filename)
+
+        self.pdf_reader = self.get_pdf_reader(filename)
         self.num_pages = self.pdf_reader.getNumPages()
         self.language = language
         self.config = config or {}
+
+    def get_pdf_reader(self, filename):
+        try:
+            return PdfFileReader(filename)
+        except (PdfReadError, ValueError, OSError) as e:
+            pass
+        pdf_file_name = rewrite_pdf_in_place(filename)
+        return PdfFileReader(pdf_file_name)
 
     def get_meta(self):
         doc_info = self.pdf_reader.getDocumentInfo()
