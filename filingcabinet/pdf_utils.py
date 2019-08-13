@@ -98,7 +98,7 @@ class PDFProcessor(object):
                 pdflib_doc = pdflib.Document(self.filename)
                 self.pdflib_pages = list(pdflib_doc)
         if hasattr(self, 'pdflib_pages'):
-            page = self.pdflib_pages[page_no]
+            page = self.pdflib_pages[page_no - 1]
             return ' '.join(page.lines).strip()
         page = self.pdf_reader.getPage(page_no - 1)
         return page.extractText()
