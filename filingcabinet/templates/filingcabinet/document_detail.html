@@ -53,12 +53,14 @@
 {% endblock %}
 
 {% block css %}
+  {{ block.super }}
   {% if beta %}
     <script src="{% static 'css/filingcabinet.css' %}" defer></script>
   {% endif %}
 {% endblock %}
 
 {% block scripts %}
+  {{ block.super }}
   {% if beta %}
     <script src="{% static 'js/common.js' %}" defer></script>
     <script src="{% static 'js/filingcabinet.js' %}" defer></script>
