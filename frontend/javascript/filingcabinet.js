@@ -7,6 +7,7 @@ Vue.config.productionTip = false
 function createDocumentViewer (selector, props) {
   /* eslint-disable no-new */
   let DocumentClass = Vue.extend(Document)
+  props.preview = true
   let instance = new DocumentClass({
     propsData: props
   })

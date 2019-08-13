@@ -12,6 +12,7 @@ Document = get_document_model()
 
 class DocumentView(DetailView):
     model = Document
+    PREVIEW_PAGE_COUNT = 10
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -20,8 +21,26 @@ class DocumentView(DetailView):
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        num_pages = self.object.num_pages
+        try:
+            start_from = int(self.request.GET.get('page', 1))
+            if start_from > num_pages:
+                raise ValueError
+        except ValueError:
+            start_from = 1
+        pages = self.object.page_set.all()
+        pages = pages.filter(number__gte=start_from)[:self.PREVIEW_PAGE_COUNT]
+        ctx['pages'] = pages
+        ctx['beta'] = (
+            self.request.GET.get('beta') is not None and
+            self.request.user.is_staff
+        )
+        return ctx
+
     def get_queryset(self):
-        qs = super(DocumentView, self).get_queryset()
+        qs = super().get_queryset()
         return qs.filter(public=True)
 
 

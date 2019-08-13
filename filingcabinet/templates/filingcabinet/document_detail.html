@@ -5,6 +5,7 @@
 {% load markup %}
 
 {% block body %}
+{% block document_top %}
 <div class="container mt-3 mb-5">
     <h2>{{ object.title }}</h2>
     {% if object.description %}
@@ -13,11 +14,31 @@
       </p>
     {% endif %}
 </div>
+{% endblock document_top %}
 
-<div class="container-sm-full">
-  <iframe src="{% static 'filingcabinet/viewer/web/viewer.html' %}?file={{ object.get_file_url | urlencode }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
-</div>
+{% block document_main %}
+  {% if beta %}
+  <div class="container">
+    <div class="document" data-fcdocument="{% url 'api:document-detail' pk=object.pk %}">
+    {% for page in pages %}
+        <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
+          <pre class="sr-only">{{ page.content }}</pre>
+          <div class="ml-auto mr-auto mt-5">
+            <div class="spinner-grow" role="status">
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% else %}
+    <div class="container-sm-full">
+      <iframe src="{% static 'filingcabinet/viewer/web/viewer.html' %}?file={{ object.get_file_url | urlencode }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+    </div>
+  {% endif %}
+{% endblock document_main %}
 
+{% block document_footer %}
 <div class="container mb-5">
   <div class="text-right">
       <small>
@@ -28,4 +49,12 @@
       </small>
   </div>
 </div>
+{% endblock document_footer %}
+{% endblock %}
+
+{% block scripts %}
+  {% if beta %}
+    <script src="{% static 'js/common.js' %}" defer></script>
+    <script src="{% static 'js/filingcabinet.js' %}" defer></script>
+  {% endif %}
 {% endblock %}

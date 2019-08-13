@@ -1,14 +1,16 @@
 <template>
-  <div>
-    <div v-if="document" class="pages">
+  <div class="document">
+    <div v-if="showPreview">
+      
+    </div>
+    <div v-else-if="document" class="">
       <RecycleScroller
         class="scroller"
         :items="pages"
-        :item-size="32"
         page-mode
         key-field="number"
+        sizeField="size"
         :emitUpdate="true"
-        @update="log"
         v-slot="{ item }"
       >
         <document-page
@@ -32,18 +34,31 @@ import {getData} from '../lib/utils.js'
 
 export default {
   name: 'document',
-  props: ['documentUrl'],
+  props: {
+    documentUrl: {
+      type: String
+    },
+    preview: {
+      type: Boolean,
+      default: true
+    }
+  },
   components: {
     RecycleScroller, DynamicScroller, DynamicScrollerItem,
     DocumentPage
   },
   data () {
     return {
-      document: null
+      document: null,
+      showPreview: false
     }
   },
   created () {
     getData(this.documentUrl).then((doc) => {
+      doc.pages = doc.pages.map(p => {
+        p.size = Math.ceil(700 / p.width * p.height)
+        return p
+      })
       this.document = doc
     })
   },
@@ -55,18 +70,15 @@ export default {
       if (this.document !== null) {
         return this.document.pages
       }
-    }
-  },
-  methods: {
-    log (args) {
-      console.log(args)
+    },
+    previewPages () {
+
     }
   }
 }
 </script>
 
 <style lang="scss">
-.scroller {
-  height: 100%;
-}
+@import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
 </style>

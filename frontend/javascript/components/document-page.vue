@@ -1,6 +1,9 @@
 <template>
-  <div class="page">
-    <img :src="imageUrl" alt="" class="img-fluid page-image"/>
+  <div class="page" :style="">
+    <img v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
+    <div v-if="!imageLoaded" class="spinner-grow" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
   </div>
 </template>
 
@@ -9,10 +12,16 @@
 export default {
   name: 'document-page',
   props: ['page'],
-  components: {
-
+  data () {
+    return {
+      imageLoaded: false
+    }
   },
-  created () {
+  beforeDestroy () {
+    if (!this.imageLoaded) {
+      // Cancel image download on destroy
+      this.$refs.image.setAttribute('src', "")
+    }
   },
   computed: {
     i18n () {
@@ -21,6 +30,11 @@ export default {
     imageUrl () {
       return this.page.image_url.replace(/\{size\}/, 'normal')
     }
+  },
+  methods: {
+    onImageLoad () {
+      this.imageLoaded = true
+    }
   }
 }
 </script>
@@ -28,13 +42,6 @@ export default {
 <style lang="scss">
 .page {
   border: 1px solid black;
-  height: 100px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-
-}
-.page-image {
-  height: 100px;
+  text-align: center;
 }
 </style>
