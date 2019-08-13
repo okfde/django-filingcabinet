@@ -20,7 +20,7 @@ class PageSerializer(serializers.HyperlinkedModelSerializer):
         model = Page
         fields = (
             'document', 'number', 'content',
-            'image_url'
+            'image_url', 'width', 'height'
         )
 
     def get_image_url(self, obj):
