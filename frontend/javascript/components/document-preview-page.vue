@@ -1,5 +1,5 @@
 <template>
-  <div :id="pageId" class="page">
+  <a :href="pageAnchor" class="preview-page" @click.prevent="navigate">
     <img v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
     <div v-if="!imageLoaded" class="spinner-grow" role="status">
       <span class="sr-only">Loading...</span>
@@ -7,13 +7,13 @@
     <p>
       {{ page.number }}
     </p>
-  </div>
+  </a>
 </template>
 
 <script>
 
 export default {
-  name: 'document-page',
+  name: 'document-preview-page',
   props: ['page'],
   data () {
     return {
@@ -31,26 +31,33 @@ export default {
       return this.config.i18n
     },
     imageUrl () {
-      return this.page.image_url.replace(/\{size\}/, 'normal')
+      return this.page.image_url.replace(/\{size\}/, 'small')
     },
-    pageId () {
-      return `page-${this.page.number}`
+    pageAnchor () {
+      return `#page-${this.page.number}`
     }
   },
   methods: {
     onImageLoad () {
       this.imageLoaded = true
+    },
+    navigate () {
+      this.$emit('navigate', this.page.number)
     }
   }
 }
 </script>
 
-<style lang="scss">
-.page {
+<style lang="scss" scoped>
+.preview-page {
+  display: block;
   text-align: center;
 }
-.page-image {
+.preview-page .page-image {
   border: 1px solid #aaa;
-  margin-bottom: 0.25rem;
+  margin: 0 auto;
+}
+.preview-page p {
+  text-align: center;
 }
 </style>
