@@ -44,6 +44,17 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
 class PageAdmin(admin.ModelAdmin):
     raw_id_fields = ('document',)
+    search_fields = ('document__title',)
+    list_filter = ('number',)
+    list_display = ('show_title', 'number')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.select_related('document')
+        return qs
+
+    def show_title(self, obj):
+        return obj.document.title
 
 
 class PageAnnotationAdmin(admin.ModelAdmin):
