@@ -28,6 +28,8 @@ try:
 except ImportError:
     pdflib = None
 
+from .utils import chunks
+
 
 OFFICE_FILETYPES = (
     'application/msexcel',
@@ -72,19 +74,17 @@ class PDFProcessor(object):
             'title': doc_info.title
         }
 
-    def get_images(self, pages=None, resolution=300):
-        if pages is None:
-            pages = range(self.num_pages)
-        for page_no in pages:
-            with self.get_image(page_no, resolution=resolution) as img:
-                yield img
-
-    def get_all_images(self, resolution=300):
+    def get_images(self, pages=None, resolution=300, chunk_size=20):
         white = wand.color.Color('#fff')
-        with get_images_from_pdf(self.filename, dpi=resolution) as images:
-            for i, image_filename in enumerate(images):
-                with Image(filename=image_filename, background=white) as img:
-                    yield i + 1, img
+        if pages is None:
+            pages = list(range(1, self.num_pages + 1))
+        images = get_images_from_pdf_chunked(
+            self.filename, pages,
+            chunk_size, dpi=resolution
+        )
+        for page_number, image_filename in images:
+            with Image(filename=image_filename, background=white) as img:
+                yield page_number, img
 
     def get_text_for_page(self, page_no, image=None):
         text = self._get_text_for_page(page_no)
@@ -370,6 +370,13 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     return writer.getvalue()
 
 
+def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300):
+    for pages in chunks(pages, chunk_size):
+        with get_images_from_pdf(
+                filename, pages=pages, dpi=dpi) as images:
+            yield from images
+
+
 @contextlib.contextmanager
 def get_images_from_pdf(filename, pages=None, dpi=300, timeout=5 * 60):
     try:
@@ -408,7 +415,13 @@ def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
 
     images = glob.glob(temp_out + '-*.png')
     images.sort()
-    return images
+    return [
+        (get_page_number(filename), filename) for filename in images
+    ]
+
+
+def get_page_number(filename):
+    return int(filename.rsplit('-', 1)[1].split('.')[0])
 
 
 def get_continuous_pages(pages):

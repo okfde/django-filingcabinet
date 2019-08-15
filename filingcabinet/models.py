@@ -8,7 +8,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
-from django.core.files.base import ContentFile
+
 from django.conf import settings
 
 from taggit.models import TaggedItemBase
@@ -19,51 +19,10 @@ from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL
 )
-from .pdf_utils import PDFProcessor, crop_image
 
 
 class DocumentManager(models.Manager):
-    def create_pages_from_pdf(self, doc):
-        config = {
-            'TESSERACT_DATA_PATH': settings.TESSERACT_DATA_PATH
-        }
-        pdf_path = doc.get_file_path()
-
-        pdf = PDFProcessor(pdf_path, language=doc.language, config=config)
-
-        doc.num_pages = pdf.num_pages
-        doc.file_size = os.path.getsize(pdf_path)
-        doc.save()
-
-        for page_no, image in pdf.get_all_images():
-            text = pdf.get_text_for_page(page_no, image)
-            page, created = Page.objects.update_or_create(
-                document=doc,
-                number=page_no,
-                defaults={'content': text}
-            )
-            dims = image.size
-            page.width = dims[0]
-            page.height = dims[1]
-            if page.image:
-                page.image.delete(save=False)
-
-            page.image.save(
-                'page.png',
-                ContentFile(image.make_blob('png')),
-                save=False
-            )
-            for size_name, width in Page.SIZES:
-                image.transform(resize='{}x'.format(width))
-                field_file = getattr(page, 'image_%s' % size_name)
-                if field_file:
-                    field_file.delete(save=False)
-                field_file.save(
-                    'page.png',
-                    ContentFile(image.make_blob('png')),
-                    save=False
-                )
-            page.save()
+    pass
 
 
 def get_document_path(instance, filename):
@@ -168,6 +127,12 @@ class AbstractDocument(models.Model):
             return False
         return True
 
+    def get_progress(self):
+        if self.num_pages:
+            pages_done = self.page_set.filter(pending=False).count()
+            return int(pages_done / self.num_pages * 100)
+        return None
+
     def get_file_path(self):
         if self.pdf_file:
             return self.pdf_file.path
@@ -196,6 +161,24 @@ class AbstractDocument(models.Model):
         return settings.MEDIA_URL + self.get_page_image_url_template().format(
             page=1, size='small'
         )
+
+    def get_serializer_class(self, detail=False):
+        from .api_views import DocumentSerializer, DocumentDetailSerializer
+
+        if detail:
+            return DocumentDetailSerializer
+        return DocumentSerializer
+
+    def process_document(self, reprocess=True):
+        from .tasks import process_document_task
+
+        self.pending = True
+        self.save()
+
+        if reprocess:
+            Page.objects.filter(document=self).update(pending=True)
+
+        process_document_task.delay(self.id)
 
 
 class Document(AbstractDocument):
@@ -309,18 +292,12 @@ class PageAnnotation(models.Model):
         return '%s (%s)' % (self.title, self.page)
 
     def save(self, *args, **kwargs):
+        from .services import make_page_annotation
+
         image_cropped = kwargs.pop('image_cropped', False)
         res = super(PageAnnotation, self).save(*args, **kwargs)
         if not image_cropped and self.valid_rect():
-            image_bytes = crop_image(
-                self.page.image.path,
-                self.left, self.top, self.width, self.height
-            )
-            self.image.save(
-                'page_annotation.png',
-                ContentFile(image_bytes),
-                save=False
-            )
+            make_page_annotation(self)
             return self.save(image_cropped=True)
         return res
 
