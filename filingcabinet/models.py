@@ -251,6 +251,7 @@ class Page(models.Model):
         upload_to=UPLOAD_FUNCS['small'])
 
     class Meta:
+        unique_together = ('document', 'number')
         ordering = ('number',)
 
     def __str__(self):
