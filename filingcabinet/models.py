@@ -113,6 +113,7 @@ class AbstractDocument(models.Model):
         storage=OverwriteStorage(),
         upload_to=get_document_path, blank=True)
     file_size = models.BigIntegerField(null=True)
+    pending = models.BooleanField(default=False)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -226,6 +227,7 @@ class Page(models.Model):
         on_delete=models.CASCADE
     )
     number = models.IntegerField(default=1)
+    pending = models.BooleanField(default=False)
 
     width = models.IntegerField(null=True)
     height = models.IntegerField(null=True)
