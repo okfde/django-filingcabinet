@@ -30,6 +30,8 @@ except ImportError:
 
 from .utils import chunks
 
+logger = logging.getLogger(__name__)
+
 
 OFFICE_FILETYPES = (
     'application/msexcel',
@@ -83,6 +85,7 @@ class PDFProcessor(object):
             chunk_size, dpi=resolution
         )
         for page_number, image_filename in images:
+            logger.info('Generated page %s: %s', page_number, image_filename)
             with Image(filename=image_filename, background=white) as img:
                 yield page_number, img
 
@@ -167,7 +170,8 @@ def convert_to_pdf(filepath, binary_name=None, construct_call=None,
         )
         return output_bytes
     except Exception as err:
-        logging.error("Error during Doc to PDF conversion: %s", err)
+        logger.error("Error during Doc to PDF conversion: %s", err)
+        logger.exception(err)
     finally:
         shutil.rmtree(outpath)
     return None
@@ -185,7 +189,8 @@ def convert_images_to_ocred_pdf(filenames, language='en', instructions=None):
         return run_ocr(output_file, language=language, timeout=180)
 
     except Exception as err:
-        logging.error("Error during convert images to ocred pdf: %s", err)
+        logger.error("Error during convert images to ocred pdf: %s", err)
+        logger.exception(err)
         return None
     finally:
         # Delete all temporary files
@@ -215,7 +220,8 @@ def run_ocr(filename, language=None, binary_name='ocrmypdf', timeout=50):
         )
         return output_bytes
     except Exception as err:
-        logging.error("Error during PDF OCR: %s", err)
+        logger.error("Error during PDF OCR: %s", err)
+        logger.exception(err)
     finally:
         shutil.rmtree(outpath)
     return None
@@ -225,7 +231,7 @@ def shell_call(arguments, outpath, output_file=None, timeout=50):
     env = dict(os.environ)
     env.update({'HOME': outpath})
 
-    logging.info("Running: %s", arguments)
+    logger.info("Running: %s", arguments)
     out, err = '', ''
     p = None
     try:
@@ -266,7 +272,8 @@ def run_command_overwrite(filename, argument_func, timeout=50):
             f.write(output_bytes)
         return filename
     except Exception as err:
-        logging.error("Error during command overwrite %s", err)
+        logger.error("Error during command overwrite %s", err)
+        logger.exception(err)
         return None
     finally:
         # Delete all temporary files
@@ -383,7 +390,8 @@ def get_images_from_pdf(filename, pages=None, dpi=300, timeout=5 * 60):
         temp_dir = tempfile.mkdtemp()
         yield run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout)
     except Exception as err:
-        logging.error("Error during command overwrite %s", err)
+        logger.error("Error during command overwrite %s", err)
+        logger.exception(err)
     finally:
         # Delete all temporary files
         shutil.rmtree(temp_dir)

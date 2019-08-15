@@ -1,10 +1,13 @@
 import os
+import logging
 
 from django.core.files.base import ContentFile
 from django.conf import settings
 
 from .models import Page
 from .pdf_utils import PDFProcessor, crop_image
+
+logger = logging.getLogger(__name__)
 
 
 def get_pdf_processor(doc):
@@ -18,6 +21,7 @@ def get_pdf_processor(doc):
 def process_document(doc):
     from .tasks import process_pages_task
 
+    logger.info('Processing document %s', doc.id)
     pdf = get_pdf_processor(doc)
     doc.num_pages = pdf.num_pages
     doc.file_size = os.path.getsize(doc.get_file_path())
@@ -32,6 +36,11 @@ def process_document(doc):
 
     missing_pages = list(all_pages - set(existing_pages))
     missing_pages.sort()
+
+    logger.info(
+        'Queueing processing of %s pages: %s',
+        len(missing_pages), missing_pages
+    )
 
     process_pages_task.delay(
         doc.id, page_numbers=missing_pages, task_page_limit=100
@@ -49,20 +58,27 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
     else:
         process_page_numbers = page_numbers[:task_page_limit]
 
+    logger.info('Processing %s pages of doc %s', process_page_numbers, doc.id)
     pdf = get_pdf_processor(doc)
 
     for page_number, image in pdf.get_images(pages=process_page_numbers):
         process_page(doc, pdf, page_number, image)
 
+    logger.info(
+        'Processing %s pages done of doc %s',
+        process_page_numbers, doc.id
+    )
     # Check if doc is done
     pending_pages = Page.objects.filter(document=doc, pending=True).count()
     if pending_pages == 0:
+        logger.info('Processing pages of doc %s complete', doc.id)
         doc.pending = False
         doc.save()
 
     if task_page_limit:
         remaining = page_numbers[task_page_limit:]
         if remaining:
+            logger.info('Queueing more pages of doc %s: %s', doc.id, remaining)
             process_pages_task.delay(
                 doc.id, page_numbers=remaining,
                 task_page_limit=task_page_limit
@@ -70,6 +86,7 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
 
 
 def process_page(doc, pdf, page_number, image):
+    logger.info('Getting text for page %s of doc %s', page_number, doc.id)
     text = pdf.get_text_for_page(page_number, image)
     dims = image.size
 
@@ -91,10 +108,11 @@ def process_page(doc, pdf, page_number, image):
         page.content = text
     page.width = dims[0]
     page.height = dims[1]
-
+    logger.info('Making thumbnails page %s of doc %s', page_number, doc.id)
     make_thumbnails(page, image)
     page.pending = False
     page.save()
+    logger.info('Processing page %s of doc %s complete', page_number, doc.id)
 
 
 def make_thumbnails(page, image):
