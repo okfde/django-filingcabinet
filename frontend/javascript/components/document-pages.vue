@@ -6,7 +6,6 @@
       page-mode
       key-field="number"
       sizeField="normalSize"
-      :emitUpdate="true"
       v-slot="{ item }"
     >
       <document-page
@@ -46,4 +45,7 @@ export default {
 <style lang="scss">
 @import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
+.document-pages {
+  padding: 1rem 0;
+}
 </style>

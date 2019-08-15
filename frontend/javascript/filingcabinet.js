@@ -17,7 +17,9 @@ function createDocumentViewer (selector, props) {
 
 Array.from(document.querySelectorAll('[data-fcdocument]')).forEach(el => {
   createDocumentViewer(el, {
-    documentUrl: el.dataset.fcdocument
+    documentUrl: el.dataset.fcdocumenturl,
+    documentPreview: JSON.parse(el.dataset.fcdocument),
+    page: parseInt(el.dataset.fcpage, 10)
   })
 })
 

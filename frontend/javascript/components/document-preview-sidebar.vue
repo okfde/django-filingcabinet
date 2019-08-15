@@ -43,7 +43,10 @@ export default {
   },
   methods: {
     navigate (number) {
-      this.$emit('navigate', number)
+      this.$emit('navigate', {
+        number,
+        source: 'sidebar'
+      })
     }
   }
 }
@@ -55,7 +58,7 @@ export default {
 .document-preview-pages {
   height: 100vh;
   overflow: auto;
-  top: 0;
+  top: 50px;
   position: sticky;
 }
 </style>

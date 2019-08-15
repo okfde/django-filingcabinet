@@ -6,36 +6,18 @@
 
 {% block body %}
 {% block document_top %}
-<div class="container mt-3 mb-5">
+  <div class="container mt-3 mb-5">
     <h2>{{ object.title }}</h2>
     {% if object.description %}
       <p>
          {{ object.description|markdown }} 
       </p>
     {% endif %}
-</div>
+  </div>
 {% endblock document_top %}
 
 {% block document_main %}
-  {% if beta %}
-  <div class="container">
-    <div class="document" data-fcdocument="{% url 'api:document-detail' pk=object.pk %}">
-    {% for page in pages %}
-        <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
-          <pre class="sr-only">{{ page.content }}</pre>
-          <div class="ml-auto mr-auto mt-5">
-            <div class="spinner-grow" role="status">
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-  {% else %}
-    <div class="container-sm-full">
-      <iframe src="{% static 'filingcabinet/viewer/web/viewer.html' %}?file={{ object.get_file_url | urlencode }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
-    </div>
-  {% endif %}
+  {% include "filingcabinet/_document_viewer.html" with object=object beta=beta %}
 {% endblock document_main %}
 
 {% block document_footer %}
@@ -54,6 +36,9 @@
 
 {% block css %}
   {{ block.super }}
+  {% if object.pending %}
+    <meta http-equiv="refresh" content="30">
+  {% endif %}
   {% if beta %}
     <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
   {% endif %}

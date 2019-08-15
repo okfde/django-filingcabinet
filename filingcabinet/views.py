@@ -1,13 +1,16 @@
+import json
+
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import DetailView
 from django.urls import reverse
 
-from . import get_document_model
-
+from . import get_document_model, get_documentcollection_model
 from .models import Page
+from .api_views import PageSerializer
 
 Document = get_document_model()
+DocumentCollection = get_documentcollection_model()
 
 
 class DocumentView(DetailView):
@@ -16,7 +19,7 @@ class DocumentView(DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.object.slug and self.kwargs.get('slug') is None:
+        if self.object.slug != self.kwargs.get('slug', ''):
             return redirect(self.object)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
@@ -37,6 +40,14 @@ class DocumentView(DetailView):
             self.request.GET.get('beta') is not None and
             self.request.user.is_staff
         )
+        serializer_klass = self.object.get_serializer_class()
+        api_ctx = {
+            'request': self.request
+        }
+        data = serializer_klass(self.object, context=api_ctx).data
+        data['pages'] = PageSerializer(pages, many=True, context=api_ctx).data
+        ctx['page'] = start_from
+        ctx['document_data'] = json.dumps(data)
         return ctx
 
     def get_queryset(self):

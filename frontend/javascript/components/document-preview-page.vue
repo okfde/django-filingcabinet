@@ -1,6 +1,6 @@
 <template>
   <a :href="pageAnchor" class="preview-page" @click.prevent="navigate">
-    <img v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
+    <img v-if="page.image_url" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
     <div v-if="!imageLoaded" class="spinner-grow" role="status">
       <span class="sr-only">Loading...</span>
     </div>
@@ -21,7 +21,7 @@ export default {
     }
   },
   beforeDestroy () {
-    if (!this.imageLoaded) {
+    if (this.page.image_url && !this.imageLoaded) {
       // Cancel image download on destroy
       this.$refs.image.setAttribute('src', "")
     }
@@ -57,7 +57,9 @@ export default {
   border: 1px solid #aaa;
   margin: 0 auto;
 }
-.preview-page p {
+.preview-page p, .preview-page p:hover {
   text-align: center;
+  color: #fff;
+  text-decoration: none;
 }
 </style>

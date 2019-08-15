@@ -119,3 +119,18 @@ class DocumentViewSet(mixins.ListModelMixin,
         return get_document_model().objects.filter(
             Q(public=True) | Q(user=self.request.user)
         )
+
+
+class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = PageSerializer
+
+    def get_queryset(self):
+        document_id = self.request.query_params.get('document', '')
+        Document = get_document_model()
+        try:
+            doc = Document.objects.filter(
+                Q(public=True) | Q(user=self.request.user)
+            ).get(pk=document_id)
+        except (ValueError, Document.DoesNotExist):
+            return Page.objects.none()
+        return Page.objects.filter(document=doc)

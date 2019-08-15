@@ -1,0 +1,36 @@
+{% load static %}
+{% load i18n %}
+
+{% if object.pending %}
+  <div class="container">
+    <p>
+      {% trans "This document is still being processed..." %}
+    </p>
+    {% with progress=object.get_progress %}
+      <div class="progress">
+        <div class="progress-bar {% if not progress %}progress-bar-striped progress-bar-animated{% endif %}" role="progressbar" style="width: {% if progress %}{{ progress }}{% else %}100{% endif %}%" aria-valuenow="{% if progress %}{{ progress }}{% else %}0{% endif %}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    {% endwith %}
+  </div>
+
+{% else %}
+  {% if beta %}
+    <div class="container">
+      <div class="document" data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}" data-fcdocument="{{ document_data }}" data-fcpage="{{ page }}">
+      {% for page in pages %}
+          <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
+            <pre class="sr-only">{{ page.content }}</pre>
+            <div class="ml-auto mr-auto mt-5">
+              <div class="spinner-grow" role="status">
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="container-sm-full">
+      <iframe src="{% static 'filingcabinet/viewer/web/viewer.html' %}?file={{ object.get_file_url | urlencode }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+    </div>
+  {% endif %}
+{% endif %}
