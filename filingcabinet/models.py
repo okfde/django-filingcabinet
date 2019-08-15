@@ -233,6 +233,8 @@ class Page(models.Model):
     height = models.IntegerField(null=True)
 
     content = models.TextField(blank=True)
+    corrected = models.BooleanField(default=False)
+
     image = models.ImageField(
         max_length=255,
         storage=OverwriteStorage(),
