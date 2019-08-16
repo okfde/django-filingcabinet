@@ -23,7 +23,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
     def get_inline_instances(self, request, obj=None):
         ''' Only show inline for docs with fewer than 31 pages'''
-        if obj.num_pages and obj.num_pages <= 30:
+        if obj is not None and obj.num_pages and obj.num_pages <= 30:
             return super().get_inline_instances(request, obj=obj)
         return []
 
