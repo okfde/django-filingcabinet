@@ -116,9 +116,10 @@ class DocumentViewSet(mixins.ListModelMixin,
             return DocumentSerializer
 
     def get_queryset(self):
-        return get_document_model().objects.filter(
-            Q(public=True) | Q(user=self.request.user)
-        )
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            cond |= Q(user=self.request.user)
+        return get_document_model().objects.filter(cond)
 
 
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -127,10 +128,11 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
         Document = get_document_model()
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            cond |= Q(user=self.request.user)
         try:
-            doc = Document.objects.filter(
-                Q(public=True) | Q(user=self.request.user)
-            ).get(pk=document_id)
+            doc = Document.objects.filter(cond).get(pk=document_id)
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
         return Page.objects.filter(document=doc)
