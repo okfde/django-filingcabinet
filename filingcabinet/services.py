@@ -19,19 +19,22 @@ def get_pdf_processor(doc):
 
 
 def process_document(doc):
-    from .tasks import process_pages_task
-
     logger.info('Processing document %s', doc.id)
     pdf = get_pdf_processor(doc)
     doc.num_pages = pdf.num_pages
     doc.file_size = os.path.getsize(doc.get_file_path())
     doc.save()
 
+    queue_missing_pages(doc)
+
+
+def queue_missing_pages(doc):
+    from .tasks import process_pages_task
+
     all_pages = set(range(1, doc.num_pages + 1))
 
     existing_pages = Page.objects.filter(
-        document=doc,
-        pending=False
+        document=doc, pending=False
     ).values_list('number', flat=True)
 
     missing_pages = list(all_pages - set(existing_pages))
@@ -43,15 +46,20 @@ def process_document(doc):
     )
 
     process_pages_task.delay(
-        doc.id, page_numbers=missing_pages, task_page_limit=100
+        doc.id, page_numbers=missing_pages, task_page_limit=20
     )
 
 
 def process_pages(doc, page_numbers=None, task_page_limit=None):
-    from .tasks import process_pages_task
-
     if page_numbers is None:
         page_numbers = list(range(1, doc.num_pages + 1))
+
+    # Remove existing non-pending page numbers
+    existing_pages = Page.objects.filter(
+        document=doc, pending=False
+    ).values_list('number', flat=True)
+    page_numbers = list(set(page_numbers) - set(existing_pages))
+    page_numbers.sort()
 
     if task_page_limit is None:
         process_page_numbers = page_numbers
@@ -69,20 +77,14 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
         process_page_numbers, doc.id
     )
     # Check if doc is done
-    pending_pages = Page.objects.filter(document=doc, pending=True).count()
-    if pending_pages == 0:
+    pending_pages = Page.objects.filter(document=doc, pending=True)
+    pending_pages_count = pending_pages.count()
+    if pending_pages_count == 0:
         logger.info('Processing pages of doc %s complete', doc.id)
         doc.pending = False
         doc.save()
-
-    if task_page_limit:
-        remaining = page_numbers[task_page_limit:]
-        if remaining:
-            logger.info('Queueing more pages of doc %s: %s', doc.id, remaining)
-            process_pages_task.delay(
-                doc.id, page_numbers=remaining,
-                task_page_limit=task_page_limit
-            )
+    else:
+        queue_missing_pages(doc)
 
 
 def process_page(doc, pdf, page_number, image):

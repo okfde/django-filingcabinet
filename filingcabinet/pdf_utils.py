@@ -66,6 +66,8 @@ class PDFProcessor(object):
         try:
             return PdfFileReader(filename)
         except (PdfReadError, ValueError, OSError) as e:
+            logger.error('Could not read PDF %s', filename)
+            logger.exception(e)
             pass
         pdf_file_name = rewrite_pdf_in_place(filename)
         return PdfFileReader(pdf_file_name)

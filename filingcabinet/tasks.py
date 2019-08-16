@@ -6,7 +6,7 @@ from .services import process_document, process_pages
 Document = get_document_model()
 
 
-@shared_task
+@shared_task(acks_late=True, time_limit=5 * 60)
 def process_document_task(doc_pk):
     try:
         doc = Document.objects.get(pk=doc_pk)
@@ -15,7 +15,7 @@ def process_document_task(doc_pk):
     process_document(doc)
 
 
-@shared_task
+@shared_task(acks_late=True, time_limit=5 * 60)
 def process_pages_task(doc_pk, page_numbers=None, task_page_limit=None):
     try:
         doc = Document.objects.get(pk=doc_pk)
