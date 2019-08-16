@@ -45,6 +45,9 @@ def queue_missing_pages(doc):
         len(missing_pages), missing_pages
     )
 
+    if not missing_pages:
+        return
+
     process_pages_task.delay(
         doc.id, page_numbers=missing_pages, task_page_limit=20
     )
