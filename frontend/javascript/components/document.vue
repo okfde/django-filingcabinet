@@ -49,6 +49,7 @@ export default {
   },
   data () {
     let doc = this.documentPreview
+    this.pageTemplate = decodeURI(this.documentPreview.page_template)
     doc.pages = this.processPages([
       ...doc.pages,
       ...Array(doc.num_pages - doc.pages.length)
@@ -113,7 +114,7 @@ export default {
         let ratio = p.height / p.width
         p.normalSize = Math.ceil(normalWidth * ratio) + 60
         p.smallSize = Math.ceil(smallWidth * ratio) + 40
-        p.image_url = this.documentPreview.page_template.replace(/\{page\}/, p.number)
+        p.image_url = this.pageTemplate.replace(/\{page\}/, p.number)
         return p
       })
     },
