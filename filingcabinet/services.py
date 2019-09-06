@@ -90,9 +90,8 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
         process_page_numbers, doc.id
     )
     # Check if doc is done
-    pending_pages = Page.objects.filter(document=doc, pending=True)
-    pending_pages_count = pending_pages.count()
-    if pending_pages_count == 0:
+    done_pages = Page.objects.filter(document=doc, pending=False).count()
+    if done_pages == doc.num_pages:
         logger.info('Processing pages of doc %s complete', doc.id)
         doc.pending = False
         doc.save()
