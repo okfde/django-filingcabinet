@@ -1,5 +1,3 @@
-from django.urls import reverse
-
 from crossdomainmedia import CrossDomainMediaAuth
 
 

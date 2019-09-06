@@ -171,7 +171,7 @@ class AbstractDocument(models.Model):
             if self.has_original:
                 return self.original.get_file_url()
             return ''
-        uid = str(self.obj.uid)
+        uid = str(self.uid)
         return reverse(
             'filingcabinet-auth_document',
             kwargs={
