@@ -31,7 +31,7 @@ else:
     MEDIA_PATH = MEDIA_PATH[1:]
 
 
-urlpatterns += [
+document_media_urlpatterns = [
     url(r'^%s%s/[a-z0-9]{2}/[a-z0-9]{2}/[a-z0-9]{2}/(?P<uuid>[a-z0-9]{32})/(?P<filename>.+)' % (
         MEDIA_PATH, settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX
     ), DocumentFileDetailView.as_view(), name='filingcabinet-auth_document')

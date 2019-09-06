@@ -21,7 +21,9 @@ class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
     def has_perm(self, request):
         ctx = self.context
         obj = ctx['object']
-        return obj.user == request.user
+        if obj.user == request.user:
+            return True
+        return super().has_perm(request)
 
     def get_auth_url(self):
         '''
@@ -44,5 +46,6 @@ class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
         '''
         Return the URL path relative to MEDIA_ROOT for debug mode
         '''
-        obj = self.context['object']
-        return obj.get_file_name()
+        ctx = self.context
+        obj = ctx['object']
+        return obj.get_file_name(filename=ctx['filename'])

@@ -130,6 +130,26 @@ class DocumentJSONView(DetailView):
         }
 
 
+class DocumentCollectionView(DetailView):
+    model = DocumentCollection
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.slug and self.kwargs.get('slug') is None:
+            return redirect(self.object)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(public=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['documents'] = self.object.documents.all()
+        return context
+
+
 class DocumentFileDetailView(CrossDomainMediaMixin, DetailView):
     '''
     Add the CrossDomainMediaMixin
@@ -139,7 +159,7 @@ class DocumentFileDetailView(CrossDomainMediaMixin, DetailView):
 
     def get_object(self):
         return get_object_or_404(
-            Document, uuid=self.kwargs['uuid']
+            Document, uid=self.kwargs['uuid']
         )
 
     def get_context_data(self, **kwargs):

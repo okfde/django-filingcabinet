@@ -10,7 +10,6 @@ from django.core.files.base import File
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
-
 from django.conf import settings
 
 from taggit.models import TaggedItemBase
@@ -157,8 +156,13 @@ class AbstractDocument(models.Model):
             return self.original.get_file_path()
         return ''
 
-    def get_file_name(self):
-        return self.get_file_path().replace(settings.MEDIA_ROOT, '')
+    def get_file_name(self, filename=None):
+        media_path = self.get_file_path().replace(settings.MEDIA_ROOT, '')
+        if filename is None:
+            return media_path
+        return '%s/%s' % (
+            media_path.rsplit('/', 1)[0], filename
+        )
 
     def _move_file(self):
         """
