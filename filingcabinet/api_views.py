@@ -45,8 +45,8 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         model = get_document_model()
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
-            'num_pages',
-            'public', 'file_url', 'cover_image', 'page_template'
+            'num_pages', 'public', 'pending',
+            'file_url', 'cover_image', 'page_template'
         )
 
 
