@@ -4,7 +4,7 @@ from django.utils.translation import pgettext_lazy
 
 from .views import (
     DocumentView, DocumentDCView, DocumentJSONView, PageTextView,
-    DocumentCollectionView, DocumentFileDetailView
+    DocumentFileDetailView
 )
 
 app_name = 'filingcabinet'
