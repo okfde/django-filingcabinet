@@ -53,11 +53,65 @@ TESSERACT_LANGUAGE = {
 }
 
 
-class PDFProcessor(object):
-    def __init__(self, filename, language=None, config=None):
-        self.filename = filename
+class PDFException(Exception):
+    def __init__(self, exc, reason):
+        self.exc = exc
+        self.reason = reason
 
-        self.pdf_reader = self.get_pdf_reader(filename)
+
+def try_reading_pdf(pdf_file, password=None):
+    try:
+        pdf_reader = PdfFileReader(pdf_file, strict=False)
+    except (PdfReadError, ValueError, OSError) as e:
+        raise PDFException(e, 'rewrite')
+
+    if pdf_reader.isEncrypted:
+        raise PDFException(None, 'decrypt')
+
+    try:
+        # Try reading number of pages
+        pdf_reader.getNumPages()
+    except KeyError as e:  # catch KeyError '/Pages'
+        raise PDFException(e, 'rewrite')
+    except PdfReadError as e:
+        raise PDFException(e, 'decrypt')
+    return pdf_reader
+
+
+def get_readable_pdf(pdf_file, copy_func, password=None):
+    tries = 0
+    while True:
+        try:
+            pdf_reader = try_reading_pdf(pdf_file, password=password)
+            return pdf_file, pdf_reader
+        except PDFException as e:
+            if tries == 0 and copy_func:
+                pdf_file = copy_func(pdf_file)
+            tries += 1
+            if tries > 2:
+                raise Exception('PDF Redaction Error')
+            if e.reason == 'rewrite':
+                next_pdf_file = rewrite_pdf_in_place(
+                    pdf_file, password=password
+                )
+                if next_pdf_file is None:
+                    next_pdf_file = rewrite_hard_pdf_in_place(
+                        pdf_file, password=password
+                    )
+            elif e.reason == 'decrypt':
+                next_pdf_file = decrypt_pdf_in_place(
+                    pdf_file, password=password
+                )
+            if next_pdf_file is None:
+                raise Exception('PDF Rewrite Error')
+            pdf_file = next_pdf_file
+
+
+class PDFProcessor(object):
+    def __init__(self, filename, copy_func=None, language=None, config=None):
+        filename, pdf_reader = get_readable_pdf(filename, copy_func)
+        self.filename = filename
+        self.pdf_reader = pdf_reader
         self.num_pages = self.pdf_reader.getNumPages()
         self.language = language
         self.config = config or {}
@@ -67,7 +121,6 @@ class PDFProcessor(object):
             return PdfFileReader(filename)
         except (PdfReadError, ValueError, OSError) as e:
             logger.error('Could not read PDF %s', filename)
-            logger.exception(e)
             pass
         pdf_file_name = rewrite_pdf_in_place(filename)
         return PdfFileReader(pdf_file_name)

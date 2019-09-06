@@ -1,10 +1,12 @@
-import os
-import uuid
 import functools
+import os
+import shutil
+import uuid
 
 from django.conf.locale import LANG_INFO
 from django.utils import timezone
 from django.db import models
+from django.core.files.base import File
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
@@ -33,7 +35,10 @@ def get_document_path(instance, filename):
     hex_name_46 = hex_name[4:6]
     name, ext = os.path.splitext(filename)
     slug = slugify(name)
-    return os.path.join('docs', hex_name_02, hex_name_24,
+    prefix = settings.FILINGCABINET_MEDIA_PUBLIC_PREFIX
+    if not instance.public:
+        prefix = settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX
+    return os.path.join(prefix, hex_name_02, hex_name_24,
                         hex_name_46, hex_name, slug + ext)
 
 
@@ -103,8 +108,20 @@ class AbstractDocument(models.Model):
         verbose_name_plural = _('documents')
         abstract = True
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._old_public = self.public
+
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        public_changed = self._old_public != self.public
+        if public_changed and self.pk and self.pdf_file:
+            self._move_file()
+            self._old_public = self.public
+        super().save(*args, **kwargs)
+    save.alters_data = True
 
     def get_absolute_url(self):
         if self.slug:
@@ -140,6 +157,31 @@ class AbstractDocument(models.Model):
             return self.original.get_file_path()
         return ''
 
+    def get_file_name(self):
+        return self.get_file_path().replace(settings.MEDIA_ROOT, '')
+
+    def _move_file(self):
+        """
+        Move the file from src to dst.
+        This uses direct filesystem operations for efficiency
+        and not replicating/copying all thumbnails
+        """
+        if not self.pdf_file:
+            # Original data holder is responsible for secure serving
+            return
+        src_file_dir = os.path.dirname(self.pdf_file.path)
+        dst_file_name = get_document_path(self, 'document.pdf')
+        dst_file_dir = os.path.dirname(os.path.join(
+            settings.MEDIA_ROOT, dst_file_name
+        ))
+        self.pdf_file = dst_file_name
+        try:
+            if src_file_dir != dst_file_dir:
+                shutil.rmtree(dst_file_dir, ignore_errors=True)
+            shutil.move(src_file_dir, dst_file_dir)
+        except IOError:
+            pass
+
     def get_internal_url(self):
         return
 
@@ -168,6 +210,12 @@ class AbstractDocument(models.Model):
         if detail:
             return DocumentDetailSerializer
         return DocumentSerializer
+
+    def get_writeable_file(self):
+        if not self.pdf_file:
+            with open(self.get_file_path(), 'rb') as f:
+                self.pdf_file.save('document.pdf', File(f))
+        return self.pdf_file.path
 
     def process_document(self, reprocess=True):
         from .tasks import process_document_task

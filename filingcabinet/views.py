@@ -1,12 +1,16 @@
 import json
 
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import DetailView
 from django.urls import reverse
+from django.db.models import Q
+
+from crossdomainmedia import CrossDomainMediaMixin
 
 from . import get_document_model, get_documentcollection_model
 from .models import Page
+from .auth import DocumentCrossDomainMediaAuth
 from .api_views import PageSerializer
 
 Document = get_document_model()
@@ -52,7 +56,10 @@ class DocumentView(DetailView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        return qs.filter(public=True)
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            cond |= Q(user=self.request.user)
+        return qs.filter(cond)
 
 
 class DocumentDCView(DocumentView):
@@ -121,3 +128,44 @@ class DocumentJSONView(DetailView):
                 # 'search': 'SEARCH_UTILITY_URL'
             }
         }
+
+
+class DocumentFileDetailView(CrossDomainMediaMixin, DetailView):
+    '''
+    Add the CrossDomainMediaMixin
+    and set your custom media_auth_class
+    '''
+    media_auth_class = DocumentCrossDomainMediaAuth
+
+    def get_object(self):
+        return get_object_or_404(
+            Document, uuid=self.kwargs['uuid']
+        )
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['filename'] = self.kwargs['filename']
+        return ctx
+
+    def redirect_to_media(self, mauth):
+        '''
+        Force direct links on main domain that are not
+        refreshing a token to go to the objects page
+        '''
+        # Check file authorization first
+        url = mauth.get_authorized_media_url(self.request)
+
+        # Check if download is requested
+        download = self.request.GET.get('download')
+        if download is None:
+            # otherwise redirect to document page
+            return redirect(self.object.get_absolute_url(), permanent=True)
+
+        return redirect(url)
+
+    def send_media_file(self, mauth):
+        response = super().send_media_file(mauth)
+        response['Link'] = '<{}>; rel="canonical"'.format(
+            self.object.get_absolute_domain_url()
+        )
+        return response

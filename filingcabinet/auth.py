@@ -1,0 +1,48 @@
+from django.urls import reverse
+
+from crossdomainmedia import CrossDomainMediaAuth
+
+
+class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
+    '''
+    Create your own custom CrossDomainMediaAuth class
+    and implement at least these methods
+    '''
+    # SITE_URL = settings.SITE_URL
+    DEBUG = False
+
+    def is_media_public(self):
+        '''
+        Determine if the media described by self.context
+        needs authentication/authorization at all
+        '''
+        return self.context['object'].public
+
+    def has_perm(self, request):
+        ctx = self.context
+        obj = ctx['object']
+        return obj.user == request.user
+
+    def get_auth_url(self):
+        '''
+        Give URL path to authenticating view
+        for the media described in context
+        '''
+        obj = self.context['object']
+
+        return reverse(
+            'filingcabinet-auth_document',
+            kwargs={
+                'pk': obj.pk,
+                'filename': self.context['filename']
+            })
+
+    def get_full_auth_url(self):
+        return super().get_full_auth_url() + '?download'
+
+    def get_media_file_path(self):
+        '''
+        Return the URL path relative to MEDIA_ROOT for debug mode
+        '''
+        obj = self.context['object']
+        return obj.get_file_name()

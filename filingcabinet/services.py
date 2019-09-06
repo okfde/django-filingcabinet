@@ -10,12 +10,22 @@ from .pdf_utils import PDFProcessor, crop_image
 logger = logging.getLogger(__name__)
 
 
+def get_copy_func(doc):
+    def copy_func(filename):
+        return doc.get_writeable_file()
+
+    return copy_func
+
+
 def get_pdf_processor(doc):
     config = {
         'TESSERACT_DATA_PATH': settings.TESSERACT_DATA_PATH
     }
     pdf_path = doc.get_file_path()
-    return PDFProcessor(pdf_path, language=doc.language, config=config)
+    return PDFProcessor(
+        pdf_path, copy_func=get_copy_func(doc),
+        language=doc.language, config=config
+    )
 
 
 def process_document(doc):
