@@ -41,3 +41,6 @@ class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
         ctx = self.context
         obj = ctx['object']
         return obj.get_file_name(filename=ctx['filename'])
+
+    def get_internal_media_prefix(self):
+        return '/filingcabinet-private'
