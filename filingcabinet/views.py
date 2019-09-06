@@ -124,7 +124,7 @@ class DocumentJSONView(DetailView):
                     'image': obj.get_page_image_url_template()
                 },
                 # 'related_story': 'LINK_URL',
-                'pdf': obj.get_file_url(),
+                'pdf': obj.get_document_file_url(),
                 # 'search': 'SEARCH_UTILITY_URL'
             }
         }

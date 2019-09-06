@@ -44,3 +44,6 @@ class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
 
     def get_internal_media_prefix(self):
         return '/filingcabinet-private'
+
+    def get_path_to_sign(self, path):
+        return path.rsplit('/', 1)[0]

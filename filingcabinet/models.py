@@ -45,11 +45,12 @@ def get_document_path(instance, filename):
     return get_document_file_path(instance, slug + ext)
 
 
-def get_page_image_filename(prefix, page_no, size_name=None, filetype='png'):
+def get_page_image_filename(prefix='page', page='{page}', size='{size}',
+                            filetype='png'):
     return '{prefix}-p{page}-{size}.{filetype}'.format(
         prefix=prefix,
-        size=size_name,
-        page=page_no,
+        size=size,
+        page=page,
         filetype=filetype
     )
 
@@ -160,18 +161,28 @@ class AbstractDocument(models.Model):
             return self.original.get_file_path()
         return ''
 
+    def get_document_filename(self):
+        return self.get_file_path().rsplit('/', 1)[1]
+
     def get_file_name(self, filename=None):
         if filename is None:
-            filename = self.get_file_path().rsplit('/', 1)[1]
+            filename = self.get_document_filename()
         return get_document_file_path(self, filename)
+
+    def get_document_file_url(self):
+        if self.pdf_file:
+            if self.public:
+                return self.pdf_file.url
+            return self.get_file_url(filename=self.get_document_filename())
+        if self.has_original:
+            return self.original.get_file_url()
+        return ''
 
     def get_file_url(self, filename=None):
         if filename is None:
-            if self.pdf_file:
-                return self.pdf_file.url
-            if self.has_original:
-                return self.original.get_file_url()
-            return ''
+            return self.get_document_file_url()
+        if self.public:
+            return settings.MEDIA_URL + self.get_file_name(filename=filename)
         uid = self.uid.hex
         return reverse(
             'filingcabinet-auth_document',
@@ -182,6 +193,24 @@ class AbstractDocument(models.Model):
                 'uuid': uid,
                 'filename': filename
             })
+
+    def get_crossdomain_auth(self, filename=None):
+        from .auth import DocumentCrossDomainMediaAuth
+
+        if filename is None:
+            filename = self.get_document_filename()
+
+        return DocumentCrossDomainMediaAuth({
+            'object': self,
+            'filename': filename
+        })
+
+    def get_authorized_file_url(self, filename=None):
+        if self.public:
+            return self.get_file_url(filename=filename)
+        return self.get_crossdomain_auth(filename=filename).get_full_media_url(
+            authorized=True
+        )
 
     def _move_file(self):
         """
@@ -205,20 +234,13 @@ class AbstractDocument(models.Model):
         except IOError:
             pass
 
-    def get_internal_url(self):
-        return
-
-    def get_page_image_url_template(self):
-        doc_path = get_document_path(self, 'page.png')
-        path, _ = os.path.splitext(doc_path)
-        return get_page_image_filename(
-            path, '{page}', size_name='{size}'
-        )
+    def get_page_template(self):
+        return self.get_authorized_file_url(filename=get_page_image_filename())
 
     def get_cover_image(self):
-        return settings.MEDIA_URL + self.get_page_image_url_template().format(
+        return self.get_authorized_file_url(filename=get_page_image_filename(
             page=1, size='small'
-        )
+        ))
 
     def get_serializer_class(self, detail=False):
         from .api_views import DocumentSerializer, DocumentDetailSerializer
@@ -253,7 +275,9 @@ class Document(AbstractDocument):
 def get_page_filename(instance, filename, size=''):
     doc_path = get_document_path(instance.document, 'page.png')
     path, ext = os.path.splitext(doc_path)
-    return get_page_image_filename(path, instance.number, size_name=size)
+    return get_page_image_filename(
+        prefix=path, page=instance.number, size=size
+    )
 
 
 class Page(models.Model):

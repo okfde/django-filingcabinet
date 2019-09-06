@@ -12,19 +12,13 @@ class PageSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,
         view_name='api:document-detail'
     )
-    image_url = serializers.CharField(
-        source='get_image_url'
-    )
 
     class Meta:
         model = Page
         fields = (
             'document', 'number', 'content',
-            'image_url', 'width', 'height'
+            'width', 'height'
         )
-
-    def get_image_url(self, obj):
-        return obj.get_image_url()
 
 
 class DocumentSerializer(serializers.HyperlinkedModelSerializer):
@@ -37,11 +31,14 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True
     )
     file_url = serializers.CharField(
-        source='get_file_url',
+        source='get_authorized_file_url',
         read_only=True
     )
     cover_image = serializers.CharField(
         source='get_cover_image'
+    )
+    page_template = serializers.CharField(
+        source='get_page_template'
     )
 
     class Meta:
@@ -49,7 +46,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
             'num_pages',
-            'file_url', 'cover_image',
+            'public', 'file_url', 'cover_image', 'page_template'
         )
 
 
