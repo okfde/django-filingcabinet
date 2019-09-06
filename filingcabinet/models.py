@@ -26,19 +26,23 @@ class DocumentManager(models.Manager):
     pass
 
 
-def get_document_path(instance, filename):
+def get_document_file_path(instance, filename):
     # UUID field is already filled
     hex_name = instance.uid.hex
     hex_name_02 = hex_name[:2]
     hex_name_24 = hex_name[2:4]
     hex_name_46 = hex_name[4:6]
-    name, ext = os.path.splitext(filename)
-    slug = slugify(name)
     prefix = settings.FILINGCABINET_MEDIA_PUBLIC_PREFIX
     if not instance.public:
         prefix = settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX
     return os.path.join(prefix, hex_name_02, hex_name_24,
-                        hex_name_46, hex_name, slug + ext)
+                        hex_name_46, hex_name, filename)
+
+
+def get_document_path(instance, filename):
+    name, ext = os.path.splitext(filename)
+    slug = slugify(name)
+    return get_document_file_path(instance, slug + ext)
 
 
 def get_page_image_filename(prefix, page_no, size_name=None, filetype='png'):
@@ -157,12 +161,9 @@ class AbstractDocument(models.Model):
         return ''
 
     def get_file_name(self, filename=None):
-        media_path = self.get_file_path().replace(settings.MEDIA_ROOT, '')
         if filename is None:
-            return media_path
-        return '%s/%s' % (
-            media_path.rsplit('/', 1)[0], filename
-        )
+            filename = self.get_file_path().rsplit('/', 1)[1]
+        return get_document_file_path(self, filename)
 
     def get_file_url(self, filename=None):
         if filename is None:
