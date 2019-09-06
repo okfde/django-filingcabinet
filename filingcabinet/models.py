@@ -222,7 +222,7 @@ class AbstractDocument(models.Model):
             # Original data holder is responsible for secure serving
             return
         src_file_dir = os.path.dirname(self.pdf_file.path)
-        dst_file_name = get_document_path(self, 'document.pdf')
+        dst_file_name = get_document_path(self, self.get_document_filename())
         dst_file_dir = os.path.dirname(os.path.join(
             settings.MEDIA_ROOT, dst_file_name
         ))
