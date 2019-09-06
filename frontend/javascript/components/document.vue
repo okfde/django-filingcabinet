@@ -121,10 +121,12 @@ export default {
       let offset = this.document.pages.filter((p) => p.number < number)
         .map((p) => p.smallSize)
         .reduce((a, v) => a + v, 0)
-      let top = this.$refs.sidebarContainer.offsetTop
-      window.setTimeout(() => {
-        this.$refs.sidebarContainer.scrollTo(0, top + offset)
-      }, 200)
+
+      const sidebar = this.$refs.sidebarContainer.querySelector(
+        '.document-preview-pages'
+      )
+      let top = sidebar.offsetTop
+      sidebar.scrollTo(0, offset)
     },
     navigate ({number, source}) {
       this.currentPage = number
