@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, Http404
 from django.views.generic import DetailView
 from django.urls import reverse
 from django.db.models import Q
@@ -158,8 +158,14 @@ class DocumentFileDetailView(CrossDomainMediaMixin, DetailView):
     media_auth_class = DocumentCrossDomainMediaAuth
 
     def get_object(self):
+        uid = self.kwargs['uuid']
+        if (
+                uid[0:2] != self.kwargs['u1'] or
+                uid[2:4] != self.kwargs['u2'] or
+                uid[4:6] != self.kwargs['u3']):
+            raise Http404
         return get_object_or_404(
-            Document, uid=self.kwargs['uuid']
+            Document, uid=uid
         )
 
     def get_context_data(self, **kwargs):

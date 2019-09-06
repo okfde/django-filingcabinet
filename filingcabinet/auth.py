@@ -31,13 +31,7 @@ class DocumentCrossDomainMediaAuth(CrossDomainMediaAuth):
         for the media described in context
         '''
         obj = self.context['object']
-
-        return reverse(
-            'filingcabinet-auth_document',
-            kwargs={
-                'pk': obj.pk,
-                'filename': self.context['filename']
-            })
+        return obj.get_file_url(filename=self.context['filename'])
 
     def get_full_auth_url(self):
         return super().get_full_auth_url() + '?download'

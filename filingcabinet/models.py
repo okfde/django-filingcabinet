@@ -164,6 +164,24 @@ class AbstractDocument(models.Model):
             media_path.rsplit('/', 1)[0], filename
         )
 
+    def get_file_url(self, filename=None):
+        if filename is None:
+            if self.pdf_file:
+                return self.pdf_file.url
+            if self.has_original:
+                return self.original.get_file_url()
+            return ''
+        uid = str(self.obj.uid)
+        return reverse(
+            'filingcabinet-auth_document',
+            kwargs={
+                'u1': uid[0:2],
+                'u2': uid[2:4],
+                'u3': uid[4:6],
+                'uuid': uid,
+                'filename': filename
+            })
+
     def _move_file(self):
         """
         Move the file from src to dst.
@@ -188,13 +206,6 @@ class AbstractDocument(models.Model):
 
     def get_internal_url(self):
         return
-
-    def get_file_url(self):
-        if self.pdf_file:
-            return self.pdf_file.url
-        if self.has_original:
-            return self.original.get_file_url()
-        return ''
 
     def get_page_image_url_template(self):
         doc_path = get_document_path(self, 'page.png')
