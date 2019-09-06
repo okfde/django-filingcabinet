@@ -113,6 +113,7 @@ export default {
         let ratio = p.height / p.width
         p.normalSize = Math.ceil(normalWidth * ratio) + 60
         p.smallSize = Math.ceil(smallWidth * ratio) + 40
+        p.image_url = this.documentPreview.page_template.replace(/\{page\}/, p.number)
         return p
       })
     },
