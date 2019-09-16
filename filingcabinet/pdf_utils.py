@@ -189,7 +189,7 @@ def draw_highlights(highlights):
             crop.opaque_paint(
                 target=Color('white'),
                 fill=Color(highlight['color']),
-                fuzz=crop.quantum_range * 0.4,
+                fuzz=crop.quantum_range * 0.3,
             )
             img.composite(
                 crop, left=highlight['left'], top=highlight['top']
