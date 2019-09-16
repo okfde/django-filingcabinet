@@ -58,6 +58,8 @@ class DocumentView(DetailView):
         qs = super().get_queryset()
         cond = Q(public=True)
         if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                return qs
             cond |= Q(user=self.request.user)
         return qs.filter(cond)
 
