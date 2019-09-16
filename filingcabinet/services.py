@@ -1,11 +1,12 @@
 import os
 import logging
+import json
 
 from django.core.files.base import ContentFile
 from django.conf import settings
 
 from .models import Page
-from .pdf_utils import PDFProcessor, crop_image
+from .pdf_utils import PDFProcessor, crop_image, draw_highlights
 
 logger = logging.getLogger(__name__)
 
@@ -150,9 +151,16 @@ def make_thumbnails(page, image):
 
 
 def make_page_annotation(annotation):
+    transform_func = None
+    if annotation.highlight:
+        highlights = json.loads(annotation.highlight)
+        if highlights:
+            transform_func = draw_highlights(highlights)
+
     image_bytes = crop_image(
         annotation.page.image.path,
-        annotation.left, annotation.top, annotation.width, annotation.height
+        annotation.left, annotation.top, annotation.width, annotation.height,
+        transform_func=transform_func
     )
     annotation.image.save(
         'page_annotation.png',

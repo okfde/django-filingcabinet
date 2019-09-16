@@ -1,15 +1,28 @@
 {% extends "admin/change_form.html" %}
 
 {% load static %}
+{% load i18n %}
 
 {% block extrahead %}{{ block.super }}
     <script src="{% static 'filingcabinet/admin/pageannotation.js' %}"></script>
 {% endblock %}
 
 {% block after_field_sets %}
-    {% if original and original.page %}
+    {% if original.image %}
+        <img src="{{ original.image.url }}" style="max-width: 100%">
+    {% endif %}
+    {% if original and original.page and original.image %}
+        <h3>{% trans "Annotation" %}</h3>
+        <input type="color" id="annotationcolor" value="#ffff88"/>
         <div style="position:relative; width: 100%">
-            <img src="{{ original.page.image.url }}" alt="Testing" id="page_image" style="outline: 1px solid #000; width: 100%;">
+            <img src="{{ original.image.url }}" id="annotation_image" style="outline: 1px solid #000; width: 100%;">
+        </div>
+    {% endif %}
+
+    {% if original and original.page %}
+        <h3>{% trans "Make annotation" %}</h3>
+        <div style="position:relative; width: 100%">
+            <img src="{{ original.page.image.url }}" id="page_image" style="outline: 1px solid #000; width: 100%;">
             <div id="page_rect" style="outline: 1px solid #f00; position: absolute; pointer-events: none;"></div>
         </div>
     {% endif %}

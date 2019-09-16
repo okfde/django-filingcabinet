@@ -179,10 +179,30 @@ class PDFProcessor(object):
         )
 
 
-def crop_image(image_path, left, top, width, height):
+def draw_highlights(highlights):
+    def apply_highlights(img):
+        for highlight in highlights:
+            crop = img[
+                highlight['left']:highlight['left'] + highlight['width'],
+                highlight['top']:highlight['top'] + highlight['height']
+            ]
+            crop.opaque_paint(
+                target=Color('white'),
+                fill=Color(highlight['color']),
+                fuzz=crop.quantum_range * 0.4,
+            )
+            img.composite(
+                crop, left=highlight['left'], top=highlight['top']
+            )
+    return apply_highlights
+
+
+def crop_image(image_path, left, top, width, height, transform_func=None):
     with Image(filename=image_path) as img:
         img.alpha_channel = False
         img.crop(left, top, left + width, top + height)
+        if transform_func is not None:
+            transform_func(img)
         return img.make_blob('gif')
 
 

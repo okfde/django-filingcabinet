@@ -42,3 +42,72 @@ window.django.jQuery(function () {
     pageRect.css('height', e.offsetY - top)
   })
 })
+
+
+window.django.jQuery(function () {
+  var $ = window.django.jQuery
+
+  var image = $('#annotation_image')
+  if (image.length === 0) {
+    return
+  }
+
+  function drawHighlightRects() {
+    image.parent().find('div').remove()
+    highlights.forEach(function(h) {
+      var div = $('<div>').css({
+        position: 'absolute',
+        'pointer-events': 'none',
+        'background-color': h.color,
+        left: h.left / ratioX,
+        top: h.top / ratioY,
+        width: h.width / ratioX,
+        height: h.height / ratioY
+      })
+      image.parent().append(div)
+    })
+  }
+
+  var highlightJson = $('#id_highlight').val()
+  var highlights = []
+  if (highlightJson.length) {
+    highlights = JSON.parse(highlightJson)
+  }
+  var currentHighlight = null
+
+  var naturalWidth = image[0].naturalWidth
+  var naturalHeight = image[0].naturalHeight
+  var ratioX, ratioY
+  image.on('load', function () {
+    naturalWidth = image[0].naturalWidth
+    naturalHeight = image[0].naturalHeight
+    var offsetWidth = image[0].offsetWidth
+    var offsetHeight = image[0].offsetHeight
+    ratioX = naturalWidth / offsetWidth
+    ratioY = naturalHeight / offsetHeight
+    drawHighlightRects()
+  })
+  image.on('mousedown', function (e) {
+    if (currentHighlight !== null) {
+      var w = Math.round((e.offsetX - currentHighlight.left) * ratioX)
+      var h = Math.round((e.offsetY - currentHighlight.top) * ratioY)
+      var color = $('#annotationcolor').val()
+      highlights.push({
+        left: Math.round(currentHighlight.left * ratioX),
+        top: Math.round(currentHighlight.top * ratioY),
+        width: w,
+        height: h,
+        color: color,
+        type: 'highlight'
+      })
+      $('#id_highlight').val(JSON.stringify(highlights))
+      currentHighlight = null
+      drawHighlightRects()
+      return
+    }
+    currentHighlight = {
+      left: e.offsetX,
+      top: e.offsetY  
+    }
+  })
+})
