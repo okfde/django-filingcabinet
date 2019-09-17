@@ -330,6 +330,12 @@ class Page(models.Model):
     def __str__(self):
         return '%s - %s' % (self.document, self.number)
 
+    def get_absolute_url(self):
+        return '{}#page-{}'.format(
+            self.document.get_absolute_url(),
+            self.number
+        )
+
     def get_image_url(self, size='{size}'):
         templ = self.document.get_page_image_url_template()
         return settings.MEDIA_URL + templ.format(
