@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-18 12:23+0200\n"
+"PO-Revision-Date: 2019-09-18 12:25+0200\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.2\n"
+
+#: admin.py:40
+msgid "Started processing documents."
+msgstr "Verarbeitung der Dokumente gestartet."
+
+#: admin.py:41
+msgid "Process documents"
+msgstr "Verarbeite Dokumente"
+
+#: admin.py:46
+msgid "Started reprocessing documents."
+msgstr "Neuverarbeitung der Dokumente gestartet."
+
+#: admin.py:47
+msgid "Reprocess documents"
+msgstr "Dokument neuverarbeiten"
+
+#: apps.py:7
+msgid "Filing Cabinet"
+msgstr "Aktenschrank"
+
+#: models.py:65
+msgid "Document Tag"
+msgstr "Dokumenten-Schlagwort"
+
+#: models.py:66
+msgid "Document Tags"
+msgstr "Dokumenten-Schlagworte"
+
+#: models.py:90 models.py:373
+msgid "User"
+msgstr "Nutzer"
+
+#: models.py:111
+msgid "document"
+msgstr "Dokument"
+
+#: models.py:112
+msgid "documents"
+msgstr "Dokumente"
+
+#: templates/admin/filingcabinet/pageannotation/change_form.html:15
+msgid "Annotation"
+msgstr "Anmerkung"
+
+#: templates/admin/filingcabinet/pageannotation/change_form.html:23
+msgid "Make annotation"
+msgstr "Anmerkung schreiben"
+
+#: templates/filingcabinet/_document_viewer.html:7
+msgid "This document is still being processed..."
+msgstr "Dieses Dokument wird noch verarbeitet..."
+
+#: templates/filingcabinet/document_detail.html:12
+msgid "private"
+msgstr "privat"
+
+#: templates/filingcabinet/document_detail.html:32
+msgid "Download PDF"
+msgstr "PDF herunterladen"
