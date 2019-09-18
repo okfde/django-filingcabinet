@@ -331,7 +331,7 @@ class Page(models.Model):
         return '%s - %s' % (self.document, self.number)
 
     def get_absolute_url(self):
-        return '{}#page-{}'.format(
+        return '{}?page={}'.format(
             self.document.get_absolute_url(),
             self.number
         )
