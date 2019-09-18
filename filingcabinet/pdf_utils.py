@@ -39,11 +39,14 @@ OFFICE_FILETYPES = (
     'application/msword',
     'application/vnd.msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/rtf',
+    'application/rtf',
 )
 OFFICE_EXTENSIONS = (
     '.doc',
     '.docx',
-    '.odt'
+    '.odt',
+    '.rtf',
 )
 
 
