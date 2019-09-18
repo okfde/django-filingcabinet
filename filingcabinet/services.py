@@ -102,7 +102,6 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
 
 def process_page(doc, pdf, page_number, image):
     logger.info('Getting text for page %s of doc %s', page_number, doc.id)
-    text = pdf.get_text_for_page(page_number, image)
     dims = image.size
 
     try:
@@ -120,6 +119,7 @@ def process_page(doc, pdf, page_number, image):
         return
 
     if not page.corrected:
+        text = pdf.get_text_for_page(page_number, image)
         page.content = text
     page.width = dims[0]
     page.height = dims[1]
