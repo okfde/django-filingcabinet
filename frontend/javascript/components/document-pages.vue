@@ -11,6 +11,7 @@
       <document-page
         :key="item.number"
         :page="item"
+        :show-text="showText"
       />
     </RecycleScroller>
   </div>
@@ -26,14 +27,14 @@ import DocumentPage from './document-page.vue'
 
 export default {
   name: 'document-pages',
-  props: ['document'],
+  props: ['document', 'preferences'],
   components: {
     RecycleScroller, DynamicScroller, DynamicScrollerItem,
     DocumentPage
   },
   computed: {
-    i18n () {
-      return this.config.i18n
+    showText () {
+      return this.preferences.showText
     },
     pages () {
       return this.document.pages

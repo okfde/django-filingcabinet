@@ -1,17 +1,17 @@
 <template>
-  <div class="document-preview-pages">
+  <div class="document-search-pages bg-secondary text-light">
     <RecycleScroller
       class="scroller"
       :items="pages"
       page-mode
       key-field="number"
-      sizeField="smallSize"
-      :emitUpdate="true"
+      :item-size="116"
       v-slot="{ item }"
     >
-      <document-preview-page
+      <document-search-preview
         :key="item.number"
-        :page="item"
+        :matches="item"
+        :page="document.pages[item.number - 1]"
         @navigate="navigate"
       />
     </RecycleScroller>
@@ -24,22 +24,16 @@ import 'intersection-observer'
 
 import { RecycleScroller } from 'vue-virtual-scroller'
 
-import DocumentPreviewPage from './document-preview-page.vue'
+import DocumentSearchPreview from './document-search-preview.vue'
 
 export default {
-  name: 'document-preview-sidebar',
-  props: ['document'],
+  name: 'document-search-sidebar',
+  props: ['document', 'pages'],
   components: {
-    RecycleScroller,
-    DocumentPreviewPage
+    DocumentSearchPreview,
+    RecycleScroller
   },
   computed: {
-    i18n () {
-      return this.config.i18n
-    },
-    pages () {
-      return this.document.pages
-    }
   },
   methods: {
     navigate (number) {
@@ -53,12 +47,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
-.document-preview-pages {
-  height: 100vh;
-  overflow: auto;
-  top: 50px;
-  position: sticky;
-}
 </style>
