@@ -83,6 +83,9 @@ def try_reading_pdf(pdf_file, password=None):
 
 def get_readable_pdf(pdf_file, copy_func, password=None):
     tries = 0
+    filesize = os.path.getsize(pdf_file)
+    # one minute + 5 seconds per megabyte timeout
+    timeout = 60 + 5 * filesize / (1024 * 1024)
     while True:
         try:
             pdf_reader = try_reading_pdf(pdf_file, password=password)
@@ -95,15 +98,18 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
                 raise Exception('PDF Redaction Error')
             if e.reason == 'rewrite':
                 next_pdf_file = rewrite_pdf_in_place(
-                    pdf_file, password=password
+                    pdf_file, password=password,
+                    timeout=timeout
                 )
                 if next_pdf_file is None:
                     next_pdf_file = rewrite_hard_pdf_in_place(
-                        pdf_file, password=password
+                        pdf_file, password=password,
+                        timeout=timeout
                     )
             elif e.reason == 'decrypt':
                 next_pdf_file = decrypt_pdf_in_place(
-                    pdf_file, password=password
+                    pdf_file, password=password,
+                    timeout=timeout
                 )
             if next_pdf_file is None:
                 raise Exception('PDF Rewrite Error')
