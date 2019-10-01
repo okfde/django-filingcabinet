@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Page
+from .models import Page, CollectionDocument
 
 
 class PageInline(admin.StackedInline):
@@ -65,6 +65,28 @@ class PageAdmin(admin.ModelAdmin):
 class PageAnnotationAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'page',)
 
+
+class DocumentInline(admin.StackedInline):
+    model = CollectionDocument
+    raw_id_fields = ('document',)
+
+
+class DocumentCollectionBaseAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'documents',)
+    inlines = [DocumentInline]
+    save_on_top = True
+    search_fields = ('title',)
+    date_hierarchy = 'created_at'
+    list_display = ('title', 'created_at', 'public', 'user')
+    prepopulated_fields = {'slug': ('title',)}
+
+    def get_inline_instances(self, request, obj=None):
+        ''' Only show inline for docs with fewer than 31 pages'''
+        if obj is not None:
+            doc_count = obj.documents.count()
+            if doc_count < 31:
+                return super().get_inline_instances(request, obj=obj)
+        return []
 
 # Register them yourself
 # admin.site.register(Document, DocumentAdmin)

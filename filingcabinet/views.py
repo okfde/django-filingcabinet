@@ -17,16 +17,29 @@ Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
 
 
-class DocumentView(DetailView):
-    model = Document
-    PREVIEW_PAGE_COUNT = 10
-
+class PkSlugMixin:
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.slug != self.kwargs.get('slug', ''):
             return redirect(self.object)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
+
+
+class AuthMixin:
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                return qs
+            cond |= Q(user=self.request.user)
+        return qs.filter(cond)
+
+
+class DocumentView(AuthMixin, PkSlugMixin, DetailView):
+    model = Document
+    PREVIEW_PAGE_COUNT = 10
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -64,10 +77,6 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
             return redirect(self.object)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        return qs.filter(public=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
