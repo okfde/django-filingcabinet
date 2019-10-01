@@ -416,9 +416,20 @@ class CollectionDocument(models.Model):
 
 
 class AbstractDocumentCollection(models.Model):
-    slug = models.SlugField(max_length=250, blank=True)
     title = models.CharField(max_length=255, blank=True)
+    slug = models.SlugField(max_length=250, blank=True)
     description = models.TextField(blank=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        on_delete=models.SET_NULL,
+        related_name='%(app_label)s_%(class)s',
+        verbose_name=_("User")
+    )
+
+    created_at = models.DateTimeField(default=timezone.now, null=True)
+    updated_at = models.DateTimeField(default=timezone.now, null=True)
+
     public = models.BooleanField(default=True)
 
     documents = models.ManyToManyField(
@@ -430,7 +441,22 @@ class AbstractDocumentCollection(models.Model):
     )
 
     class Meta:
+        verbose_name = _('document collection')
+        verbose_name_plural = _('document collections')
         abstract = True
+
+    def get_absolute_url(self):
+        if self.slug:
+            return reverse('document-collection', kwargs={
+                'pk': self.pk,
+                'slug': self.slug
+            })
+        return reverse('document-collection_short', kwargs={
+            'pk': self.pk
+        })
+
+    def get_absolute_domain_url(self):
+        return settings.SITE_URL + self.get_absolute_url()
 
 
 class DocumentCollection(AbstractDocumentCollection):
