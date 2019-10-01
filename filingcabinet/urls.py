@@ -3,8 +3,7 @@ from django.conf import settings
 from django.utils.translation import pgettext_lazy
 
 from .views import (
-    DocumentView, DocumentDCView, DocumentJSONView, PageTextView,
-    DocumentFileDetailView
+    DocumentView, DocumentFileDetailView, DocumentCollectionView
 )
 
 app_name = 'filingcabinet'
@@ -14,12 +13,6 @@ urlpatterns = [
         name="document-detail"),
     url(r"^(?P<pk>\d+)/$", DocumentView.as_view(),
         name="document-detail_short"),
-    url(r"^(?P<pk>\d+)\.json$", DocumentJSONView.as_view(),
-        name="document_json"),
-    url(r"^(?P<pk>\d+)/dc/$", DocumentDCView.as_view(),
-        name="document-detail_dc"),
-    url(r"^(?P<pk>\d+)/text/(?P<page>\d+)/$", PageTextView.as_view(),
-        name="document_page_text"),
 ]
 
 
