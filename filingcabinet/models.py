@@ -440,6 +440,12 @@ class AbstractDocumentCollection(models.Model):
     def get_absolute_domain_url(self):
         return settings.SITE_URL + self.get_absolute_url()
 
+    def get_cover_image(self):
+        document = self.documents.all().first()
+        if document:
+            return document.get_cover_image()
+        return None
+
 
 class DocumentCollection(AbstractDocumentCollection):
     class Meta(AbstractDocumentCollection.Meta):

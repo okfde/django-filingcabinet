@@ -3,7 +3,7 @@ from django.template.defaultfilters import slugify
 
 from rest_framework import viewsets, mixins, serializers, permissions
 
-from . import get_document_model
+from . import get_document_model, get_documentcollection_model
 from .models import Page
 
 
@@ -79,6 +79,31 @@ class UpdateDocumentSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
+    resource_uri = serializers.HyperlinkedIdentityField(
+        view_name='api:documentcollection-detail',
+        lookup_field='pk'
+    )
+    site_url = serializers.CharField(
+        source='get_absolute_domain_url',
+        read_only=True
+    )
+    cover_image = serializers.CharField(
+        source='get_cover_image'
+    )
+    documents = DocumentSerializer(
+        many=True
+    )
+
+    class Meta:
+        model = get_documentcollection_model()
+        fields = (
+            'resource_uri', 'id', 'site_url', 'title', 'description',
+            'public', 'created_at', 'updated_at',
+            'cover_image', 'documents',
+        )
+
+
 class IsUserOrReadOnly(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit it.
@@ -133,3 +158,27 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
         return Page.objects.filter(document=doc)
+
+
+class DocumentCollectionViewSet(
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        viewsets.GenericViewSet):
+    serializer_action_classes = {
+        'list': DocumentCollectionSerializer,
+    }
+    permission_classes = (IsUserOrReadOnly,)
+
+    def get_serializer_class(self):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return DocumentCollectionSerializer
+
+    def get_queryset(self):
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            cond |= Q(user=self.request.user)
+        qs = get_document_model().objects.filter(cond)
+        qs = qs.prefetch_related('documents')
+        return qs
