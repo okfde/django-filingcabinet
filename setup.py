@@ -39,7 +39,7 @@ setup(
         'wand',
         'pypdf2',
         'Pillow',
-        'django-crossdomainmedia',
+        'django-filter',
     ],
     include_package_data=True,
     classifiers=[

@@ -194,24 +194,6 @@ class AbstractDocument(models.Model):
                 'filename': filename
             })
 
-    def get_crossdomain_auth(self, filename=None):
-        from .auth import DocumentCrossDomainMediaAuth
-
-        if filename is None:
-            filename = self.get_document_filename()
-
-        return DocumentCrossDomainMediaAuth({
-            'object': self,
-            'filename': filename
-        })
-
-    def get_authorized_file_url(self, filename=None):
-        if self.public:
-            return self.get_file_url(filename=filename)
-        return self.get_crossdomain_auth(filename=filename).get_full_media_url(
-            authorized=True
-        )
-
     def _move_file(self):
         """
         Move the file from src to dst.
@@ -235,10 +217,10 @@ class AbstractDocument(models.Model):
             pass
 
     def get_page_template(self):
-        return self.get_authorized_file_url(filename=get_page_image_filename())
+        return self.get_file_url(filename=get_page_image_filename())
 
     def get_cover_image(self):
-        return self.get_authorized_file_url(filename=get_page_image_filename(
+        return self.get_file_url(filename=get_page_image_filename(
             page=1, size='small'
         ))
 
