@@ -216,6 +216,10 @@ class AbstractDocument(models.Model):
         except IOError:
             pass
 
+        from .task import files_moved_task
+
+        files_moved_task.delay(self.id)
+
     def get_page_template(self):
         return self.get_file_url(filename=get_page_image_filename())
 

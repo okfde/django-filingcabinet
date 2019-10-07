@@ -5,7 +5,10 @@ import json
 from django.core.files.base import ContentFile
 from django.conf import settings
 
-from .models import Page
+from .models import (
+    Page, PageAnnotation,
+    get_page_filename, get_page_annotation_filename
+)
 from .pdf_utils import PDFProcessor, crop_image, draw_highlights
 
 logger = logging.getLogger(__name__)
@@ -167,3 +170,36 @@ def make_page_annotation(annotation):
         ContentFile(image_bytes),
         save=False
     )
+
+
+def fix_file_paths(doc):
+    pages = Page.objects.filter(document=doc)
+    for page in pages:
+        fix_file_paths_for_page(page)
+
+
+def fix_file_paths_for_page(page):
+    changed = False
+    for size_name, width in (('original', -1),) + Page.SIZES:
+        if size_name == 'original':
+            field_file = page.image
+        else:
+            field_file = getattr(page, 'image_%s' % size_name)
+        real_filename = get_page_filename(page, 'page.png', size=size_name)
+        if real_filename != field_file.name:
+            field_file.name = real_filename
+            changed = True
+    if changed:
+        page.save()
+
+    annotations = PageAnnotation.objects.filter(page=page)
+    for annotation in annotations:
+        annotation.page = page
+        fix_file_paths_for_pageannotation(annotation)
+
+
+def fix_file_paths_for_pageannotation(annotation):
+    filename = get_page_annotation_filename(annotation, 'annotation.png')
+    if annotation.image and filename != annotation.image.name:
+        annotation.image.name = filename
+        annotation.save()
