@@ -80,7 +80,7 @@ class AbstractDocument(models.Model):
         max_length=255,
         storage=OverwriteStorage(),
         upload_to=get_document_path, blank=True)
-    file_size = models.BigIntegerField(null=True)
+    file_size = models.BigIntegerField(null=True, blank=True)
     pending = models.BooleanField(default=False)
 
     user = models.ForeignKey(
@@ -399,6 +399,12 @@ class CollectionDocument(models.Model):
         related_name='%(app_label)s_%(class)s',
         on_delete=models.CASCADE
     )
+    order = models.PositiveIntegerField(
+        default=0, blank=False, null=False
+    )
+
+    class Meta:
+        ordering = ['order', 'document__title']
 
 
 class AbstractDocumentCollection(models.Model):
