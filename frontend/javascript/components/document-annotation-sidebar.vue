@@ -1,21 +1,16 @@
 <template>
-  <div class="document-pages">
+  <div class="annotations">
     <RecycleScroller
       class="scroller"
       :items="pages"
       page-mode
       key-field="number"
       sizeField="normalSize"
-      :emitUpdate="true"
-      @update="updateCurrentPage"
       v-slot="{ item }"
     >
-      <document-page
-        :key="item.number"
-        :page="item"
+      <page-annotations
         :annotations="annotations[item.number] || []"
-        :show-text="showText"
-        :show-annotations="showAnnotations"
+        :page="item"
         :current-annotation="currentAnnotation"
         @currentannotation="$emit('currentannotation', $event)"
       />
@@ -29,38 +24,26 @@ import 'intersection-observer'
 
 import { RecycleScroller } from 'vue-virtual-scroller'
 
-import DocumentPage from './document-page.vue'
+import PageAnnotations from './document-annotations.vue'
 
 export default {
-  name: 'document-pages',
-  props: ['document', 'preferences', 'annotations', 'currentAnnotation'],
+  name: 'document-annotation-sidebar',
+  props: ['document', 'annotations', 'currentAnnotation'],
   components: {
     RecycleScroller,
-    DocumentPage
+    PageAnnotations
   },
   computed: {
-    showText () {
-      return this.preferences.showText
-    },
-    showAnnotations () {
-      return this.preferences.showAnnotations
-    },
     pages () {
       return this.document.pages
     }
   },
-  methods: {
-    updateCurrentPage (startIndex, endIndex) {
-      this.$emit('currentpage', {start: startIndex, end: endIndex})
-    }
-  }
 }
 </script>
 
 <style lang="scss">
 @import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
-
-.document-pages {
+.annotations {
   padding: 1rem 0;
 }
 </style>

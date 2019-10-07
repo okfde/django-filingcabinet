@@ -1,6 +1,17 @@
 <template>
   <div class="row py-2 bg-dark">
     <div class="col-auto">
+      <div class="btn-group" role="group">
+        <button type="button"
+          class="btn btn-sm btn-secondary" :class="{'active': preferences.showSidebar}"
+          :disabled="!!searcher"
+          @click="toggleShowSidebar"
+        >
+          <i class="fa" :class="{'fa-toggle-left': preferences.showSidebar, 'fa-toggle-right': !preferences.showSidebar}"></i>
+        </button>
+      </div>
+    </div>
+    <div class="col-auto">
       <div class="input-group input-group-sm">
         <input type="number" class="page-number-input form-control bg-light form-control-sm"
           v-model="page"
@@ -32,9 +43,19 @@
         >
         <div class="input-group-append">
           <button class="btn btn-outline-light" @click="runSearch">
-            Search
+            {{ i18n.search }}
           </button>
         </div>
+      </div>
+    </div>
+    <div class="col-auto">
+      <div class="btn-group" role="group">
+        <button type="button"
+          class="btn btn-sm btn-secondary" :class="{'active': preferences.showAnnotations}"
+          @click="toggleShowAnnotations"
+        >
+          <i class="fa fa-commenting-o"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -47,17 +68,23 @@ export default {
   data () {
     return {
       search: '',
-      page: this.currentPage
     }
   },
   computed: {
     i18n () {
-      return this.config.i18n
+      return this.$root.config.i18n
     },
+    page: {
+      get () {
+        return this.currentPage
+      },
+      set (val) {
+        this.navigate(val)
+      }
+    }
   },
   methods: {
-    navigate () {
-      let number = parseInt(this.page, 10)
+    navigate (number) {
       if (number > this.document.num_pages) {
         this.page = this.document.num_pages
         number = this.page
@@ -71,8 +98,13 @@ export default {
       this.$emit('search', this.search)
     },
     toggleShowText () {
-      console.log('test')
       this.$emit('updatepreferences', {showText: !this.preferences.showText})
+    },
+    toggleShowSidebar () {
+      this.$emit('updatepreferences', {showSidebar: !this.preferences.showSidebar})
+    },
+    toggleShowAnnotations () {
+      this.$emit('updatepreferences', {showAnnotations: !this.preferences.showAnnotations})
     }
   }
 }

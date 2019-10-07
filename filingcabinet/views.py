@@ -1,8 +1,10 @@
 import json
 
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic import DetailView
 from django.db.models import Q
+from django.utils.translation import ugettext as _
 
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
@@ -31,6 +33,23 @@ class AuthMixin:
         return qs.filter(cond)
 
 
+def get_js_config(request):
+    return {
+        'urls': {
+            'pageApiUrl': reverse('api:page-list'),
+            'pageAnnotationApiUrl': reverse('api:pageannotation-list'),
+        },
+        'i18n': {
+            'page': _('page'),
+            'pages': _('pages'),
+            'matches': _('matches'),
+            'search': _('Search'),
+            'searching': _('Searching...'),
+            'found_on': _('Found on'),
+        }
+    }
+
+
 class DocumentView(AuthMixin, PkSlugMixin, DetailView):
     model = Document
     PREVIEW_PAGE_COUNT = 10
@@ -47,10 +66,7 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
         pages = self.object.page_set.all()
         pages = pages.filter(number__gte=start_from)[:self.PREVIEW_PAGE_COUNT]
         ctx['pages'] = pages
-        ctx['beta'] = (
-            self.request.GET.get('beta') is not None and
-            self.request.user.is_staff
-        )
+        ctx['beta'] = self.request.GET.get('beta') is not None
         serializer_klass = self.object.get_serializer_class()
         api_ctx = {
             'request': self.request
@@ -59,6 +75,7 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
         data['pages'] = PageSerializer(pages, many=True, context=api_ctx).data
         ctx['page'] = start_from
         ctx['document_data'] = json.dumps(data)
+        ctx['config'] = json.dumps(get_js_config(self.request))
         return ctx
 
 
@@ -75,4 +92,12 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['documents'] = self.object.documents.all()
+        serializer_klass = self.object.get_serializer_class()
+        api_ctx = {
+            'request': self.request
+        }
+        data = serializer_klass(self.object, context=api_ctx).data
+        context['documentcollection_data'] = json.dumps(data)
+        context['config'] = json.dumps(get_js_config(self.request))
+
         return context

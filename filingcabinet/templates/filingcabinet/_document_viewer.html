@@ -16,7 +16,7 @@
 
 {% if beta and not object.pending %}
   <div class="container">
-    <div class="document" data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}" data-fcdocument="{{ document_data }}" data-fcpage="{{ page }}">
+    <div class="document" data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}" data-fcdocument="{{ document_data }}" data-fcpage="{{ page }}" data-fcconfig="{{ config }}">
     {% for page in pages %}
         <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
           <pre class="sr-only">{{ page.content }}</pre>

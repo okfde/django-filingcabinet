@@ -6,21 +6,23 @@
     </div>
     <div class="col-auto ml-auto">
       <div v-if="searching" class="spinner-border spinner-border-sm" role="status">
-        <span class="sr-only">Searching...</span>
+        <span class="sr-only">{{ i18n.searching }}</span>
       </div>
       <small>
-        Found on {{ searcher.pageCount }} pages
+        {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
       </small>
       <div class="btn-group" role="group">
         <button type="button"
           class="btn btn-sm btn-light"
-          @click="toggleShowText"
+          :disabled="!hasPrev"
+          @click="prevSearchResult"
         >
           <i class="fa fa-chevron-left"></i>
         </button>
         <button type="button"
           class="btn btn-sm btn-light"
-          @click="toggleShowText"
+          :disabled="!hasNext"
+          @click="nextSearchResult"
         >
           <i class="fa fa-chevron-right"></i>
         </button>
@@ -38,20 +40,31 @@
 <script>
 export default {
   name: 'document-searchbar',
-  props: ['searcher'],
+  props: ['searcher', 'searchIndex', 'pages'],
   data () {
     return {
     }
   },
   computed: {
+    i18n () {
+      return this.$root.config.i18n
+    },
     searching () {
       return !this.searcher.done
+    },
+    hasNext () {
+      return this.pages.length > 0 && this.searchIndex < this.pages.length - 1
+    },
+    hasPrev () {
+      return this.pages.length > 0 && this.searchIndex > 0
     }
   },
   methods: {
-    toggleShowText () {
-      console.log('test')
-      this.$emit('updatepreferences', {showText: !this.preferences.showText})
+    prevSearchResult () {
+      this.$emit('movesearchindex', -1)
+    },
+    nextSearchResult () {
+      this.$emit('movesearchindex', 1)
     },
     clear () {
       this.$emit('clearsearch')

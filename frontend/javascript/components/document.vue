@@ -13,6 +13,9 @@
       <document-searchbar
         v-if="searcher"
         :searcher="searcher"
+        :search-index="searchIndex"
+        :pages="pagesWithMatches"
+        @movesearchindex="moveSearchIndex"
         @clearsearch="searcher=null"
       ></document-searchbar>
     </div>
@@ -20,12 +23,14 @@
       <div class="col-md-3 col-2 py-2"
         :class="{'bg-dark': !searcher, 'bg-secondary': !!searcher}"
         ref="sidebarContainer"
+        v-if="preferences.showSidebar || searcher"
       >
         <div class="sidebar" :class="{'preview': !searcher, 'search': !!searcher}">
           <document-search-sidebar
             v-if="searcher"
             :document="document"
             :pages="pagesWithMatches"
+            :current-page="currentPage"
             @navigate="navigate"
           ></document-search-sidebar>
           <document-preview-sidebar
@@ -35,11 +40,24 @@
           ></document-preview-sidebar>
         </div>
       </div>
-      <div class="col-md-9 col-10 document-pages-container" ref="documentContainer">
+      <div class="col document-pages-container bg-light" :class="{'annotations-hidden': !preferences.showAnnotations}" ref="documentContainer">
         <document-pages
           :document="document"
+          :annotations="annotations"
+          :current-annotation="currentAnnotation"
           :preferences="preferences"
+          @currentpage="updateCurrentPage"
+          @currentannotation="updateCurrentAnnotation"
         ></document-pages>
+      </div>
+      <div v-if="preferences.showAnnotations" class="col-3 col-md-4 bg-light annotation-sidebar">
+        <annotation-sidebar
+          :document="document"
+          :annotations="annotations"
+          :current-annotation="currentAnnotation"
+          @currentannotation="$emit('currentannotation', $event)"
+        >
+        </annotation-sidebar>
       </div>
     </div>
   </div>
@@ -53,8 +71,7 @@ import DocumentPreviewSidebar from './document-preview-sidebar.vue'
 import DocumentSearchSidebar from './document-search-sidebar.vue'
 import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
-
-import docsearch from '../lib/docsearch.js'
+import AnnotationSidebar from './document-annotation-sidebar.vue'
 
 import {getData} from '../lib/utils.js'
 
@@ -81,7 +98,11 @@ export default {
     DocumentSearchbar,
     DocumentPages,
     DocumentPreviewSidebar,
-    DocumentSearchSidebar
+    DocumentSearchSidebar,
+    AnnotationSidebar
+  },
+  mounted () {
+    this.$root.config = this.config
   },
   data () {
     let doc = this.documentPreview
@@ -93,24 +114,37 @@ export default {
     return {
       preferences: {
         showText: false,
+        showSidebar: true,
+        showAnnotations: true,
       },
       document: doc,
       searcher: null,
       searchIndex: null,
-      currentPage: this.getLocationHashPage() || this.page || 1
+      currentPage: this.getLocationHashPage() || this.page || 1,
+      annotations: {},
+      currentAnnotation: null
     }
   },
   created () {
     getData(this.documentUrl).then((doc) => {
-      docsearch.addDocuments(doc.pages)
       doc.pages = this.processPages(doc.pages)
       this.document = doc
+    })
+    getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
+      let annotations = {}
+      results.objects.forEach((a) => {
+        if (annotations[a.number] === undefined) {
+          annotations[a.number] = []
+        }
+        annotations[a.number].push(a)
+      })
+      this.annotations = annotations
     })
   },
   mounted () {
     window.addEventListener('resize', () => {
       console.log('resize')
-      Vue.set(this.document, 'pages', this.processPages(this.document.pages))
+      this.resize()
     })
   },
   computed: {
@@ -145,6 +179,9 @@ export default {
     }
   },
   methods: {
+    resize () {
+      Vue.set(this.document, 'pages', this.processPages(this.document.pages))
+    },
     getLocationHashPage () {
       let match = document.location.hash.match(/page-(\d+)/)
       if (match !== null) {
@@ -179,11 +216,18 @@ export default {
       })
     },
     navigateSidebar (number) {
+      if (this.searcher !== null) {
+        return
+      }
       let offset = this.document.pages.filter((p) => p.number < number)
         .map((p) => p.smallSize)
         .reduce((a, v) => a + v, 0)
 
-      const sidebar = this.$refs.sidebarContainer.querySelector(
+      let sidebarContainer = this.$refs.sidebarContainer
+      if (!sidebarContainer) {
+        return
+      }
+      const sidebar = sidebarContainer.querySelector(
         '.document-preview-pages'
       )
       let top = sidebar.offsetTop
@@ -196,26 +240,68 @@ export default {
         .reduce((a, v) => a + v, 0)
       let top = this.$refs.documentContainer.offsetTop
       window.scrollTo(0, top + offset)
-      if (source !== 'sidebar') {
+      if (source !== 'sidebar' && source !== 'search') {
         this.navigateSidebar(number)
       }
     },
     search (term) {
       console.log('searching for term', term)
-      this.searcher = docsearch.searchDocuments(term)
-      this.searcher.done(() => {
-        console.log('search done')
+      this.searcher = {
+        term: term,
+        done: false,
+        results: []
+      }
+      let searchUrl = `${this.config.urls.pageApiUrl}?document=${this.document.id}&q=${encodeURIComponent(term)}`
+      getData(searchUrl).then((response) => {
+        this.searcher.response = response
+        this.searcher.done = true
+        this.searcher.results = response.objects
+        if (this.searcher.results.length > 0) {
+          this.searchIndex = 0
+          this.navigate({
+            number: this.searcher.results[0].number,
+            source: 'search'
+          })
+        }
+        let pages = {}
+        let pageCount = 0
+        response.objects.forEach((p) => {
+          if (pages[p.number] === undefined) {
+            pages[p.number] = true
+            pageCount += 1
+          }
+        })
+        this.searcher.pageCount = pageCount
       })
-      this.$nextTick(() => this.searcher.start())
+    },
+    moveSearchIndex (move) {
+      this.searchIndex += move
+      let page = this.pagesWithMatches[this.searchIndex]
+      this.navigate({
+        number: page.number,
+        source: 'search'
+      })
     },
     clearSearch () {
       this.searcher = null
-      this.searchIndex = null
     },
     updatePreferences (update) {
       for (let key in update) {
         Vue.set(this.preferences, key, update[key])
       }
+      if (update.showSidebar !== undefined || update.showAnnotations !== undefined) {
+        window.setTimeout(() => {
+          this.resize()
+        }, 5)
+      }
+    },
+    updateCurrentPage ({start, end}) {
+      let currentIndex = start + Math.floor((end - start) / 2)
+      this.currentPage = this.document.pages[currentIndex].number
+      this.navigateSidebar(this.currentPage)
+    },
+    updateCurrentAnnotation (annotationId) {
+      this.currentAnnotation = annotationId
     }
   }
 }
@@ -237,7 +323,15 @@ export default {
   top: 90px;
 }
 .document-pages-container {
-  padding-right: 0;
+  border-bottom: 15px solid #343a40;
+  border-right: 0px;
+  &.annotations-hidden {
+    padding-right: 0 !important;
+    border-right: 15px solid #343a40;
+  }
+}
+.annotation-sidebar {
+  padding-left: 0 !important;
   border-right: 15px solid #343a40;
   border-bottom: 15px solid #343a40;
 }
