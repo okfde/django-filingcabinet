@@ -1,10 +1,10 @@
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
-from rest_framework import viewsets, mixins, serializers, permissions
+from rest_framework import viewsets, mixins, serializers, permissions, filters
 
 from . import get_document_model, get_documentcollection_model
-from .models import Page
+from .models import Page, PageAnnotation
 
 
 class PageSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +31,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True
     )
     file_url = serializers.CharField(
-        source='get_authorized_file_url',
+        source='get_file_url',
         read_only=True
     )
     cover_image = serializers.CharField(
@@ -104,6 +104,27 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
+class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
+    document = serializers.HyperlinkedRelatedField(
+        read_only=True,
+        lookup_field='page.document_id',
+        view_name='api:document-detail'
+    )
+
+    number = serializers.IntegerField(
+        source='page.number',
+        read_only=True
+    )
+
+    class Meta:
+        model = PageAnnotation
+        fields = (
+            'id', 'title', 'description',
+            'top', 'left', 'width', 'height',
+            'highlight', 'image', 'document', 'number'
+        )
+
+
 class IsUserOrReadOnly(permissions.BasePermission):
     """
     Object-level permission to only allow owners of an object to edit it.
@@ -146,6 +167,8 @@ class DocumentViewSet(mixins.ListModelMixin,
 
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['content']
 
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
@@ -181,4 +204,29 @@ class DocumentCollectionViewSet(
             cond |= Q(user=self.request.user)
         qs = get_document_model().objects.filter(cond)
         qs = qs.prefetch_related('documents')
+        return qs
+
+
+class PageAnnotationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = PageAnnotationSerializer
+
+    def get_queryset(self):
+        document_id = self.request.query_params.get('document', '')
+
+        Document = get_document_model()
+        cond = Q(public=True)
+        if self.request.user.is_authenticated:
+            cond |= Q(user=self.request.user)
+        try:
+            doc = Document.objects.filter(cond).get(pk=document_id)
+        except (ValueError, Document.DoesNotExist):
+            return PageAnnotation.objects.none()
+        qs = PageAnnotation.objects.filter(page__document=doc)
+
+        number = self.request.query_params.get('number')
+        if number is not None:
+            try:
+                qs.filter(page__number=int(number))
+            except ValueError:
+                pass
         return qs
