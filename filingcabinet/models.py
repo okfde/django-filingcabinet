@@ -216,7 +216,7 @@ class AbstractDocument(models.Model):
         except IOError:
             pass
 
-        from .task import files_moved_task
+        from .tasks import files_moved_task
 
         files_moved_task.delay(self.id)
 
