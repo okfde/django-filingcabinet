@@ -1,10 +1,16 @@
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
-from rest_framework import viewsets, mixins, serializers, permissions, filters
+from rest_framework import (
+    viewsets, mixins, serializers, permissions, filters, status
+)
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from . import get_document_model, get_documentcollection_model
 from .models import Page, PageAnnotation
+
+Document = get_document_model()
 
 
 class PageSerializer(serializers.HyperlinkedModelSerializer):
@@ -42,10 +48,10 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     class Meta:
-        model = get_document_model()
+        model = Document
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
-            'num_pages', 'public', 'pending',
+            'num_pages', 'public', 'allow_annotation', 'pending',
             'file_url', 'cover_image', 'page_template'
         )
 
@@ -70,7 +76,7 @@ class DocumentDetailSerializer(PagesMixin, DocumentSerializer):
 
 class UpdateDocumentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = get_document_model()
+        model = Document
         fields = ('title', 'description')
 
     def update(self, instance, validated_data):
@@ -121,8 +127,84 @@ class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'id', 'title', 'description',
             'top', 'left', 'width', 'height',
+            'timestamp',
             'highlight', 'image', 'document', 'number'
         )
+
+
+def get_annotatable_documents(request):
+    cond = Q(public=True, allow_annotation=True)
+    if request.user.is_authenticated:
+        cond |= Q(user=request.user)
+    return Document.objects.filter(cond)
+
+
+class CreatePageAnnotationSerializer(serializers.Serializer):
+    document = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.none()
+    )
+    page_number = serializers.IntegerField()
+    title = serializers.CharField()
+    description = serializers.CharField(allow_blank=True)
+    top = serializers.IntegerField(required=False, allow_null=True)
+    left = serializers.IntegerField(required=False, allow_null=True)
+    width = serializers.IntegerField(required=False, allow_null=True)
+    height = serializers.IntegerField(required=False, allow_null=True)
+
+    class Meta:
+        fields = (
+            'document', 'page_number',
+            'title', 'description',
+            'top', 'left', 'width', 'height',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        qs = get_annotatable_documents(self.context['view'].request)
+        self.fields['document'].queryset = qs
+
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        doc = data['document']
+        if not (1 <= data['page_number'] <= doc.num_pages):
+            raise serializers.ValidationError("page number out of bounds")
+        page = Page.objects.get(
+            document=data['document'],
+            number=data['page_number']
+        )
+        if (not data['left'] or not data['top']
+                or not data['width'] or not data['height']):
+            return data
+
+        MIN_DIM = 10
+        MAX_WIDTH = page.width - data['left']
+        MAX_HEIGHT = page.height - data['top']
+        if (not (0 <= data['top'] <= page.height) or
+                not (0 <= data['left'] <= page.width) or
+                not (MIN_DIM <= data['width'] <= MAX_WIDTH) or
+                not (MIN_DIM <= data['height'] <= MAX_HEIGHT)):
+            raise serializers.ValidationError("selection incorrect")
+
+        return data
+
+    def create(self, validated_data):
+        page = Page.objects.get(
+            document=validated_data['document'],
+            number=validated_data['page_number']
+        )
+        annotation = PageAnnotation.objects.create(
+            page=page,
+            title=validated_data['title'],
+            description=validated_data['description'],
+            top=validated_data['top'],
+            left=validated_data['left'],
+            width=validated_data['width'],
+            height=validated_data['height'],
+            user=validated_data['user'],
+        )
+        return annotation
 
 
 class IsUserOrReadOnly(permissions.BasePermission):
@@ -162,7 +244,7 @@ class DocumentViewSet(mixins.ListModelMixin,
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
-        return get_document_model().objects.filter(cond)
+        return Document.objects.filter(cond)
 
 
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -172,7 +254,6 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
-        Document = get_document_model()
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
@@ -202,18 +283,25 @@ class DocumentCollectionViewSet(
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
-        qs = get_document_model().objects.filter(cond)
+        qs = Document.objects.filter(cond)
         qs = qs.prefetch_related('documents')
         return qs
 
 
-class PageAnnotationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class PageAnnotationViewSet(
+        mixins.CreateModelMixin, mixins.ListModelMixin,
+        viewsets.GenericViewSet):
     serializer_class = PageAnnotationSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return CreatePageAnnotationSerializer
+        return self.serializer_class
 
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
 
-        Document = get_document_model()
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
@@ -229,4 +317,17 @@ class PageAnnotationViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 qs.filter(page__number=int(number))
             except ValueError:
                 pass
-        return qs
+        return qs.order_by('timestamp')
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = self.perform_create(serializer)
+        data = {
+            'status': 'success',
+            'annotation': PageAnnotationSerializer(instance).data
+        }
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    def perform_create(self, serializer):
+        return serializer.save(user=self.request.user)
