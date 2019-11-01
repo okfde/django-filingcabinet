@@ -100,6 +100,7 @@ class AbstractDocument(models.Model):
                                 choices=settings.LANGUAGES)
 
     public = models.BooleanField(default=False)
+    allow_annotation = models.BooleanField(default=False)
     tags = TaggableManager(
         through=TaggedDocument, blank=True,
         related_name='+'
@@ -351,6 +352,7 @@ class PageAnnotation(models.Model):
 
     title = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
+    timestamp = models.DateTimeField(default=timezone.now)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -368,6 +370,9 @@ class PageAnnotation(models.Model):
                               storage=OverwriteStorage(),
                               max_length=255, blank=True)
 
+    class Meta:
+        ordering = ('-timestamp',)
+
     def __str__(self):
         return '%s (%s)' % (self.title, self.page)
 
@@ -375,7 +380,7 @@ class PageAnnotation(models.Model):
         from .services import make_page_annotation
 
         image_cropped = kwargs.pop('image_cropped', False)
-        res = super(PageAnnotation, self).save(*args, **kwargs)
+        res = super().save(*args, **kwargs)
         if not image_cropped and self.valid_rect():
             make_page_annotation(self)
             return self.save(image_cropped=True)
