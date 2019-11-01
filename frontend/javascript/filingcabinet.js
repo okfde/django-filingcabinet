@@ -30,7 +30,8 @@ Array.from(document.querySelectorAll('[data-fcdocument]')).forEach(el => {
     documentUrl: el.dataset.fcdocumenturl,
     documentPreview: JSON.parse(el.dataset.fcdocument),
     page: parseInt(el.dataset.fcpage, 10),
-    config: JSON.parse(el.dataset.fcconfig)
+    config: JSON.parse(el.dataset.fcconfig),
+    defaults: JSON.parse(el.dataset.fcdefaults),
   })
 })
 

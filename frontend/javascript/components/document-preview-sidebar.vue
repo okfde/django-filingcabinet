@@ -5,6 +5,7 @@
       :items="pages"
       page-mode
       key-field="number"
+      :buffer="400"
       sizeField="smallSize"
       :emitUpdate="true"
       v-slot="{ item }"
@@ -28,7 +29,7 @@ import DocumentPreviewPage from './document-preview-page.vue'
 
 export default {
   name: 'document-preview-sidebar',
-  props: ['document'],
+  props: ['pages'],
   components: {
     RecycleScroller,
     DocumentPreviewPage
@@ -37,8 +38,14 @@ export default {
     i18n () {
       return this.config.i18n
     },
-    pages () {
-      return this.document.pages
+  },
+  mounted () {
+    this.initialNav = false
+  },
+  updated () {
+    if (!this.initialNav) {
+      this.initialNav = true
+      this.$emit('navigatesidebar')
     }
   },
   methods: {
@@ -58,7 +65,6 @@ export default {
 .document-preview-pages {
   height: 100vh;
   overflow: auto;
-  top: 50px;
-  position: sticky;
+  padding: 0.5rem 0;
 }
 </style>

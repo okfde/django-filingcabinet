@@ -12,6 +12,8 @@ from .api_views import PageSerializer
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
 
+PREVIEW_PAGE_COUNT = 10
+
 
 class PkSlugMixin:
     def get(self, request, *args, **kwargs):
@@ -33,26 +35,56 @@ class AuthMixin:
         return qs.filter(cond)
 
 
-def get_js_config(request):
+def get_js_config(request, obj):
     return {
+        'settings': {
+            'isOwner': obj.user == request.user
+        },
         'urls': {
             'pageApiUrl': reverse('api:page-list'),
             'pageAnnotationApiUrl': reverse('api:pageannotation-list'),
         },
         'i18n': {
+            'loading': _('Loading...'),
             'page': _('page'),
             'pages': _('pages'),
             'matches': _('matches'),
             'search': _('Search'),
             'searching': _('Searching...'),
             'found_on': _('Found on'),
+            'show_text': _('Show/hide Text'),
+            'title': _('Title'),
+            'description': _('Description'),
+            'cancel': _('Cancel'),
+            'addAnnotation': _('Add annotation'),
+            'deleteAnnotation': _('Delete this annotation?')
         }
     }
 
 
+def get_document_viewer_context(doc, request, page_number=1, defaults=None):
+    pages = doc.page_set.all()
+    pages = pages.filter(number__gte=page_number)[:PREVIEW_PAGE_COUNT]
+
+    ctx = {
+        'object': doc,
+        'pages': pages,
+        'page_number': page_number,
+        'defaults': json.dumps(defaults or {}),
+        'config': json.dumps(get_js_config(request, doc))
+    }
+    serializer_klass = doc.get_serializer_class()
+    api_ctx = {
+        'request': request
+    }
+    data = serializer_klass(doc, context=api_ctx).data
+    data['pages'] = PageSerializer(pages, many=True, context=api_ctx).data
+    ctx['document_data'] = json.dumps(data)
+    return ctx
+
+
 class DocumentView(AuthMixin, PkSlugMixin, DetailView):
     model = Document
-    PREVIEW_PAGE_COUNT = 10
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -63,19 +95,10 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
                 raise ValueError
         except ValueError:
             start_from = 1
-        pages = self.object.page_set.all()
-        pages = pages.filter(number__gte=start_from)[:self.PREVIEW_PAGE_COUNT]
-        ctx['pages'] = pages
         ctx['beta'] = self.request.GET.get('beta') is not None
-        serializer_klass = self.object.get_serializer_class()
-        api_ctx = {
-            'request': self.request
-        }
-        data = serializer_klass(self.object, context=api_ctx).data
-        data['pages'] = PageSerializer(pages, many=True, context=api_ctx).data
-        ctx['page'] = start_from
-        ctx['document_data'] = json.dumps(data)
-        ctx['config'] = json.dumps(get_js_config(self.request))
+        ctx.update(get_document_viewer_context(
+            self.object, self.request, page_number=start_from,
+        ))
         return ctx
 
 

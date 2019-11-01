@@ -1,14 +1,20 @@
 <template>
-  <div class="document">
-    <div class="toolbar">
+  <div class="document" ref="document" :style="documentStyle">
+    <div class="toolbar" ref="toolbar">
       <document-toolbar
+        v-if="preferences.showToolbar"
         :document="document"
         :searcher="searcher"
         :preferences="preferences"
+        :current-page="currentPage"
+        :default-search="preferences.defaultSearch"
+        :zoom="zoom"
+        :is-small-screen="isSmallScreen"
         @navigate="navigate"
         @search="search"
         @updatepreferences="updatePreferences"
-        :current-page="currentPage"
+        @zoomin="zoomIn"
+        @zoomout="zoomOut"
       ></document-toolbar>
       <document-searchbar
         v-if="searcher"
@@ -16,46 +22,60 @@
         :search-index="searchIndex"
         :pages="pagesWithMatches"
         @movesearchindex="moveSearchIndex"
-        @clearsearch="searcher=null"
+        @clearsearch="clearSearch"
       ></document-searchbar>
     </div>
     <div class="row">
-      <div class="col-md-3 col-2 py-2"
+      <div class="col-md-3 col-2 px-0"
         :class="{'bg-dark': !searcher, 'bg-secondary': !!searcher}"
         ref="sidebarContainer"
         v-if="preferences.showSidebar || searcher"
       >
-        <div class="sidebar" :class="{'preview': !searcher, 'search': !!searcher}">
+        <div class="sidebar"
+          :class="{'preview': !searcher, 'search': !!searcher}"
+          :style="sidebarStyle">
           <document-search-sidebar
             v-if="searcher"
-            :document="document"
+            :document-pages="document.pages"
             :pages="pagesWithMatches"
             :current-page="currentPage"
             @navigate="navigate"
           ></document-search-sidebar>
           <document-preview-sidebar
             v-else
-            :document="document"
+            :pages="document.pages"
             @navigate="navigate"
+            @navigatesidebar="navigateSidebar(currentPage)"
           ></document-preview-sidebar>
         </div>
       </div>
-      <div class="col document-pages-container bg-light" :class="{'annotations-hidden': !preferences.showAnnotations}" ref="documentContainer">
+      <div class="col document-pages-container bg-light"
+        :class="{'annotations-hidden': !preferences.showAnnotations, '-sm': isSmallScreen}"
+        ref="documentContainer">
         <document-pages
           :document="document"
+          :pages="document.pages"
           :annotations="annotations"
           :current-annotation="currentAnnotation"
           :preferences="preferences"
+          :active-annotation-form="activeAnnotationForm"
+          :width="documentContainerWidth"
+          @initialized="pagesInitialized"
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
+          @activateannotationform="activateAnnotationForm"
         ></document-pages>
       </div>
-      <div v-if="preferences.showAnnotations" class="col-3 col-md-4 bg-light annotation-sidebar">
+      <div v-if="preferences.showAnnotations" class="col-4 bg-light annotation-sidebar">
         <annotation-sidebar
           :document="document"
           :annotations="annotations"
           :current-annotation="currentAnnotation"
-          @currentannotation="$emit('currentannotation', $event)"
+          :can-annotate="canAnnotate"
+          :active-annotation-form="activeAnnotationForm"
+          @currentannotation="updateCurrentAnnotation"
+          @activateannotationform="activateAnnotationForm"
+          @deleteannotation="deleteAnnotation"
         >
         </annotation-sidebar>
       </div>
@@ -73,7 +93,7 @@ import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
 import AnnotationSidebar from './document-annotation-sidebar.vue'
 
-import {getData} from '../lib/utils.js'
+import {getData, postData} from '../lib/utils.js'
 
 export default {
   name: 'document',
@@ -91,6 +111,10 @@ export default {
     config: {
       type: Object,
       default: () => ({})
+    },
+    defaults: {
+      type: Object,
+      default: () => ({})
     }
   },
   components: {
@@ -101,34 +125,55 @@ export default {
     DocumentSearchSidebar,
     AnnotationSidebar
   },
-  mounted () {
-    this.$root.config = this.config
-  },
   data () {
     let doc = this.documentPreview
     this.pageTemplate = decodeURI(this.documentPreview.page_template)
-    doc.pages = this.processPages([
+    doc.pages = [
+      ...Array(this.page - 1),
       ...doc.pages,
-      ...Array(doc.num_pages - doc.pages.length)
-    ])
+      ...Array(doc.num_pages - doc.pages.length - (this.page - 1))
+    ]
+    let preferences = {
+      showToolbar: true,
+      showTextToggle: true,
+      showZoom: true,
+      showSearch: true,
+      showSidebarToggle: true,
+      showAnnotationsToggle: true,
+      showText: false,
+      showSidebar: true,
+      showAnnotations: false,
+      maxHeight: null,
+      defaultSearch: null,
+      defaultZoom: 1
+    }
+    Object.assign(preferences, this.defaults)
     return {
-      preferences: {
-        showText: false,
-        showSidebar: true,
-        showAnnotations: true,
-      },
+      preferences: preferences,
+      zoom: preferences.defaultZoom,
       document: doc,
       searcher: null,
       searchIndex: null,
-      currentPage: this.getLocationHashPage() || this.page || 1,
+      currentPage: 1,
+      targetPage: this.getLocationHashPage() || this.page || 1,
       annotations: {},
-      currentAnnotation: null
+      currentAnnotation: null,
+      activeAnnotationForm: null,
+      resizing: false,
+      documentContainerWidth: null,
+      sidebarContainerWidth: null,
+      toolbarHeight: null,
+      isSmallScreen: true,
+      isMediumScreen: true,
     }
   },
   created () {
+    this.document.pages = this.processPages(this.document.pages)
+    this.resizing = true
     getData(this.documentUrl).then((doc) => {
-      doc.pages = this.processPages(doc.pages)
       this.document = doc
+      this.document.loaded = true
+      Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
     })
     getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
       let annotations = {}
@@ -142,19 +187,25 @@ export default {
     })
   },
   mounted () {
+    this.calcResponsive()
     window.addEventListener('resize', () => {
       console.log('resize')
       this.resize()
     })
+    if (this.preferences.defaultSearch) {
+      this.search(this.preferences.defaultSearch)
+    }
+    let el = document.querySelector('[name=csrfmiddlewaretoken]')
+    if (el !== null) {
+      this.$root.csrfToken = el.value
+    }
   },
   computed: {
     i18n () {
       return this.config.i18n
     },
-    pages () {
-      if (this.document !== null) {
-        return this.document.pages
-      }
+    processedPages () {
+      return this.document.pages // = this.processPages(this.document.pages)
     },
     pagesWithMatches () {
       if (this.searcher === null) {
@@ -176,11 +227,76 @@ export default {
         }
       })
       return resultPages
+    },
+    isFramed () {
+      return !!this.preferences.maxHeight
+    },
+    canAnnotate () {
+      return this.$root.csrfToken && (
+        this.config.settings.isOwner || this.document.allow_annotation
+      )
+    },
+    documentStyle () {
+      if (this.isFramed) {
+        return {
+          height: this.preferences.maxHeight,
+          overflow: 'auto',
+          padding: '0 15px'
+        }
+      }
+      return {}
+    },
+    sidebarStyle () {
+      return {
+        top: (this.toolbarHeight || 0) + 'px'
+      }
     }
   },
   methods: {
-    resize () {
-      Vue.set(this.document, 'pages', this.processPages(this.document.pages))
+    resize (scrollRatio) {
+      console.log('resize called', scrollRatio)
+      this.resizing = true
+      Vue.nextTick(() => {
+        this.calcResponsive()
+        Vue.set(this.document, 'pages', this.processPages(this.document.pages))
+        Vue.nextTick(() => {
+          if (scrollRatio) {
+            let top = this.$refs.documentContainer.offsetTop
+            console.log('scrolling to ', scrollRatio)
+            if (this.isFramed) {
+              let d = this.$refs.document
+              d.scrollTo(0, Math.round(d.scrollHeight * scrollRatio))
+            } else {
+              window.scrollTo(0, Math.round(document.documentElement.scrollHeight * scrollRatio))
+            }
+          }
+          this.resizing = false
+        })
+      })
+    },
+    pagesInitialized () {
+      if (this.targetPage !== this.currentPage) {
+        this.navigate({number: this.targetPage, source: 'mounted', force: true})
+      }
+    },
+    calcResponsive () {
+      if (this.$refs.document) {
+        this.isMediumScreen = this.$refs.document.clientWidth < 960
+        this.isSmallScreen = this.$refs.document.clientWidth < 600
+      }
+      if (this.$refs.documentContainer) {
+        this.documentContainerWidth = this.$refs.documentContainer.clientWidth - 30 // - padding
+      }
+      if (this.$refs.sidebarContainer) {
+        this.sidebarContainerWidth = this.$refs.sidebarContainer.clientWidth
+      }
+      if (this.$refs.toolbar) {
+        this.toolbarHeight = this.$refs.toolbar.clientHeight
+      }
+      if (this.isSmallScreen) {
+        this.preferences.showSidebar = false
+        this.preferences.showSidebarToggle = false
+      }
     },
     getLocationHashPage () {
       let match = document.location.hash.match(/page-(\d+)/)
@@ -189,29 +305,36 @@ export default {
       }
       return null
     },
-    processPages (pages) {
+    processPages (pages, rerun) {
+      let normalWidth = 700
+      if (this.documentContainerWidth) {
+        normalWidth = Math.min(this.documentContainerWidth, normalWidth)
+      }
+      let zoomedWidth = normalWidth * this.zoom
+      if (!rerun && this.lastZoomedWidth === zoomedWidth) {
+        return pages
+      }
+      this.lastZoomedWidth = zoomedWidth
+      console.log('Setting page width to', zoomedWidth, 'normal:', normalWidth)
+      let smallWidth = 180
+      if (this.sidebarContainerWidth) {
+        smallWidth = Math.min(this.sidebarContainerWidth, smallWidth)
+      }
+
       return pages.map((p, index) => {
-        if (p === undefined) {
+        if (p === undefined || p.width === undefined) {
           return {
+            zoomedWidth: zoomedWidth,
             normalSize: 1000,
             smallSize: 255,
             number: index + 1,
           }
         }
-
-        let normalWidth = 700
-        if (this.$refs.documentContainer) {
-          normalWidth = Math.min(this.$refs.documentContainer.clientWidth - 30, normalWidth)
-        }
-        console.log('Setting page width to', normalWidth)
-        let smallWidth = 180
-        if (this.$refs.sidebarContainer) {
-          smallWidth = Math.min(this.$refs.sidebarContainer.clientWidth - 30, smallWidth)
-        }
-        let ratio = p.height / p.width
-        p.normalSize = Math.ceil(normalWidth * ratio) + 60
-        p.smallSize = Math.ceil(smallWidth * ratio) + 40
         p.image_url = this.pageTemplate.replace(/\{page\}/, p.number)
+        let ratio = p.height / p.width
+        Vue.set(p, 'zoomedWidth', zoomedWidth)
+        Vue.set(p, 'normalSize', Math.ceil(zoomedWidth * ratio) + 60)
+        Vue.set(p, 'smallSize', Math.ceil(smallWidth * ratio) + 40)
         return p
       })
     },
@@ -219,7 +342,7 @@ export default {
       if (this.searcher !== null) {
         return
       }
-      let offset = this.document.pages.filter((p) => p.number < number)
+      let offset = this.processedPages.filter((p) => p.number < number)
         .map((p) => p.smallSize)
         .reduce((a, v) => a + v, 0)
 
@@ -233,19 +356,35 @@ export default {
       let top = sidebar.offsetTop
       sidebar.scrollTo(0, offset)
     },
-    navigate ({number, source}) {
-      this.currentPage = number
-      let offset = this.document.pages.filter((p) => p.number < number)
+    navigate ({number, source, searchIndex, force}) {
+      if (number === this.currentPage && !force) {
+        console.log('Not Navigate', this.currentPage, number, source)
+        return
+      }
+      console.log('Navigate from', this.currentPage, 'to', number, source, force)
+      let offset = this.processedPages.filter((p) => p.number < number)
         .map((p) => p.normalSize)
         .reduce((a, v) => a + v, 0)
       let top = this.$refs.documentContainer.offsetTop
-      window.scrollTo(0, top + offset)
+      if (this.isFramed) {
+        this.$refs.document.scrollTo(0, offset)
+      } else {
+        window.scrollTo(0, top + offset)
+      }
+      this.currentPage = number
+      console.log('navigate scroll', offset)
       if (source !== 'sidebar' && source !== 'search') {
         this.navigateSidebar(number)
+      }
+      if (searchIndex !== undefined) {
+        this.searchIndex = searchIndex
       }
     },
     search (term) {
       console.log('searching for term', term)
+      if (this.isMediumScreen && this.preferences.showAnnotations) {
+        Vue.set(this.preferences, 'showAnnotations', false)
+      }
       this.searcher = {
         term: term,
         done: false,
@@ -273,35 +412,123 @@ export default {
         })
         this.searcher.pageCount = pageCount
       })
+      this.willResize()
     },
     moveSearchIndex (move) {
       this.searchIndex += move
       let page = this.pagesWithMatches[this.searchIndex]
       this.navigate({
         number: page.number,
-        source: 'search'
+        source: 'search',
       })
     },
     clearSearch () {
       this.searcher = null
+      this.willResize()
+    },
+    zoomIn () {
+      this.zoom = Math.min(3, this.zoom + 0.5)
+      this.willResize(true)
+    },
+    zoomOut () {
+      this.zoom = Math.max(1, this.zoom - 0.5)
+      this.willResize(true)
     },
     updatePreferences (update) {
       for (let key in update) {
         Vue.set(this.preferences, key, update[key])
       }
+      if (this.isMediumScreen) {
+        if (update.showSidebar && this.preferences.showAnnotations) {
+          Vue.set(this.preferences, 'showAnnotations', false)
+        } else if (update.showAnnotations && this.preferences.showSidebar) {
+          Vue.set(this.preferences, 'showSidebar', false)
+        }
+      }
       if (update.showSidebar !== undefined || update.showAnnotations !== undefined) {
-        window.setTimeout(() => {
-          this.resize()
-        }, 5)
+        this.willResize(true)
       }
     },
+    willResize (preserveScroll) {
+      this.resizing = true
+      let scrollRatio = null
+      if (preserveScroll) {
+        if (this.isFramed) {
+          let d = this.$refs.document
+          if (d) {
+            scrollRatio = d.scrollTop / d.scrollHeight
+          }
+        } else {
+          let h = document.documentElement, 
+            b = document.body,
+            st = 'scrollTop',
+            sh = 'scrollHeight';
+
+          scrollRatio = (h[st]||b[st]) / ((h[sh]||b[sh]));
+        }
+      }
+        
+      this.resize(scrollRatio)
+    },
     updateCurrentPage ({start, end}) {
-      let currentIndex = start + Math.floor((end - start) / 2)
-      this.currentPage = this.document.pages[currentIndex].number
-      this.navigateSidebar(this.currentPage)
+      if (this.resizing || !this.document.loaded) {
+        return
+      }
+
+      let currentIndex
+      let diff = end - start
+      if (diff <= 2) {
+        // top of page, default to top
+        currentIndex = start
+      } else {
+        currentIndex = start + Math.floor(diff / 2)
+      }
+      let page = this.document.pages[currentIndex].number
+      if (page !== this.currentPage) {
+        this.currentPage = page
+        this.navigateSidebar(this.currentPage)
+      }
     },
     updateCurrentAnnotation (annotationId) {
       this.currentAnnotation = annotationId
+    },
+    activateAnnotationForm (info) {
+      if (info === null) {
+        this.activeAnnotationForm = null
+        return
+      }
+      let obj = this.activeAnnotationForm || {}
+      Object.assign(obj, info)
+      this.activeAnnotationForm = obj
+      if (!this.activeAnnotationForm.ready) {
+        return
+      }
+      postData(
+        this.config.urls.pageAnnotationApiUrl, 
+        {
+          document: this.document.id,
+          page_number: this.activeAnnotationForm.number,
+          ...this.activeAnnotationForm,
+        },
+        this.$root.csrfToken
+      ).then((data) => {
+        if (data.status === 'success') {
+          let annotation = data.annotation
+          Vue.set(this.annotations, annotation.number, [
+            ...(this.annotations[annotation.number] || []),
+            annotation
+          ])
+          this.currentAnnotation = annotation.id
+        }
+      })
+    },
+    deleteAnnotation(annotation) {
+      if (window.confirm(this.i18n.deleteAnnotation)) {
+        let pageAnnotations = this.annotations[annotation.number].filter((a) => a.id !== annotation.id)
+        Vue.set(this.annotations, annotation.number, pageAnnotations)
+        let url = `${this.config.urls.pageAnnotationApiUrl}${annotation.id}/?document=${this.document.id}`
+        postData(url, {}, this.$root.csrfToken, 'DELETE')
+      }
     }
   }
 }
@@ -314,25 +541,9 @@ export default {
   z-index: 30;
 }
 .sidebar {
-  height: 100vh;
-  overflow: auto;
-  top: 50px;
   position: sticky;
-}
-.sidebar.search {
-  top: 90px;
-}
-.document-pages-container {
-  border-bottom: 15px solid #343a40;
-  border-right: 0px;
-  &.annotations-hidden {
-    padding-right: 0 !important;
-    border-right: 15px solid #343a40;
-  }
 }
 .annotation-sidebar {
   padding-left: 0 !important;
-  border-right: 15px solid #343a40;
-  border-bottom: 15px solid #343a40;
 }
 </style>

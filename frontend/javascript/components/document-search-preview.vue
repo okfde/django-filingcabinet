@@ -1,8 +1,8 @@
 <template>
-  <a :href="pageAnchor" class="media search-preview-page border-top border-light text-white" :class="{'bg-dark': isCurrent}" @click.prevent="navigate">
+  <a :href="pageAnchor" class="media search-preview-page text-white" :class="{'bg-dark': isCurrent}" @click.prevent="navigate">
     <img :src="imageUrl" alt="" class="d-flex img-fluid" style="height:90px">
     <div class="media-body ml-2">
-      <h6>{{ i18n.page }} {{ page.number }} - {{ matches.count }} matches</h6>
+      <h6>{{ i18n.page }} {{ page.number }} - {{ matches.count }} {{ i18n.matches }}</h6>
       <div class="query-highlight">
         <template v-for="result in matches.results">
           <span :key="result.query_highlight" v-html="result.query_highlight"></span>

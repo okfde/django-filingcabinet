@@ -1,4 +1,7 @@
-from django.db.models import Q
+from django.db.models import (
+    Q, Value, BooleanField, Case, When
+)
+
 from django.template.defaultfilters import slugify
 
 from rest_framework import (
@@ -122,12 +125,14 @@ class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True
     )
 
+    can_delete = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = PageAnnotation
         fields = (
             'id', 'title', 'description',
             'top', 'left', 'width', 'height',
-            'timestamp',
+            'timestamp', 'can_delete',
             'highlight', 'image', 'document', 'number'
         )
 
@@ -144,8 +149,10 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
         queryset=Document.objects.none()
     )
     page_number = serializers.IntegerField()
-    title = serializers.CharField()
-    description = serializers.CharField(allow_blank=True)
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField(
+        allow_blank=True, max_length=1024
+    )
     top = serializers.IntegerField(required=False, allow_null=True)
     left = serializers.IntegerField(required=False, allow_null=True)
     width = serializers.IntegerField(required=False, allow_null=True)
@@ -289,7 +296,8 @@ class DocumentCollectionViewSet(
 
 
 class PageAnnotationViewSet(
-        mixins.CreateModelMixin, mixins.ListModelMixin,
+        mixins.CreateModelMixin, mixins.DestroyModelMixin,
+        mixins.ListModelMixin, mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     serializer_class = PageAnnotationSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -317,6 +325,15 @@ class PageAnnotationViewSet(
                 qs.filter(page__number=int(number))
             except ValueError:
                 pass
+        user = self.request.user
+        qs = qs.annotate(
+            can_delete=Case(
+                When(user_id=user.id, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+
         return qs.order_by('timestamp')
 
     def create(self, request, *args, **kwargs):

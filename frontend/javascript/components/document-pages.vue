@@ -17,7 +17,10 @@
         :show-text="showText"
         :show-annotations="showAnnotations"
         :current-annotation="currentAnnotation"
+        :annotation-form="activeAnnotationForm"
+        :width="width"
         @currentannotation="$emit('currentannotation', $event)"
+        @activateannotationform="$emit('activateannotationform', $event)"
       />
     </RecycleScroller>
   </div>
@@ -33,7 +36,10 @@ import DocumentPage from './document-page.vue'
 
 export default {
   name: 'document-pages',
-  props: ['document', 'preferences', 'annotations', 'currentAnnotation'],
+  props: [
+    'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
+    'activeAnnotationForm', 'width'
+  ],
   components: {
     RecycleScroller,
     DocumentPage
@@ -45,8 +51,16 @@ export default {
     showAnnotations () {
       return this.preferences.showAnnotations
     },
-    pages () {
-      return this.document.pages
+  },
+  mounted () {
+    this.initialNav = false
+  },
+  updated () {
+    if (!this.initialNav || !this.document.loaded) {
+      if (this.document.loaded) {
+        this.initialNav = true
+      }
+      this.$emit('initialized')
     }
   },
   methods: {

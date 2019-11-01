@@ -19,9 +19,13 @@ export default {
       return this.annotation.id === this.currentAnnotation
     },
     annotationStyle () {
-      
+      let bg = ''
+      if (this.annotation.highlight) {
+        bg = `url(${this.annotation.image})`
+      }
       return {
-        'background-image': `url(${this.annotation.image})`,
+        'background-image': bg,
+        transform: 'translateY(-1px)',
         top: (this.annotation.top / this.page.height * 100) + '%',
         left: (this.annotation.left / this.page.width * 100) + '%',
         width: (this.annotation.width / this.page.width * 100) + '%',
@@ -41,7 +45,7 @@ export default {
   cursor: help;
 
   &:hover, &.current{
-    box-shadow: 0px 0px 2px yellow;
+    box-shadow: 0px 0px 5px 3px #FCED00;
   }
 }
 </style>

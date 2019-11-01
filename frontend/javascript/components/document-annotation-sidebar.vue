@@ -12,7 +12,11 @@
         :annotations="annotations[item.number] || []"
         :page="item"
         :current-annotation="currentAnnotation"
+        :can-annotate="canAnnotate"
+        :active-annotation-form="activeAnnotationForm"
         @currentannotation="$emit('currentannotation', $event)"
+        @activateannotationform="$emit('activateannotationform', $event)"
+        @deleteannotation="$emit('deleteannotation', $event)"
       />
     </RecycleScroller>
   </div>
@@ -28,7 +32,10 @@ import PageAnnotations from './document-annotations.vue'
 
 export default {
   name: 'document-annotation-sidebar',
-  props: ['document', 'annotations', 'currentAnnotation'],
+  props: [
+    'document', 'annotations', 'currentAnnotation', 'canAnnotate',
+    'activeAnnotationForm'
+  ],
   components: {
     RecycleScroller,
     PageAnnotations

@@ -11,9 +11,9 @@
       <document-search-preview
         :key="item.number"
         :matches="item"
-        :page="document.pages[item.number - 1]"
+        :page="documentPages[item.number - 1]"
         :current-page="currentPage"
-        @navigate="navigate"
+        @navigate="navigate(item)"
       />
     </RecycleScroller>
   </div>
@@ -29,7 +29,7 @@ import DocumentSearchPreview from './document-search-preview.vue'
 
 export default {
   name: 'document-search-sidebar',
-  props: ['document', 'pages', 'currentPage'],
+  props: ['documentPages', 'pages', 'currentPage'],
   components: {
     DocumentSearchPreview,
     RecycleScroller
@@ -37,10 +37,12 @@ export default {
   computed: {
   },
   methods: {
-    navigate (number) {
+    navigate (item) {
+      let searchIndex = this.pages.findIndex((i) => i === item)
       this.$emit('navigate', {
-        number,
-        source: 'sidebar'
+        number: item.number,
+        source: 'sidebar',
+        searchIndex: searchIndex
       })
     }
   }
@@ -48,5 +50,9 @@ export default {
 </script>
 
 <style lang="scss">
-
+.document-search-pages {
+  height: 100vh;
+  overflow: auto;
+  padding: 0.5rem 0;
+}
 </style>
