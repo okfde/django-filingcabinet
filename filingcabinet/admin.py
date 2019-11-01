@@ -29,8 +29,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
     def save_model(self, request, doc, form, change):
         doc.updated_at = timezone.now()
-        super(DocumentBaseAdmin, self).save_model(
-            request, doc, form, change)
+        super().save_model(request, doc, form, change)
         if not change:
             doc.process_document()
 
