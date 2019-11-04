@@ -19,7 +19,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     readonly_fields = ('uid',)
     prepopulated_fields = {'slug': ('title',)}
-    actions = ['process_document', 'reprocess_document']
+    actions = ['process_document', 'reprocess_document', 'fix_document_paths']
 
     def get_inline_instances(self, request, obj=None):
         ''' Only show inline for docs with fewer than 31 pages'''
@@ -44,6 +44,15 @@ class DocumentBaseAdmin(admin.ModelAdmin):
             instance.process_document(reprocess=True)
         self.message_user(request, _("Started reprocessing documents."))
     reprocess_document.short_description = _("Reprocess documents")
+
+    def fix_document_paths(self, request, queryset):
+        from .tasks import files_moved_task
+
+        for instance in queryset:
+            files_moved_task.delay(instance.id)
+
+        self.message_user(request, _("Fixing document paths..."))
+    fix_document_paths.short_description = _("Fix document paths")
 
 
 class PageAdmin(admin.ModelAdmin):
