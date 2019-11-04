@@ -221,6 +221,8 @@ class IsUserOrReadOnly(permissions.BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
         if obj.user == request.user:
             return True
 
@@ -326,13 +328,23 @@ class PageAnnotationViewSet(
             except ValueError:
                 pass
         user = self.request.user
-        qs = qs.annotate(
-            can_delete=Case(
-                When(user_id=user.id, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
+
+        if user.is_superuser:
+            qs = qs.annotate(can_delete=Value(
+                True, output_field=BooleanField())
             )
-        )
+        else:
+            whens = []
+            if user.is_authenticated:
+                whens = [When(user_id=user.id, then=Value(True))]
+
+            qs = qs.annotate(
+                can_delete=Case(
+                    *whens,
+                    default=Value(False),
+                    output_field=BooleanField()
+                )
+            )
 
         return qs.order_by('timestamp')
 
