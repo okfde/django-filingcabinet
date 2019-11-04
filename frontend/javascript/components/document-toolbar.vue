@@ -67,7 +67,7 @@
         </div>
       </div>
     </div>
-    <div v-if="preferences.showAnnotationToggle" class="col-auto">
+    <div v-if="preferences.showAnnotationsToggle" class="col-auto">
       <div class="btn-group" role="group">
         <button type="button"
           class="btn btn-sm btn-secondary"
