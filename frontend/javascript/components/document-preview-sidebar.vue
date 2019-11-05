@@ -63,8 +63,6 @@ export default {
 @import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 .document-preview-pages {
-  height: 100vh;
-  overflow: auto;
   padding: 0.5rem 0;
 }
 </style>

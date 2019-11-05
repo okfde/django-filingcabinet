@@ -34,19 +34,21 @@
         <div class="sidebar"
           :class="{'preview': !searcher, 'search': !!searcher}"
           :style="sidebarStyle">
-          <document-search-sidebar
-            v-if="searcher"
-            :document-pages="document.pages"
-            :pages="pagesWithMatches"
-            :current-page="currentPage"
-            @navigate="navigate"
-          ></document-search-sidebar>
-          <document-preview-sidebar
-            v-else
-            :pages="document.pages"
-            @navigate="navigate"
-            @navigatesidebar="navigateSidebar(currentPage)"
-          ></document-preview-sidebar>
+          <div class="sidebar-content" :style="sidebarContentStyle">
+            <document-search-sidebar
+              v-if="searcher"
+              :document-pages="document.pages"
+              :pages="pagesWithMatches"
+              :current-page="currentPage"
+              @navigate="navigate"
+            ></document-search-sidebar>
+            <document-preview-sidebar
+              v-else
+              :pages="document.pages"
+              @navigate="navigate"
+              @navigatesidebar="navigateSidebar(currentPage)"
+            ></document-preview-sidebar>
+          </div>
         </div>
       </div>
       <div class="col document-pages-container bg-light"
@@ -162,6 +164,7 @@ export default {
       resizing: false,
       documentContainerWidth: null,
       sidebarContainerWidth: null,
+      documentHeight: null,
       toolbarHeight: null,
       isSmallScreen: true,
       isMediumScreen: true,
@@ -250,6 +253,21 @@ export default {
       return {
         top: (this.toolbarHeight || 0) + 'px'
       }
+    },
+    sidebarContentStyle () {
+      if (!this.isFramed) {
+        return {
+          height: '100vh'
+        }
+      }
+      if (this.documentHeight && this.toolbarHeight) {
+        return {
+          height: (this.documentHeight - this.toolbarHeight) + 'px'
+        }
+      }
+      return {
+        height: '100vh'
+      }
     }
   },
   methods: {
@@ -292,6 +310,9 @@ export default {
       }
       if (this.$refs.toolbar) {
         this.toolbarHeight = this.$refs.toolbar.clientHeight
+      }
+      if (this.$refs.document) {
+        this.documentHeight = this.$refs.document.clientHeight
       }
       if (this.isSmallScreen) {
         this.preferences.showSidebar = false
@@ -542,6 +563,9 @@ export default {
 }
 .sidebar {
   position: sticky;
+}
+.sidebar-content {
+  overflow: auto;
 }
 .annotation-sidebar {
   padding-left: 0 !important;

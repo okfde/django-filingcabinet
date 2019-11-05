@@ -51,8 +51,6 @@ export default {
 
 <style lang="scss">
 .document-search-pages {
-  height: 100vh;
-  overflow: auto;
   padding: 0.5rem 0;
 }
 </style>
