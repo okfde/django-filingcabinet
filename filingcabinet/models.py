@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.db import transaction
 
 from taggit.models import TaggedItemBase
 from taggit.managers import TaggableManager
@@ -219,7 +220,7 @@ class AbstractDocument(models.Model):
 
         from .tasks import files_moved_task
 
-        files_moved_task.delay(self.id)
+        transaction.on_commit(lambda: files_moved_task.delay(self.id))
 
     def get_page_template(self):
         return self.get_file_url(filename=get_page_image_filename())
