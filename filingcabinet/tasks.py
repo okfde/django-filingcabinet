@@ -35,3 +35,5 @@ def files_moved_task(doc_pk):
     except Document.DoesNotExist:
         return None
     fix_file_paths(doc)
+    doc.pending = False
+    doc.save()

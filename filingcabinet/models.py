@@ -210,6 +210,7 @@ class AbstractDocument(models.Model):
         dst_file_dir = os.path.dirname(os.path.join(
             settings.MEDIA_ROOT, dst_file_name
         ))
+        self.pending = True
         self.pdf_file = dst_file_name
         try:
             if src_file_dir != dst_file_dir:
