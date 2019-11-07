@@ -204,10 +204,10 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
             page=page,
             title=validated_data['title'],
             description=validated_data['description'],
-            top=validated_data['top'],
-            left=validated_data['left'],
-            width=validated_data['width'],
-            height=validated_data['height'],
+            top=validated_data.get('top'),
+            left=validated_data.get('left'),
+            width=validated_data.get('width'),
+            height=validated_data.get('height'),
             user=validated_data['user'],
         )
         return annotation
