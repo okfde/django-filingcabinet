@@ -238,6 +238,22 @@ class AbstractDocument(models.Model):
             return DocumentDetailSerializer
         return DocumentSerializer
 
+    def can_read(self, request):
+        if self.public:
+            return True
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            return request.user == self.user
+        return False
+
+    def can_write(self, request):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            return request.user == self.user
+        return False
+
     def get_writeable_file(self):
         if not self.pdf_file:
             with open(self.get_file_path(), 'rb') as f:
