@@ -180,8 +180,8 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
             document=data['document'],
             number=data['page_number']
         )
-        if (not data['left'] or not data['top']
-                or not data['width'] or not data['height']):
+        if (not data.get('left') or not data.get('top')
+                or not data.get('width') or not data.get('height')):
             return data
 
         MIN_DIM = 10
