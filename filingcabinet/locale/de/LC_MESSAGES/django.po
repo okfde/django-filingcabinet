@@ -7,56 +7,72 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-18 12:23+0200\n"
-"PO-Revision-Date: 2019-09-18 12:25+0200\n"
+"POT-Creation-Date: 2019-11-07 12:07+0100\n"
+"PO-Revision-Date: 2019-11-07 12:15+0100\n"
+"Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
+"Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
-"Language-Team: \n"
 "X-Generator: Poedit 2.2\n"
 
-#: admin.py:40
+#: admin.py:39
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py:41
+#: admin.py:40
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py:46
+#: admin.py:45
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py:47
+#: admin.py:46
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
+
+#: admin.py:54
+msgid "Fixing document paths..."
+msgstr "Dokumentenpfade werden repariert..."
+
+#: admin.py:55
+msgid "Fix document paths"
+msgstr "Repariere Dokumentenpfade"
 
 #: apps.py:7
 msgid "Filing Cabinet"
 msgstr "Aktenschrank"
 
-#: models.py:65
+#: models.py:66
 msgid "Document Tag"
 msgstr "Dokumenten-Schlagwort"
 
-#: models.py:66
+#: models.py:67
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py:90 models.py:373
+#: models.py:91 models.py:379 models.py:442
 msgid "User"
 msgstr "Nutzer"
 
-#: models.py:111
+#: models.py:113
 msgid "document"
 msgstr "Dokument"
 
-#: models.py:112
+#: models.py:114
 msgid "documents"
 msgstr "Dokumente"
+
+#: models.py:459
+msgid "document collection"
+msgstr "Dokumentensammlung"
+
+#: models.py:460
+msgid "document collections"
+msgstr "Dokumentensammlungen"
 
 #: templates/admin/filingcabinet/pageannotation/change_form.html:15
 msgid "Annotation"
@@ -77,3 +93,65 @@ msgstr "privat"
 #: templates/filingcabinet/document_detail.html:32
 msgid "Download PDF"
 msgstr "PDF herunterladen"
+
+#: urls.py:13
+msgctxt "url part"
+msgid "^collection/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
+msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
+
+#: urls.py:18
+msgctxt "url part"
+msgid "^collection/(?P<pk>\\d+)/$"
+msgstr "^sammlung/(?P<pk>\\d+)/$"
+
+#: views.py:48
+msgid "Loading..."
+msgstr "Wird geladen..."
+
+#: views.py:49
+msgid "page"
+msgstr "Seite"
+
+#: views.py:50
+msgid "pages"
+msgstr "Seiten"
+
+#: views.py:51
+msgid "matches"
+msgstr "Ergebnisse"
+
+#: views.py:52
+msgid "Search"
+msgstr "Suchen"
+
+#: views.py:53
+msgid "Searching..."
+msgstr "Suche läuft..."
+
+#: views.py:54
+msgid "Found on"
+msgstr "Gefunden auf"
+
+#: views.py:55
+msgid "Show/hide Text"
+msgstr "Zeige/verstecke Text"
+
+#: views.py:56
+msgid "Title"
+msgstr "Titel"
+
+#: views.py:57
+msgid "Description"
+msgstr "Beschreibung"
+
+#: views.py:58
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: views.py:59
+msgid "Add annotation"
+msgstr "Annotation hinzufügen"
+
+#: views.py:60
+msgid "Delete this annotation?"
+msgstr "Diese Annotation löschen?"
