@@ -38,7 +38,7 @@ class AuthMixin:
 def get_js_config(request, obj):
     return {
         'settings': {
-            'isOwner': obj.user == request.user
+            'canWrite': obj.can_write(request)
         },
         'urls': {
             'pageApiUrl': reverse('api:page-list'),

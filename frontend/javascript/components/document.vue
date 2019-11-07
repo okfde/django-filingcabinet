@@ -236,7 +236,7 @@ export default {
     },
     canAnnotate () {
       return this.$root.csrfToken && (
-        this.config.settings.isOwner || this.document.allow_annotation
+        this.config.settings.canWrite || this.document.allow_annotation
       )
     },
     documentStyle () {
