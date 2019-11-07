@@ -97,6 +97,33 @@ import AnnotationSidebar from './document-annotation-sidebar.vue'
 
 import {getData, postData} from '../lib/utils.js'
 
+function range(size, startAt = 0) {
+    return [...Array(size).keys()].map(i => i + startAt);
+}
+
+function getPageRange (pageRangeStr) {
+  if (!pageRangeStr) {
+    return null
+  }
+  let parts = pageRangeStr.split(',')
+  let pages = []
+  parts.forEach(part => {
+    part = part.trim()
+    if (part.indexOf('-') !== -1) {
+      let startStop = part.split('-')
+      let start = parseInt(startStop[0], 10)
+      let stop = parseInt(startStop[1], 10)
+      pages = [
+        ...pages,
+        ...range(stop - start + 1, start)
+      ]
+    } else {
+      pages.push(parseInt(part, 10))
+    }
+  })
+  return pages
+}
+
 export default {
   name: 'document',
   props: {
@@ -147,9 +174,15 @@ export default {
       showAnnotations: false,
       maxHeight: null,
       defaultSearch: null,
-      defaultZoom: 1
+      defaultZoom: 1,
+      pageRange: null,
+      showPageNumberInput: true
     }
     Object.assign(preferences, this.defaults)
+    let pageRange = getPageRange(preferences.pageRange)
+    if (pageRange) {
+      preferences.showPageNumberInput = false
+    }
     return {
       preferences: preferences,
       zoom: preferences.defaultZoom,
@@ -157,6 +190,7 @@ export default {
       searcher: null,
       searchIndex: null,
       currentPage: 1,
+      pageRange: pageRange,
       targetPage: this.getLocationHashPage() || this.page || 1,
       annotations: {},
       currentAnnotation: null,
@@ -342,7 +376,7 @@ export default {
         smallWidth = Math.min(this.sidebarContainerWidth, smallWidth)
       }
 
-      return pages.map((p, index) => {
+      let processedPages = pages.map((p, index) => {
         if (p === undefined || p.width === undefined) {
           return {
             zoomedWidth: zoomedWidth,
@@ -358,6 +392,12 @@ export default {
         Vue.set(p, 'smallSize', Math.ceil(smallWidth * ratio) + 40)
         return p
       })
+      if (this.pageRange === null) {
+        return processedPages
+      }
+      let pageMap = {}
+      this.pageRange.forEach((p) => pageMap[p] = true)
+      return processedPages.filter((p) => !!pageMap[p.number])
     },
     navigateSidebar (number) {
       if (this.searcher !== null) {

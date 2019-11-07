@@ -11,7 +11,7 @@
         </button>
       </div>
     </div>
-    <div class="col-auto">
+    <div v-if="preferences.showPageNumberInput" class="col-auto">
       <div class="input-group input-group-sm">
         <input type="number" class="page-number-input form-control bg-light form-control-sm"
           v-model="page"
