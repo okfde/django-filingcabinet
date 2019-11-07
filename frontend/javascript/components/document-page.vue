@@ -228,7 +228,7 @@ export default {
   top: 1px;
   width: 100%;
   pre {
-    white-space: normal;
+    white-space: pre-wrap;
     text-align: left;
     margin: 0 auto;
     overflow: auto;
