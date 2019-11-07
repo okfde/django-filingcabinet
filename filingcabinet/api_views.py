@@ -8,7 +8,6 @@ from rest_framework import (
     viewsets, mixins, serializers, permissions, filters, status
 )
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from . import get_document_model, get_documentcollection_model
 from .models import Page, PageAnnotation
@@ -302,16 +301,14 @@ class PageAnnotationViewSet(
         mixins.ListModelMixin, mixins.RetrieveModelMixin,
         viewsets.GenericViewSet):
     serializer_class = PageAnnotationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsUserOrReadOnly,)
 
     def get_serializer_class(self):
         if self.action == 'create':
             return CreatePageAnnotationSerializer
         return self.serializer_class
 
-    def get_queryset(self):
-        document_id = self.request.query_params.get('document', '')
-
+    def get_base_queryset(self, document_id):
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
@@ -319,14 +316,9 @@ class PageAnnotationViewSet(
             doc = Document.objects.filter(cond).get(pk=document_id)
         except (ValueError, Document.DoesNotExist):
             return PageAnnotation.objects.none()
-        qs = PageAnnotation.objects.filter(page__document=doc)
+        return PageAnnotation.objects.filter(page__document=doc)
 
-        number = self.request.query_params.get('number')
-        if number is not None:
-            try:
-                qs.filter(page__number=int(number))
-            except ValueError:
-                pass
+    def annotate_permissions(self, qs):
         user = self.request.user
 
         if user.is_superuser:
@@ -345,6 +337,21 @@ class PageAnnotationViewSet(
                     output_field=BooleanField()
                 )
             )
+        return qs
+
+    def get_queryset(self):
+        document_id = self.request.query_params.get('document', '')
+
+        qs = self.get_base_queryset(document_id)
+
+        number = self.request.query_params.get('number')
+        if number is not None:
+            try:
+                qs.filter(page__number=int(number))
+            except ValueError:
+                pass
+
+        qs = self.annotate_permissions(qs)
 
         return qs.order_by('timestamp')
 
