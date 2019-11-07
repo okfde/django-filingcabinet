@@ -171,6 +171,10 @@ export default {
     }
   },
   created () {
+    let el = document.querySelector('[name=csrfmiddlewaretoken]')
+    if (el !== null) {
+      this.$root.csrfToken = el.value
+    }
     this.document.pages = this.processPages(this.document.pages)
     this.resizing = true
     getData(this.documentUrl).then((doc) => {
@@ -197,10 +201,6 @@ export default {
     })
     if (this.preferences.defaultSearch) {
       this.search(this.preferences.defaultSearch)
-    }
-    let el = document.querySelector('[name=csrfmiddlewaretoken]')
-    if (el !== null) {
-      this.$root.csrfToken = el.value
     }
   },
   computed: {

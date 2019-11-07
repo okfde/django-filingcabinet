@@ -16,9 +16,6 @@
 
 {% if beta and not object.pending %}
   <div class="container-sm-full">
-    {% if request.user.is_authenticated %}
-      {% csrf_token %}
-    {% endif %}
     <div class="document"
       data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}"
       data-fcdocument="{{ document_data }}"
