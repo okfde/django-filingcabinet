@@ -232,7 +232,9 @@ export default {
     text-align: left;
     margin: 0 auto;
     overflow: auto;
-    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    font-family: sans-serif;
+    background-color: rgba(255, 255, 255, 0.95);
     color: #333;
     font-family: 'Courier New', Courier, monospace;
   }
