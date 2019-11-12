@@ -97,6 +97,17 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
                 return super().get_inline_instances(request, obj=obj)
         return []
 
+
+class CollectionDocumentBaseAdmin(admin.ModelAdmin):
+    list_display = ('document', 'collection', 'order')
+    raw_id_fields = ('document', 'collection',)
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.select_related('document', 'collection')
+        return qs
+
+
 # Register them yourself
 # admin.site.register(Document, DocumentAdmin)
 # admin.site.register(Page)
