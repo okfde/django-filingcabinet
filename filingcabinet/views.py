@@ -121,6 +121,7 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
         }
         data = serializer_klass(self.object, context=api_ctx).data
         context['documentcollection_data'] = json.dumps(data)
-        context['config'] = json.dumps(get_js_config(self.request))
+        config = get_js_config(self.request, self.object)
+        context['config'] = json.dumps(config)
 
         return context
