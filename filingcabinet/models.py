@@ -460,6 +460,9 @@ class AbstractDocumentCollection(models.Model):
         verbose_name_plural = _('document collections')
         abstract = True
 
+    def __str__(self):
+        return self.title
+
     def get_absolute_url(self):
         if self.slug:
             return reverse('document-collection', kwargs={
