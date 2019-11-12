@@ -16,6 +16,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     date_hierarchy = 'created_at'
     list_display = ('title', 'created_at', 'num_pages', 'public', 'pending')
+    list_filter = ('pending', 'public', 'allow_annotation',)
     raw_id_fields = ('user',)
     readonly_fields = ('uid',)
     prepopulated_fields = {'slug': ('title',)}
