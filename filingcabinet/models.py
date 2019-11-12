@@ -479,6 +479,22 @@ class AbstractDocumentCollection(models.Model):
             return document.get_cover_image()
         return None
 
+    def can_read(self, request):
+        if self.public:
+            return True
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            return request.user == self.user
+        return False
+
+    def can_write(self, request):
+        if request.user.is_superuser:
+            return True
+        if request.user.is_authenticated:
+            return request.user == self.user
+        return False
+
 
 class DocumentCollection(AbstractDocumentCollection):
     class Meta(AbstractDocumentCollection.Meta):
