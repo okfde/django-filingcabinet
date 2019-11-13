@@ -7,6 +7,7 @@
       key-field="number"
       sizeField="normalSize"
       :emitUpdate="true"
+      :prerender="3"
       @update="updateCurrentPage"
       v-slot="{ item }"
     >

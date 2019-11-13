@@ -6,6 +6,7 @@
       page-mode
       key-field="number"
       :buffer="400"
+      :prerender="5"
       sizeField="smallSize"
       :emitUpdate="true"
       v-slot="{ item }"
