@@ -1,10 +1,10 @@
 <template>
-  <a :href="document.site_url" class="preview-doc" target="_blank">
+  <a :href="document.site_url" @click="navigate" class="preview-doc" target="_blank">
     <img v-if="imageUrl" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
     <div v-if="!imageLoaded" class="spinner-grow" role="status">
       <span class="sr-only">Loading...</span>
     </div>
-    <p>
+    <p class="text-truncate">
       {{ document.title }}
     </p>
   </a>
@@ -37,6 +37,10 @@ export default {
   methods: {
     onImageLoad () {
       this.imageLoaded = true
+    },
+    navigate (e) {
+      e.preventDefault()
+      this.$emit('navigate', this.document)
     }
   }
 }
@@ -46,6 +50,9 @@ export default {
 .preview-doc {
   display: block;
   text-align: center;
+}
+.preview-doc:hover {
+  text-decoration: none;
 }
 .preview-doc .page-image {
   border: 1px solid #aaa;

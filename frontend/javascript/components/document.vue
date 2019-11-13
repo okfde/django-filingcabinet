@@ -132,10 +132,11 @@ export default {
     },
     documentPreview: {
       type: Object,
+      default: null
     },
     page: {
       type: Number,
-      default: null
+      default: 1
     },
     config: {
       type: Object,
@@ -156,12 +157,15 @@ export default {
   },
   data () {
     let doc = this.documentPreview
-    this.pageTemplate = decodeURI(this.documentPreview.page_template)
-    doc.pages = [
-      ...Array(this.page - 1),
-      ...doc.pages,
-      ...Array(doc.num_pages - doc.pages.length - (this.page - 1))
-    ]
+    if (doc !== null) {
+      this.pageTemplate = decodeURI(this.documentPreview.page_template)
+      doc.pages = doc.pages || []
+      doc.pages = [
+        ...Array(this.page - 1),
+        ...doc.pages,
+        ...Array(doc.num_pages - doc.pages.length - (this.page - 1))
+      ]
+    }
     let preferences = {
       showToolbar: true,
       showTextToggle: true,
@@ -212,6 +216,7 @@ export default {
     this.document.pages = this.processPages(this.document.pages)
     this.resizing = true
     getData(this.documentUrl).then((doc) => {
+      this.pageTemplate = decodeURI(doc.page_template)
       this.document = doc
       this.document.loaded = true
       Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))

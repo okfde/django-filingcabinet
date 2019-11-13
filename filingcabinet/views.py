@@ -57,7 +57,9 @@ def get_js_config(request, obj):
             'description': _('Description'),
             'cancel': _('Cancel'),
             'addAnnotation': _('Add annotation'),
-            'deleteAnnotation': _('Delete this annotation?')
+            'deleteAnnotation': _('Delete this annotation?'),
+            'backToCollection': _('Back to collection'),
+            'documents': _('documents'),
         }
     }
 

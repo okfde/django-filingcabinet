@@ -1,6 +1,6 @@
 <template>
-  <div class="document-preview-grid bg-secondary">
-    <div class="row">
+  <div class="document-preview-grid">
+    <div class="row bg-secondary pt-3">
       <div v-for="document in documents" class="col-sm-4 col-md-3" :key="document.id">
         <document-preview
           :document="document"
@@ -21,7 +21,7 @@ export default {
   name: 'document-preview-grid',
   props: ['documents'],
   components: {
-    DocumentPreview
+    DocumentPreview,
   },
   computed: {
     i18n () {
@@ -29,11 +29,8 @@ export default {
     },
   },
   methods: {
-    navigate (number) {
-      this.$emit('navigate', {
-        number,
-        source: 'preview-grid'
-      })
+    navigate (doc) {
+      this.$emit('navigate', doc)
     }
   }
 }
