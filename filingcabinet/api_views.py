@@ -100,7 +100,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         source='get_cover_image'
     )
     documents = DocumentSerializer(
-        many=True
+        many=True, source='ordered_documents'
     )
 
     class Meta:

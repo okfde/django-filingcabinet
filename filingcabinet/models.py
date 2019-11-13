@@ -463,6 +463,14 @@ class AbstractDocumentCollection(models.Model):
     def __str__(self):
         return self.title
 
+    @property
+    def ordered_documents(self):
+        if not hasattr(self, '_ordered_documents'):
+            self._ordered_documents = self.documents.all().order_by(
+                'filingcabinet_collectiondocument__order'
+            )
+        return self._ordered_documents
+
     def get_absolute_url(self):
         if self.slug:
             return reverse('document-collection', kwargs={
@@ -477,10 +485,11 @@ class AbstractDocumentCollection(models.Model):
         return settings.SITE_URL + self.get_absolute_url()
 
     def get_cover_image(self):
-        document = self.documents.all().first()
-        if document:
+        try:
+            document = self.ordered_documents[0]
             return document.get_cover_image()
-        return None
+        except IndexError:
+            return None
 
     def can_read(self, request):
         if self.public:
