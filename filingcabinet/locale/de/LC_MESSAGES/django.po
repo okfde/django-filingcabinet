@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-07 12:07+0100\n"
-"PO-Revision-Date: 2019-11-07 12:15+0100\n"
+"POT-Creation-Date: 2019-11-13 15:10+0100\n"
+"PO-Revision-Date: 2019-11-13 15:10+0100\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -18,27 +18,27 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.2\n"
 
-#: admin.py:39
+#: admin.py:40
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py:40
+#: admin.py:41
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py:45
+#: admin.py:46
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py:46
+#: admin.py:47
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
 
-#: admin.py:54
+#: admin.py:55
 msgid "Fixing document paths..."
 msgstr "Dokumentenpfade werden repariert..."
 
-#: admin.py:55
+#: admin.py:56
 msgid "Fix document paths"
 msgstr "Repariere Dokumentenpfade"
 
@@ -62,7 +62,7 @@ msgstr "Nutzer"
 msgid "document"
 msgstr "Dokument"
 
-#: models.py:114
+#: models.py:114 views.py:62
 msgid "documents"
 msgstr "Dokumente"
 
@@ -155,3 +155,7 @@ msgstr "Annotation hinzufügen"
 #: views.py:60
 msgid "Delete this annotation?"
 msgstr "Diese Annotation löschen?"
+
+#: views.py:61
+msgid "Back to collection"
+msgstr "Zurück zur Sammlung"
