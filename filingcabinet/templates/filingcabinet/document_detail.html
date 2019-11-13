@@ -20,7 +20,7 @@
 {% endblock document_top %}
 
 {% block document_main %}
-  {% include "filingcabinet/_document_viewer.html" with object=object beta=beta %}
+  {% include "filingcabinet/_document_viewer.html" with object=object %}
 {% endblock document_main %}
 
 {% block document_footer %}
@@ -42,15 +42,11 @@
   {% if object.pending %}
     <meta http-equiv="refresh" content="30">
   {% endif %}
-  {% if beta %}
-    <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
-  {% endif %}
+  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  {% if beta %}
-    <script src="{% static 'js/common.js' %}" defer></script>
-    <script src="{% static 'js/filingcabinet.js' %}" defer></script>
-  {% endif %}
+  <script src="{% static 'js/common.js' %}" defer></script>
+  <script src="{% static 'js/filingcabinet.js' %}" defer></script>
 {% endblock %}

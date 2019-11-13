@@ -14,7 +14,7 @@
   </div>
 {% endif %}
 
-{% if beta and not object.pending %}
+{% if not object.pending %}
   <div class="container-sm-full">
     <div class="document"
       data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}"

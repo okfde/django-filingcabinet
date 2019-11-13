@@ -95,7 +95,6 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
                 raise ValueError
         except ValueError:
             start_from = 1
-        ctx['beta'] = self.request.GET.get('beta') is not None
         ctx.update(get_document_viewer_context(
             self.object, self.request, page_number=start_from,
         ))
