@@ -26,7 +26,7 @@
         >
         <div v-if="annotationRect" :style="annotationRectStyle" class="annotation-rect"></div>
       </div>
-      <div v-if="showAnnotations && imageLoaded && !showAnnotationForm && annotationsWithRect.length"
+      <div v-if="showAnnotations && imageLoaded && !showText && !showAnnotationForm && annotationsWithRect.length"
         class="annotation-overlay-container" :style="imageOverlayStyle">
         <page-annotation-overlay v-for="annotation in annotationsWithRect"
           :key="annotation.id"
