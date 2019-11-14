@@ -254,6 +254,13 @@ class AbstractDocument(models.Model):
             return request.user == self.user
         return False
 
+    @classmethod
+    def get_annotatable(cls, request):
+        cond = models.Q(public=True, allow_annotation=True)
+        if request.user.is_authenticated:
+            cond |= models.Q(user=request.user)
+        return cls.objects.filter(cond)
+
     def get_writeable_file(self):
         if not self.pdf_file:
             with open(self.get_file_path(), 'rb') as f:

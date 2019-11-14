@@ -136,13 +136,6 @@ class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-def get_annotatable_documents(request):
-    cond = Q(public=True, allow_annotation=True)
-    if request.user.is_authenticated:
-        cond |= Q(user=request.user)
-    return Document.objects.filter(cond)
-
-
 class CreatePageAnnotationSerializer(serializers.Serializer):
     document = serializers.PrimaryKeyRelatedField(
         queryset=Document.objects.none()
@@ -166,7 +159,7 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        qs = get_annotatable_documents(self.context['view'].request)
+        qs = Document.get_annotatable(self.context['view'].request)
         self.fields['document'].queryset = qs
 
     def validate(self, data):
