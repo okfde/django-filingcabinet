@@ -172,7 +172,7 @@ export default {
       showZoom: true,
       showSearch: true,
       showSidebarToggle: true,
-      showAnnotationsToggle: true,
+      showAnnotationsToggle: null,
       showText: false,
       showSidebar: true,
       showAnnotations: false,
@@ -197,6 +197,7 @@ export default {
       pageRange: pageRange,
       targetPage: this.getLocationHashPage() || this.page || 1,
       annotations: {},
+      hasAnnotations: false,
       currentAnnotation: null,
       activeAnnotationForm: null,
       resizing: false,
@@ -228,8 +229,17 @@ export default {
           annotations[a.number] = []
         }
         annotations[a.number].push(a)
+        this.hasAnnotations = true
       })
       this.annotations = annotations
+      if (this.preferences.showAnnotationsToggle === null) {
+        // Only show annotation toggle if explicitly set (non-null)
+        // and we either have annotations or can annotate
+        Vue.set(
+          this.preferences, 'showAnnotationsToggle',
+          this.hasAnnotations || this.canAnnotate
+        )
+      }
     })
   },
   mounted () {
@@ -277,6 +287,9 @@ export default {
       return this.$root.csrfToken && (
         this.config.settings.canWrite || this.document.allow_annotation
       )
+    },
+    showAnnotations () {
+      return this.hasAnnotations || this.canAnnotate
     },
     documentStyle () {
       if (this.isFramed) {
