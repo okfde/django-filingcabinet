@@ -256,6 +256,8 @@ class AbstractDocument(models.Model):
 
     @classmethod
     def get_annotatable(cls, request):
+        if request.user.is_superuser:
+            return cls.objects.all()
         cond = models.Q(public=True, allow_annotation=True)
         if request.user.is_authenticated:
             cond |= models.Q(user=request.user)
