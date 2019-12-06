@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 15:10+0100\n"
-"PO-Revision-Date: 2019-11-13 15:10+0100\n"
+"POT-Creation-Date: 2019-12-06 16:56+0100\n"
+"PO-Revision-Date: 2019-12-06 16:56+0100\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -54,7 +54,7 @@ msgstr "Dokumenten-Schlagwort"
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py:91 models.py:379 models.py:442
+#: models.py:91 models.py:389 models.py:452
 msgid "User"
 msgstr "Nutzer"
 
@@ -62,15 +62,15 @@ msgstr "Nutzer"
 msgid "document"
 msgstr "Dokument"
 
-#: models.py:114 views.py:62
+#: models.py:114 views.py:63
 msgid "documents"
 msgstr "Dokumente"
 
-#: models.py:459
+#: models.py:469
 msgid "document collection"
 msgstr "Dokumentensammlung"
 
-#: models.py:460
+#: models.py:470
 msgid "document collections"
 msgstr "Dokumentensammlungen"
 
@@ -133,29 +133,33 @@ msgid "Found on"
 msgstr "Gefunden auf"
 
 #: views.py:55
+msgid "Found in"
+msgstr "Gefunden in"
+
+#: views.py:56
 msgid "Show/hide Text"
 msgstr "Zeige/verstecke Text"
 
-#: views.py:56
+#: views.py:57
 msgid "Title"
 msgstr "Titel"
 
-#: views.py:57
+#: views.py:58
 msgid "Description"
 msgstr "Beschreibung"
 
-#: views.py:58
+#: views.py:59
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: views.py:59
+#: views.py:60
 msgid "Add annotation"
 msgstr "Annotation hinzufügen"
 
-#: views.py:60
+#: views.py:61
 msgid "Delete this annotation?"
 msgstr "Diese Annotation löschen?"
 
-#: views.py:61
+#: views.py:62
 msgid "Back to collection"
 msgstr "Zurück zur Sammlung"
