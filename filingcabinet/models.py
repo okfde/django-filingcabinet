@@ -352,7 +352,7 @@ class Page(models.Model):
             self.number
         )
 
-    def get_image_url(self, size='small'):
+    def get_image_url(self, size='{size}'):
         return self.document.get_page_template(
             page=self.number, size=size
         )
