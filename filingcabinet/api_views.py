@@ -13,6 +13,7 @@ from . import get_document_model, get_documentcollection_model
 from .models import Page, PageAnnotation
 
 Document = get_document_model()
+DocumentCollection = get_documentcollection_model()
 
 
 class PageSerializer(serializers.HyperlinkedModelSerializer):
@@ -258,14 +259,25 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
+        collection_id = self.request.query_params.get('collection', '')
         cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
+
+        pages = Page.objects.all()
         try:
             doc = Document.objects.filter(cond).get(pk=document_id)
+            pages = pages.filter(document=doc)
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
-        return Page.objects.filter(document=doc)
+        try:
+            collection = DocumentCollection.objects.filter(cond).get(
+                pk=collection_id
+            )
+            pages = pages.filter(document__in=collection.documents.all())
+        except (ValueError, Document.DoesNotExist):
+            return Page.objects.none()
+        return pages.prefetch_related('document')
 
 
 class DocumentCollectionViewSet(
