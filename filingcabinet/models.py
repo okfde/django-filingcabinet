@@ -223,8 +223,10 @@ class AbstractDocument(models.Model):
 
         transaction.on_commit(lambda: files_moved_task.delay(self.id))
 
-    def get_page_template(self):
-        return self.get_file_url(filename=get_page_image_filename())
+    def get_page_template(self, page=1, size='small'):
+        return self.get_file_url(filename=get_page_image_filename(
+            page=page, size=size
+        ))
 
     def get_cover_image(self):
         return self.get_file_url(filename=get_page_image_filename(
@@ -350,9 +352,8 @@ class Page(models.Model):
             self.number
         )
 
-    def get_image_url(self, size='{size}'):
-        templ = self.document.get_page_image_url_template()
-        return settings.MEDIA_URL + templ.format(
+    def get_image_url(self, size='small'):
+        return self.document.get_page_template(
             page=self.number, size=size
         )
 

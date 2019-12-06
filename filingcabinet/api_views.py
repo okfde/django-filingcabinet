@@ -20,12 +20,15 @@ class PageSerializer(serializers.HyperlinkedModelSerializer):
         read_only=True,
         view_name='api:document-detail'
     )
+    image = serializers.CharField(
+        source='get_image_url'
+    )
 
     class Meta:
         model = Page
         fields = (
             'document', 'number', 'content',
-            'width', 'height'
+            'width', 'height', 'image'
         )
 
 
