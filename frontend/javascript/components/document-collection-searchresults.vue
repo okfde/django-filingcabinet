@@ -1,9 +1,17 @@
 <template>
   <div class="document-preview-grid">
     <div class="row bg-secondary pt-3">
-      <div v-for="document in documents" class="col-sm-4 col-md-3" :key="document.id">
+      <div class="col-12">
+        <h4>{{ document.title }}</h4>
+      </div>
+    </div>
+    <div class="row bg-secondary">
+      <div v-for="page in pages" class="col-sm-4 col-md-3" :key="page.number">
         <document-preview
           :document="document"
+          :page="page.number"
+          :highlight="page.query_highlight"
+          :image="page.image"
           @navigate="navigate"
         />
       </div>
@@ -18,14 +26,14 @@ import 'intersection-observer'
 import DocumentPreview from './document-preview.vue'
 
 export default {
-  name: 'document-preview-grid',
-  props: ['documents'],
+  name: 'document-collection-searchresult',
+  props: ['document', 'pages'],
   components: {
     DocumentPreview,
   },
   computed: {
     i18n () {
-      return this.$root.config.i18n
+      return this.config.i18n
     },
   },
   methods: {
@@ -37,7 +45,5 @@ export default {
 </script>
 
 <style lang="scss">
-.document-preview-grid {
 
-}
 </style>

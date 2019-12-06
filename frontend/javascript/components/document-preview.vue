@@ -1,20 +1,46 @@
 <template>
-  <a :href="document.site_url" @click="navigate" class="preview-doc" target="_blank">
-    <img v-if="imageUrl" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
-    <div v-if="!imageLoaded" class="spinner-grow" role="status">
-      <span class="sr-only">Loading...</span>
+  <div>
+    <a :href="documentUrl" @click="navigate" class="preview-doc" target="_blank">
+      <img v-if="imageUrl" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
+      <div v-if="!imageLoaded" class="spinner-grow" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p class="text-truncate">
+        <template v-if="highlight">
+          {{ i18n.page  }} {{ page }}
+        </template>
+        <template v-else>
+          {{ document.title }}
+        </template>
+      </p>
+    </a>
+    <div class="query-highlight" v-if="highlight">
+      <span v-html="highlight"></span>
     </div>
-    <p class="text-truncate">
-      {{ document.title }}
-    </p>
-  </a>
+  </div>
 </template>
 
 <script>
 
 export default {
   name: 'document-preview',
-  props: ['document'],
+  props: {
+    document: {
+      type: Object,
+    },
+    page: {
+      type: Number,
+      default: 1
+    },
+    highlight: {
+      type: String,
+      default: null
+    },
+    image: {
+      type: String,
+      default: null
+    }
+  },
   data () {
     return {
       imageLoaded: false
@@ -28,11 +54,18 @@ export default {
   },
   computed: {
     i18n () {
-      return this.config.i18n
+      return this.$root.config.i18n
     },
     imageUrl () {
-      return this.document.cover_image
+      return this.image || this.document.cover_image
     },
+    documentUrl () {
+      let url = this.document.site_url
+      if (this.page) {
+        url += `?page=${this.page}`
+      }
+      return url
+    }
   },
   methods: {
     onImageLoad () {
@@ -40,7 +73,10 @@ export default {
     },
     navigate (e) {
       e.preventDefault()
-      this.$emit('navigate', this.document)
+      this.$emit('navigate', {
+        document: this.document,
+        page: this.page
+      })
     }
   }
 }
@@ -62,5 +98,25 @@ export default {
   text-align: center;
   color: #fff;
   text-decoration: none;
+}
+
+.query-highlight {
+  font-size: 0.7rem;
+  max-height: 48px;
+  overflow: hidden;
+  span {
+    text-overflow: ellipsis;
+  }
+}
+
+</style>
+
+<style lang="scss">
+/* Do not scope as it's v-html-injected */
+.query-highlight {
+  em {
+    background-color: yellow;
+    color: #333;
+  }
 }
 </style>
