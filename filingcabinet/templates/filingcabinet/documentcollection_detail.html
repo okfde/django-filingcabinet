@@ -14,29 +14,8 @@
     {% endif %}
 </div>
 
-<div class="container mb-5">
-  <div class="document" data-fcdocumentcollectionurl="{% url 'api:documentcollection-detail' pk=object.pk %}" data-fcdocumentcollection="{{ documentcollection_data }}" data-fcconfig="{{ config }}">
-    <div class="row">
-      {% for document in documents %}
-        <div class="col-md-3">
-          <div class="card">
-            <a href="{{ document.get_absolute_url }}">
-              <img src="{{ document.get_cover_image }}" class="card-img-top" alt="{{ document.title }}">
-            </a>
-            <div class="card-body">
-              <h5 class="card-title">
-                <a href="{{ document.get_absolute_url }}">
-                  {{ document.title }}
-                </a>
-              </h5>
-              <p class="card-text">{{ document.description }}</p>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-</div>
+{% include "filingcabinet/_documentcollection_viewer.html" %}
+
 {% endblock %}
 
 

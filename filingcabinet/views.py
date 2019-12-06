@@ -103,6 +103,20 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
         return ctx
 
 
+def get_document_collection_context(collection, request):
+    context = {}
+    context['documents'] = collection.documents.all()
+    serializer_klass = collection.get_serializer_class()
+    api_ctx = {
+        'request': request
+    }
+    data = serializer_klass(collection, context=api_ctx).data
+    context['documentcollection_data'] = json.dumps(data)
+    config = get_js_config(request, collection)
+    context['config'] = json.dumps(config)
+    return context
+
+
 class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     model = DocumentCollection
 
@@ -115,14 +129,8 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['documents'] = self.object.documents.all()
-        serializer_klass = self.object.get_serializer_class()
-        api_ctx = {
-            'request': self.request
-        }
-        data = serializer_klass(self.object, context=api_ctx).data
-        context['documentcollection_data'] = json.dumps(data)
-        config = get_js_config(self.request, self.object)
-        context['config'] = json.dumps(config)
 
+        context.update(
+            get_document_collection_context(self.object, self.request)
+        )
         return context
