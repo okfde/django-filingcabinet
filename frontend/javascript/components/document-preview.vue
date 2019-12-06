@@ -14,7 +14,7 @@
         </template>
       </p>
     </a>
-    <div class="query-highlight" v-if="highlight">
+    <div class="query-highlight mb-5" v-if="highlight">
       <span v-html="highlight"></span>
     </div>
   </div>

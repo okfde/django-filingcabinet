@@ -2,7 +2,7 @@
   <div class="document-preview-grid">
     <div class="row bg-secondary pt-3">
       <div class="col-12">
-        <h4>{{ document.title }}</h4>
+        <h4 class="text-white">{{ document.title }}</h4>
       </div>
     </div>
     <div class="row bg-secondary">

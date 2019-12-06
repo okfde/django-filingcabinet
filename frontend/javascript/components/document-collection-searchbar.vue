@@ -5,7 +5,7 @@
         <span class="sr-only">{{ i18n.searching }}</span>
       </div>
       <small v-if="searcher">
-        {{ i18n.found_on }} {{ resultCount }} {{ i18n.pages }}
+        {{ i18n.found_in }} {{ resultCount }} {{ i18n.document }}
       </small>
     </div>
     <div class="col-auto ml-auto">
@@ -42,7 +42,7 @@ export default {
     },
     resultCount () {
       if (this.searcher !== null) {
-        return this.searcher.results.length
+        return this.searcher.docCount
       }
       return 0
     }
