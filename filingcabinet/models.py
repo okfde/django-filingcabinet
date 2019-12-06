@@ -223,7 +223,7 @@ class AbstractDocument(models.Model):
 
         transaction.on_commit(lambda: files_moved_task.delay(self.id))
 
-    def get_page_template(self, page=1, size='{size}'):
+    def get_page_template(self, page='{page}', size='{size}'):
         return self.get_file_url(filename=get_page_image_filename(
             page=page, size=size
         ))
