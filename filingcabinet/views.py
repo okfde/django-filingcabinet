@@ -52,7 +52,7 @@ def get_js_config(request, obj):
             'search': _('Search'),
             'searching': _('Searching...'),
             'found_on': _('Found on'),
-            'found_in': _('Found in'),
+            'found': _('found'),
             'show_text': _('Show/hide Text'),
             'title': _('Title'),
             'description': _('Description'),

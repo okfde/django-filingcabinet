@@ -202,7 +202,7 @@ export default {
 
         })
         this.searcher.results = docsWithPages
-        this.searcher.docCount = docCount
+        Vue.set(this.searcher, 'docCount', docCount)
       })
     },
   }

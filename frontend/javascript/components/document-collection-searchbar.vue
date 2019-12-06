@@ -5,7 +5,7 @@
         <span class="sr-only">{{ i18n.searching }}</span>
       </div>
       <small v-if="searcher">
-        {{ i18n.found_in }} {{ resultCount }} {{ i18n.document }}
+        {{ resultCount }} {{ i18n.documents }} {{ i18n.found }} 
       </small>
     </div>
     <div class="col-auto ml-auto">
