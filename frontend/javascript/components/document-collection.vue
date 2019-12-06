@@ -185,7 +185,7 @@ export default {
           const docId = getIDFromURL(p.document)
           let document = this.collection.documents[this.collectionIndex[docId]]
           let docResult = {
-            image: p.image,
+            image: p.image.replace(/\{size\}/, 'small'),
             number: p.number,
             query_highlight: p.query_highlight
           }
