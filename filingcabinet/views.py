@@ -104,7 +104,9 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
 
 
 def get_document_collection_context(collection, request):
-    context = {}
+    context = {
+        'object': collection
+    }
     context['documents'] = collection.documents.all()
     serializer_klass = collection.get_serializer_class()
     api_ctx = {
