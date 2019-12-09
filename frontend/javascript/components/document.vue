@@ -40,11 +40,13 @@
               :document-pages="document.pages"
               :pages="pagesWithMatches"
               :current-page="currentPage"
+              :height="sidebarContentHeight"
               @navigate="navigate"
             ></document-search-sidebar>
             <document-preview-sidebar
               v-else
               :pages="document.pages"
+              :height="sidebarContentHeight"
               @navigate="navigate"
               @navigatesidebar="navigateSidebar(currentPage)"
             ></document-preview-sidebar>
@@ -62,6 +64,7 @@
           :preferences="preferences"
           :active-annotation-form="activeAnnotationForm"
           :width="documentContainerWidth"
+          :height="documentViewHeight"
           @initialized="pagesInitialized"
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
@@ -307,19 +310,23 @@ export default {
       }
     },
     sidebarContentStyle () {
-      if (!this.isFramed) {
-        return {
-          height: '100vh'
-        }
-      }
       if (this.documentHeight && this.toolbarHeight) {
         return {
           height: (this.documentHeight - this.toolbarHeight) + 'px'
         }
       }
       return {
-        height: '100vh'
+        height: '90vh'
       }
+    },
+    sidebarContentHeight () {
+      return this.sidebarContentStyle.height
+    },
+    documentViewHeight () {
+      if (this.isFramed) {
+        return (this.documentHeight - this.toolbarHeight) + 'px'
+      }
+      return null
     }
   },
   methods: {
@@ -627,5 +634,8 @@ export default {
 }
 .annotation-sidebar {
   padding-left: 0 !important;
+}
+.document-pages-container {
+  position: relative;
 }
 </style>

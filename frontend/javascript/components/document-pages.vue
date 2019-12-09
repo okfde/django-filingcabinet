@@ -1,13 +1,12 @@
 <template>
-  <div class="document-pages">
+  <div class="document-pages" :style="{'height': height}">
     <RecycleScroller
       class="scroller"
       :items="pages"
-      page-mode
+      :page-mode="isPageMode"
       key-field="number"
       sizeField="normalSize"
       :emitUpdate="true"
-      :prerender="3"
       @update="updateCurrentPage"
       v-slot="{ item }"
     >
@@ -39,7 +38,7 @@ export default {
   name: 'document-pages',
   props: [
     'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
-    'activeAnnotationForm', 'width'
+    'activeAnnotationForm', 'width', 'height'
   ],
   components: {
     RecycleScroller,
@@ -52,6 +51,9 @@ export default {
     showAnnotations () {
       return this.preferences.showAnnotations
     },
+    isPageMode () {
+      return this.preferences.maxHeight === null
+    }
   },
   mounted () {
     this.initialNav = false
@@ -74,6 +76,10 @@ export default {
 
 <style lang="scss">
 @import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
+
+.scroller {
+  height: 100%;
+}
 
 .document-pages {
   padding: 1rem 0;

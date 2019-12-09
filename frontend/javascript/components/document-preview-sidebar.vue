@@ -1,12 +1,9 @@
 <template>
-  <div class="document-preview-pages">
+  <div class="document-preview-pages" :style="{'height': height}">
     <RecycleScroller
       class="scroller"
       :items="pages"
-      page-mode
       key-field="number"
-      :buffer="400"
-      :prerender="5"
       sizeField="smallSize"
       :emitUpdate="true"
       v-slot="{ item }"
@@ -30,7 +27,7 @@ import DocumentPreviewPage from './document-preview-page.vue'
 
 export default {
   name: 'document-preview-sidebar',
-  props: ['pages'],
+  props: ['pages', 'height'],
   components: {
     RecycleScroller,
     DocumentPreviewPage
