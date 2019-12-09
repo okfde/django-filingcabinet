@@ -233,6 +233,11 @@ class AbstractDocument(models.Model):
             page=1, size='small'
         ))
 
+    def get_full_cover_image(self):
+        return self.get_file_url(filename=get_page_image_filename(
+            page=1, size='original'
+        ))
+
     def get_serializer_class(self, detail=False):
         from .api_views import DocumentSerializer, DocumentDetailSerializer
 
