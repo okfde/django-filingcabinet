@@ -127,6 +127,10 @@ function getPageRange (pageRangeStr) {
   return pages
 }
 
+function getScroll (d) {
+  return d.querySelector('.document-pages .scroller')
+}
+
 export default {
   name: 'document',
   props: {
@@ -224,6 +228,7 @@ export default {
       this.document = doc
       this.document.loaded = true
       Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
+      this.willResize()
     })
     getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
       let annotations = {}
@@ -310,9 +315,17 @@ export default {
       }
     },
     sidebarContentStyle () {
-      if (this.documentHeight && this.toolbarHeight) {
-        return {
-          height: (this.documentHeight - this.toolbarHeight) + 'px'
+      if (this.isFramed) {
+        if (this.toolbarHeight) {
+          return {
+            height: (this.documentHeight - this.toolbarHeight) + 'px'
+          }
+        }
+      } else {
+        if (this.toolbarHeight) {
+          return {
+            height: (window.innerHeight - this.toolbarHeight) + 'px'
+          }
         }
       }
       return {
@@ -341,7 +354,7 @@ export default {
             let top = this.$refs.documentContainer.offsetTop
             console.log('scrolling to ', scrollRatio)
             if (this.isFramed) {
-              let d = this.$refs.document
+              let d = getScroll(this.$refs.document)
               d.scrollTo(0, Math.round(d.scrollHeight * scrollRatio))
             } else {
               window.scrollTo(0, Math.round(document.documentElement.scrollHeight * scrollRatio))
@@ -437,7 +450,7 @@ export default {
         return
       }
       const sidebar = sidebarContainer.querySelector(
-        '.document-preview-pages'
+        '.document-preview-pages .scroller'
       )
       let top = sidebar.offsetTop
       sidebar.scrollTo(0, offset)
@@ -451,10 +464,10 @@ export default {
       let offset = this.processedPages.filter((p) => p.number < number)
         .map((p) => p.normalSize)
         .reduce((a, v) => a + v, 0)
-      let top = this.$refs.documentContainer.offsetTop
       if (this.isFramed) {
-        this.$refs.document.scrollTo(0, offset)
+        getScroll(this.$refs.document).scrollTo(0, offset)
       } else {
+        let top = this.$refs.documentContainer.offsetTop
         window.scrollTo(0, top + offset)
       }
       this.currentPage = number
@@ -540,7 +553,7 @@ export default {
       let scrollRatio = null
       if (preserveScroll) {
         if (this.isFramed) {
-          let d = this.$refs.document
+          let d = getScroll(this.$refs.document)
           if (d) {
             scrollRatio = d.scrollTop / d.scrollHeight
           }
