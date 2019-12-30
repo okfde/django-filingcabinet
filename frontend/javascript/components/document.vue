@@ -634,6 +634,10 @@ export default {
 </script>
 
 <style lang="scss">
+.document {
+  position: relative;
+  z-index: 0;
+}
 .toolbar {
   position: sticky;
   top: 0;
