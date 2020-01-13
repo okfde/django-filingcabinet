@@ -60,6 +60,8 @@ def queue_missing_pages(doc):
     )
 
     if not missing_pages:
+        doc.pending = False
+        doc.save()
         return
 
     process_pages_task.delay(
