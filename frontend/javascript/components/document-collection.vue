@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="collection-toolbar">
+    <div class="collection-toolbar" ref="toolbar">
       <div class="row py-2 bg-dark">
         <div class="col-4">
           <div v-if="document" class="btn-group" role="group">
             <button type="button"
               class="btn btn-sm btn-secondary"
-              @click="document = null"
+              @click="clearDocument"
             >
               {{ i18n.backToCollection }}
             </button>
@@ -157,6 +157,11 @@ export default {
     navigate ({document, page}) {
       this.document = document
       this.documentPage = page || 1
+      window.scrollTo(0, this.$refs.toolbar.offsetTop)
+    },
+    clearDocument () {
+      this.document = null
+      window.scrollTo(0, this.$refs.toolbar.offsetTop)
     },
     enableSearch () {
       this.showSearch = true
