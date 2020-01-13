@@ -23,6 +23,22 @@ from .settings import (
 )
 
 
+class DocumentPortal(models.Model):
+    title = models.CharField(max_length=250)
+    slug = models.SlugField(max_length=250)
+
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    public = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('document portal')
+        verbose_name_plural = _('document portals')
+
+    def __str__(self):
+        return self.title
+
+
 class DocumentManager(models.Manager):
     pass
 
@@ -105,6 +121,10 @@ class AbstractDocument(models.Model):
     tags = TaggableManager(
         through=TaggedDocument, blank=True,
         related_name='+'
+    )
+    portal = models.ForeignKey(
+        DocumentPortal, null=True, blank=True,
+        on_delete=models.SET_NULL
     )
 
     objects = DocumentManager()
@@ -468,6 +488,10 @@ class AbstractDocumentCollection(models.Model):
         blank=True,
         through=CollectionDocument,
         through_fields=('collection', 'document')
+    )
+    portal = models.ForeignKey(
+        DocumentPortal, null=True, blank=True,
+        on_delete=models.SET_NULL
     )
 
     class Meta:

@@ -5,6 +5,14 @@ from django.utils.translation import ugettext_lazy as _
 from .models import Page, CollectionDocument
 
 
+class DocumentPortalAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title',)
+    date_hierarchy = 'created_at'
+    list_display = ('title', 'created_at', 'public')
+    list_filter = ('public',)
+
+
 class PageInline(admin.StackedInline):
     model = Page
     raw_id_fields = ('document',)
@@ -16,7 +24,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     date_hierarchy = 'created_at'
     list_display = ('title', 'created_at', 'num_pages', 'public', 'pending')
-    list_filter = ('pending', 'public', 'allow_annotation',)
+    list_filter = ('pending', 'public', 'allow_annotation', 'portal')
     raw_id_fields = ('user',)
     readonly_fields = ('uid',)
     prepopulated_fields = {'slug': ('title',)}
