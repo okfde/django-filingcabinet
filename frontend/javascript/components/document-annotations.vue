@@ -79,6 +79,8 @@ export default {
     postAnnotation () {
       this.activateForm(true)
       this.$emit('activateannotationform', null)
+      this.title = ''
+      this.description = ''
     },
     activateForm (ready) {
       this.$emit('activateannotationform', {
