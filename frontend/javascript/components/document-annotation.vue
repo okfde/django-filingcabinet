@@ -1,5 +1,5 @@
 <template>
-  <div class="annotation" :class="{'current': isCurrent, 'has-rect': hasRect}"
+  <div :id="'sidebar-annotation-' + annotation.id" class="annotation" :class="{'current': isCurrent, 'has-rect': hasRect}"
     @mouseover="activateAnnotation"
     @mouseout="deactivateAnnotation"
     @click="permanentlyActivateAnnotation">

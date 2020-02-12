@@ -1,61 +1,81 @@
 <template>
-  <div class="page-wrapper" ref="pageWrapper">
-    <div :id="pageId" class="page" :style="pageStyle">
-      <img v-if="page.image_url" v-show="imageLoaded" ref="image"
-        @load="onImageLoad"
-        :src="imageUrl"
-        :alt="pageLabel"
-        :style="{'width': page.zoomedWidth + 'px'}"
-        class="page-image"
-        draggable="false"
-        :class="{'annotation-form': showAnnotationForm}"
-        />
-      <div class="page-text" v-if="showText && !showAnnotationForm">
-        <pre :style="imageOverlayStyle">
-          {{ page.content }}
-        </pre>
-      </div>
-      <div v-if="!imageLoaded" class="spinner-grow" role="status">
-        <span class="sr-only">{{ i18n.loading }}</span>
-      </div>
-      <div v-if="showAnnotationForm"
-        class="annotation-rect-container" :style="imageOverlayStyle"
-        @mousedown="mouseDown"
-        @mousemove="mouseMove"
-        @mouseup="mouseUp"
-        >
-        <div v-if="annotationRect" :style="annotationRectStyle" class="annotation-rect"></div>
-      </div>
-      <div v-if="showAnnotations && imageLoaded && !showText && !showAnnotationForm && annotationsWithRect.length"
-        class="annotation-overlay-container" :style="imageOverlayStyle">
-        <page-annotation-overlay v-for="annotation in annotationsWithRect"
-          :key="annotation.id"
-          :page="page"
-          :annotation="annotation"
-          :current-annotation="currentAnnotation"
-          @currentannotation="$emit('currentannotation', $event)"
-        >
-        </page-annotation-overlay>
+  <div class="row justify-content-center">
+    <div :class="{'col-8': showAnnotations, 'col-auto': !showAnnotations}">
+      <div class="page-wrapper">
+        <div :id="pageId" class="page">
+          <img v-if="page.image_url" v-show="imageLoaded" ref="image"
+            @load="onImageLoad"
+            :src="imageUrl"
+            :alt="pageLabel"
+            :style="{'width': page.zoomedWidth + 'px'}"
+            class="page-image"
+            draggable="false"
+            :class="{'annotation-form': showAnnotationForm}"
+            />
+          <div class="page-text" v-if="showText && !showAnnotationForm">
+            <pre :style="imageOverlayStyle">
+              {{ page.content }}
+            </pre>
+          </div>
+          <div v-if="!imageLoaded" class="spinner-grow" role="status">
+            <span class="sr-only">{{ i18n.loading }}</span>
+          </div>
+          <div v-if="showAnnotationForm"
+            class="annotation-rect-container" :style="imageOverlayStyle"
+            @mousedown="mouseDown"
+            @mousemove="mouseMove"
+            @mouseup="mouseUp"
+            >
+            <div v-if="annotationRect" :style="annotationRectStyle" class="annotation-rect"></div>
+          </div>
+          <div v-if="showAnnotations && imageLoaded && !showText && !showAnnotationForm && annotationsWithRect.length"
+            class="annotation-overlay-container" :style="imageOverlayStyle">
+            <page-annotation-overlay v-for="annotation in annotationsWithRect"
+              :key="annotation.id"
+              :page="page"
+              :annotation="annotation"
+              :current-annotation="currentAnnotation"
+              @currentannotation="annotationRectClicked"
+            >
+            </page-annotation-overlay>
+          </div>
+        </div>
+        <p class="page-number">
+          {{ page.number }}
+        </p>
       </div>
     </div>
-    <p class="page-number">
-      {{ page.number }}
-    </p>
+
+    <div v-if="showAnnotations" class="col-4 bg-light annotation-sidebar">
+      <page-annotations
+        :annotations="annotations"
+        :page="page"
+        :current-annotation="currentAnnotation"
+        :can-annotate="canAnnotate"
+        :active-annotation-form="annotationForm"
+        @currentannotation="$emit('currentannotation', $event)"
+        @activateannotationform="$emit('activateannotationform', $event)"
+        @deleteannotation="$emit('deleteannotation', $event)"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 
+import PageAnnotations from './document-annotations.vue'
 import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
 export default {
   name: 'document-page',
   props: [
     'page', 'annotations', 'showText', 'showAnnotations',
-    'currentAnnotation', 'annotationForm', 'width'
+    'currentAnnotation', 'annotationForm', 'width',
+    'canAnnotate'
   ],
   components: {
-    PageAnnotationOverlay
+    PageAnnotationOverlay,
+    PageAnnotations
   },
   data () {
     return {
@@ -126,11 +146,6 @@ export default {
         ratioX: this.page.width / this.imageDimensions.width,
         ratioY: this.page.height / this.imageDimensions.height,
       }
-    },
-    pageStyle () {
-      return {
-        width: this.width + 'px'
-      }
     }
   },
   methods: {
@@ -199,8 +214,19 @@ export default {
           height: Math.round(this.annotationRect.height * this.imageInfo.ratioY),
         })
       }
+    },
+    annotationRectClicked (annotationId) {
+      this.$emit('currentannotation', annotationId)
+      if (annotationId) {
+        let el = document.querySelector('#sidebar-annotation-' + annotationId)
+        if (el) {
+          el.scrollIntoView({
+            behavior: 'smooth'
+          })
+        }
+      }
     }
-  },
+  }
 }
 </script>
 
@@ -246,9 +272,15 @@ export default {
   height: 100%;
   position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
 }
 .annotation-rect-container {
   cursor: crosshair;
+}
+.annotation-sidebar {
+  padding-left: 0 !important;
 }
 .annotation {
   position: absolute;

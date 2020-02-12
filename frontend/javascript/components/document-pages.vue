@@ -19,8 +19,10 @@
         :current-annotation="currentAnnotation"
         :annotation-form="activeAnnotationForm"
         :width="width"
+        :can-annotate="canAnnotate"
         @currentannotation="$emit('currentannotation', $event)"
         @activateannotationform="$emit('activateannotationform', $event)"
+        @deleteannotation="$emit('deleteannotation', $event)"
       />
     </RecycleScroller>
   </div>
@@ -38,7 +40,7 @@ export default {
   name: 'document-pages',
   props: [
     'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
-    'activeAnnotationForm', 'width', 'height'
+    'activeAnnotationForm', 'width', 'height', 'canAnnotate'
   ],
   components: {
     RecycleScroller,

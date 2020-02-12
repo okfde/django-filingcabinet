@@ -65,24 +65,12 @@
           :active-annotation-form="activeAnnotationForm"
           :width="documentContainerWidth"
           :height="documentViewHeight"
+          :canAnnotate="canAnnotate"
           @initialized="pagesInitialized"
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
         ></document-pages>
-      </div>
-      <div v-if="preferences.showAnnotations" class="col-4 bg-light annotation-sidebar">
-        <annotation-sidebar
-          :document="document"
-          :annotations="annotations"
-          :current-annotation="currentAnnotation"
-          :can-annotate="canAnnotate"
-          :active-annotation-form="activeAnnotationForm"
-          @currentannotation="updateCurrentAnnotation"
-          @activateannotationform="activateAnnotationForm"
-          @deleteannotation="deleteAnnotation"
-        >
-        </annotation-sidebar>
       </div>
     </div>
   </div>
@@ -96,7 +84,6 @@ import DocumentPreviewSidebar from './document-preview-sidebar.vue'
 import DocumentSearchSidebar from './document-search-sidebar.vue'
 import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
-import AnnotationSidebar from './document-annotation-sidebar.vue'
 
 import {getData, postData} from '../lib/utils.js'
 
@@ -160,7 +147,6 @@ export default {
     DocumentPages,
     DocumentPreviewSidebar,
     DocumentSearchSidebar,
-    AnnotationSidebar
   },
   data () {
     let doc = this.documentPreview
@@ -401,7 +387,11 @@ export default {
     processPages (pages, rerun) {
       let normalWidth = 700
       if (this.documentContainerWidth) {
-        normalWidth = Math.min(this.documentContainerWidth, normalWidth)
+        let pageAvailableWidth = this.documentContainerWidth
+        if (this.preferences.showAnnotations) {
+          pageAvailableWidth = pageAvailableWidth / 12 * 7
+        }
+        normalWidth = Math.min(pageAvailableWidth, normalWidth)
       }
       let zoomedWidth = normalWidth * this.zoom
       if (!rerun && this.lastZoomedWidth === zoomedWidth) {
@@ -644,9 +634,6 @@ export default {
 }
 .sidebar-content {
   overflow: auto;
-}
-.annotation-sidebar {
-  padding-left: 0 !important;
 }
 .document-pages-container {
   position: relative;
