@@ -45,6 +45,7 @@ OFFICE_FILETYPES = (
 OFFICE_EXTENSIONS = (
     '.doc',
     '.docx',
+    '.docm',
     '.odt',
     '.rtf',
 )
