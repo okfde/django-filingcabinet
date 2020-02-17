@@ -33,6 +33,8 @@ def get_pdf_processor(doc):
 
 
 def process_document(doc):
+    if not doc.get_file_path():
+        return
     logger.info('Processing document %s', doc.id)
     pdf = get_pdf_processor(doc)
     doc.num_pages = pdf.num_pages
