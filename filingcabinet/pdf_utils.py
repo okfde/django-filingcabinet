@@ -28,7 +28,7 @@ try:
 except ImportError:
     pdflib = None
 
-from .utils import chunks
+from .utils import chunks, estimate_time
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,7 @@ def try_reading_pdf(pdf_file, password=None):
 def get_readable_pdf(pdf_file, copy_func, password=None):
     tries = 0
     filesize = os.path.getsize(pdf_file)
-    # one minute + 5 seconds per megabyte timeout
-    timeout = 60 + 5 * filesize / (1024 * 1024)
+    timeout = estimate_time(filesize)
     while True:
         try:
             pdf_reader = try_reading_pdf(pdf_file, password=password)
@@ -141,13 +140,14 @@ class PDFProcessor(object):
             'title': doc_info.title
         }
 
-    def get_images(self, pages=None, resolution=300, chunk_size=20):
+    def get_images(self, pages=None, resolution=300, chunk_size=20, timeout=5 * 60):
         white = wand.color.Color('#fff')
         if pages is None:
             pages = list(range(1, self.num_pages + 1))
         images = get_images_from_pdf_chunked(
             self.filename, pages,
-            chunk_size, dpi=resolution
+            chunk_size, dpi=resolution,
+            timeout=timeout
         )
         for page_number, image_filename in images:
             logger.info('Generated page %s: %s', page_number, image_filename)
@@ -462,10 +462,11 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     return writer.getvalue()
 
 
-def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300):
+def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300,
+                                timeout=5 * 60):
     for pages in chunks(pages, chunk_size):
         with get_images_from_pdf(
-                filename, pages=pages, dpi=dpi) as images:
+                filename, pages=pages, dpi=dpi, timeout=timeout) as images:
             yield from images
 
 

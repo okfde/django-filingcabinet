@@ -10,6 +10,7 @@ from .models import (
     get_page_filename, get_page_annotation_filename
 )
 from .pdf_utils import PDFProcessor, crop_image, draw_highlights
+from .utils import estimate_time
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +67,10 @@ def queue_missing_pages(doc):
         doc.save()
         return
 
-    process_pages_task.delay(
-        doc.id, page_numbers=missing_pages, task_page_limit=20
+    process_pages_task.apply_async(
+        args=[doc.id],
+        kwargs={'page_numbers': missing_pages, 'task_page_limit': 20},
+        time_limit=60 + estimate_time(doc.file_size)
     )
 
 
@@ -90,7 +93,10 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
     logger.info('Processing %s pages of doc %s', process_page_numbers, doc.id)
     pdf = get_pdf_processor(doc)
 
-    for page_number, image in pdf.get_images(pages=process_page_numbers):
+    timeout = estimate_time(doc.filesize)
+
+    for page_number, image in pdf.get_images(pages=process_page_numbers,
+                                             timeout=timeout):
         process_page(doc, pdf, page_number, image)
 
     logger.info(
