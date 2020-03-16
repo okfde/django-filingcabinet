@@ -93,7 +93,7 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
     logger.info('Processing %s pages of doc %s', process_page_numbers, doc.id)
     pdf = get_pdf_processor(doc)
 
-    timeout = estimate_time(doc.filesize)
+    timeout = estimate_time(doc.file_size)
 
     for page_number, image in pdf.get_images(pages=process_page_numbers,
                                              timeout=timeout):
