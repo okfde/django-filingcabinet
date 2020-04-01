@@ -204,7 +204,9 @@ export default {
   mounted () {
     console.log('mounting', this.page.number)
     if (this.pdfDocument) {
-      this.loadText(this.pdfDocument)
+      this.$nextTick(function () {
+        this.loadText(this.pdfDocument)
+      })
     }
   },
   beforeDestroy () {
