@@ -20,17 +20,17 @@
           >
           <div
             class="pdf-layer"
-            :style="{'width': page.zoomedWidth + 'px'}"
+            :style="imageOverlayStyle"
           >
             <div
               ref="textLayer"
               class="text-layer"
-              :style="{'width': page.zoomedWidth + 'px'}"
+              :style="imageOverlayStyle"
             />
             <div
               ref="annotationLayer"
               class="annotation-layer"
-              :style="{'width': page.zoomedWidth + 'px'}"
+              :style="imageOverlayStyle"
             />
           </div>
 
@@ -310,6 +310,7 @@ export default {
         this.page.zoomedWidth / pdfPage.view[2]
       )
       // Rendering text layer as HTML.
+      this.$refs.textLayer.innerHTML = ""
       console.log('Rendering content', pdfTextContent)
       this.$root.PDFJS.renderTextLayer({
         textContent: pdfTextContent,
@@ -413,8 +414,8 @@ export default {
   top: 0;
   right: 0;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%)
+  height: 100%;
+  margin: 0 auto;
 }
 
 .text-layer {
@@ -427,8 +428,10 @@ export default {
   text-align: initial;
   opacity: 0.2;
   line-height: 1.0;
-  left: 50%;
-  transform: translateX(-50%)
+  /* left: 50%;
+  transform: translateX(-50%) */
+  height: 100%;
+  margin: 0 auto;
 }
 .text-layer > div {
   color: transparent;
