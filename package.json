@@ -1,14 +1,21 @@
 {
-  "name": "filingcabinet",
+  "name": "@okfde/filingcabinet",
   "version": "0.0.1",
-  "main": "index.js",
+  "main": "frontend/javascript/filingcabinet.js",
   "repository": "git@github.com:okfde/django-filingcabinet.git",
   "author": "Stefan Wehrmeyer <mail@stefanwehrmeyer.com>",
   "license": "MIT",
-  "private": true,
   "dependencies": {
     "intersection-observer": "^0.7.0",
     "vue": "^2.5.16",
     "vue-virtual-scroller": "^1.0.0-rc.2"
+  },
+  "files": [
+    "frontend/*"
+  ],
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^6.2.2"
   }
 }
