@@ -649,10 +649,7 @@ export default {
         let loadingTask = this.$root.PDFJS.getDocument({
           url: this.document.file_url,
           isEvalSupported: false,
-          httpHeaders: {
-            'pragma': 'no-cache',
-            'cache-control': 'no-cache'
-          }
+          withCredentials: true
         })
         loadingTask.promise.then(pdfDocument => {
           this.pdfDocument = pdfDocument
