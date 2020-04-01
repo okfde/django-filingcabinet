@@ -648,8 +648,7 @@ export default {
         console.log('Loading PDF', this.document.file_url)
         let loadingTask = this.$root.PDFJS.getDocument({
           url: this.document.file_url,
-          isEvalSupported: false,
-          withCredentials: true
+          isEvalSupported: false
         })
         loadingTask.promise.then(pdfDocument => {
           this.pdfDocument = pdfDocument
