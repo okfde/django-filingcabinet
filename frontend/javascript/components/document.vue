@@ -1,6 +1,13 @@
 <template>
-  <div class="document" ref="document" :style="documentStyle">
-    <div class="toolbar" ref="toolbar">
+  <div
+    ref="document"
+    class="document"
+    :style="documentStyle"
+  >
+    <div
+      ref="toolbar"
+      class="toolbar"
+    >
       <document-toolbar
         v-if="preferences.showToolbar"
         :document="document"
@@ -15,7 +22,7 @@
         @updatepreferences="updatePreferences"
         @zoomin="zoomIn"
         @zoomout="zoomOut"
-      ></document-toolbar>
+      />
       <document-searchbar
         v-if="searcher"
         :searcher="searcher"
@@ -23,18 +30,24 @@
         :pages="pagesWithMatches"
         @movesearchindex="moveSearchIndex"
         @clearsearch="clearSearch"
-      ></document-searchbar>
+      />
     </div>
     <div class="row">
-      <div class="col-md-3 col-2 px-0"
-        :class="{'bg-dark': !searcher, 'bg-secondary': !!searcher}"
-        ref="sidebarContainer"
+      <div
         v-if="preferences.showSidebar || searcher"
+        ref="sidebarContainer"
+        class="col-md-3 col-2 px-0"
+        :class="{'bg-dark': !searcher, 'bg-secondary': !!searcher}"
       >
-        <div class="sidebar"
+        <div
+          class="sidebar"
           :class="{'preview': !searcher, 'search': !!searcher}"
-          :style="sidebarStyle">
-          <div class="sidebar-content" :style="sidebarContentStyle">
+          :style="sidebarStyle"
+        >
+          <div
+            class="sidebar-content"
+            :style="sidebarContentStyle"
+          >
             <document-search-sidebar
               v-if="searcher"
               :document-pages="document.pages"
@@ -42,20 +55,22 @@
               :current-page="currentPage"
               :height="sidebarContentHeight"
               @navigate="navigate"
-            ></document-search-sidebar>
+            />
             <document-preview-sidebar
               v-else
               :pages="document.pages"
               :height="sidebarContentHeight"
               @navigate="navigate"
               @navigatesidebar="navigateSidebar(currentPage)"
-            ></document-preview-sidebar>
+            />
           </div>
         </div>
       </div>
-      <div class="col document-pages-container bg-light"
+      <div
+        ref="documentContainer"
+        class="col document-pages-container bg-light"
         :class="{'annotations-hidden': !preferences.showAnnotations, '-sm': isSmallScreen}"
-        ref="documentContainer">
+      >
         <document-pages
           :document="document"
           :pages="document.pages"
@@ -65,12 +80,12 @@
           :active-annotation-form="activeAnnotationForm"
           :width="documentContainerWidth"
           :height="documentViewHeight"
-          :canAnnotate="canAnnotate"
+          :can-annotate="canAnnotate"
           @initialized="pagesInitialized"
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
-        ></document-pages>
+        />
       </div>
     </div>
   </div>
@@ -119,10 +134,18 @@ function getScroll (d) {
 }
 
 export default {
-  name: 'document',
+  name: 'Document',
+  components: {
+    DocumentToolbar,
+    DocumentSearchbar,
+    DocumentPages,
+    DocumentPreviewSidebar,
+    DocumentSearchSidebar,
+  },
   props: {
     documentUrl: {
-      type: String
+      type: String,
+      required: true
     },
     documentPreview: {
       type: Object,
@@ -140,13 +163,6 @@ export default {
       type: Object,
       default: () => ({})
     }
-  },
-  components: {
-    DocumentToolbar,
-    DocumentSearchbar,
-    DocumentPages,
-    DocumentPreviewSidebar,
-    DocumentSearchSidebar,
   },
   data () {
     let doc = this.documentPreview
@@ -200,50 +216,6 @@ export default {
       toolbarHeight: null,
       isSmallScreen: true,
       isMediumScreen: true,
-    }
-  },
-  created () {
-    let el = document.querySelector('[name=csrfmiddlewaretoken]')
-    if (el !== null) {
-      this.$root.csrfToken = el.value
-    }
-    this.document.pages = this.processPages(this.document.pages)
-    this.resizing = true
-    getData(this.documentUrl).then((doc) => {
-      this.pageTemplate = decodeURI(doc.page_template)
-      this.document = doc
-      this.document.loaded = true
-      Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
-      this.willResize()
-    })
-    getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
-      let annotations = {}
-      results.objects.forEach((a) => {
-        if (annotations[a.number] === undefined) {
-          annotations[a.number] = []
-        }
-        annotations[a.number].push(a)
-        this.hasAnnotations = true
-      })
-      this.annotations = annotations
-      if (this.preferences.showAnnotationsToggle === null) {
-        // Only show annotation toggle if explicitly set (non-null)
-        // and we either have annotations or can annotate
-        Vue.set(
-          this.preferences, 'showAnnotationsToggle',
-          this.hasAnnotations || this.canAnnotate
-        )
-      }
-    })
-  },
-  mounted () {
-    this.calcResponsive()
-    window.addEventListener('resize', () => {
-      console.log('resize')
-      this.resize()
-    })
-    if (this.preferences.defaultSearch) {
-      this.search(this.preferences.defaultSearch)
     }
   },
   computed: {
@@ -328,6 +300,50 @@ export default {
       return null
     }
   },
+  created () {
+    let el = document.querySelector('[name=csrfmiddlewaretoken]')
+    if (el !== null) {
+      this.$root.csrfToken = el.value
+    }
+    this.document.pages = this.processPages(this.document.pages)
+    this.resizing = true
+    getData(this.documentUrl).then((doc) => {
+      this.pageTemplate = decodeURI(doc.page_template)
+      this.document = doc
+      this.document.loaded = true
+      Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
+      this.willResize()
+    })
+    getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
+      let annotations = {}
+      results.objects.forEach((a) => {
+        if (annotations[a.number] === undefined) {
+          annotations[a.number] = []
+        }
+        annotations[a.number].push(a)
+        this.hasAnnotations = true
+      })
+      this.annotations = annotations
+      if (this.preferences.showAnnotationsToggle === null) {
+        // Only show annotation toggle if explicitly set (non-null)
+        // and we either have annotations or can annotate
+        Vue.set(
+          this.preferences, 'showAnnotationsToggle',
+          this.hasAnnotations || this.canAnnotate
+        )
+      }
+    })
+  },
+  mounted () {
+    this.calcResponsive()
+    window.addEventListener('resize', () => {
+      console.log('resize')
+      this.resize()
+    })
+    if (this.preferences.defaultSearch) {
+      this.search(this.preferences.defaultSearch)
+    }
+  },
   methods: {
     resize (scrollRatio) {
       console.log('resize called', scrollRatio)
@@ -337,7 +353,6 @@ export default {
         Vue.set(this.document, 'pages', this.processPages(this.document.pages))
         Vue.nextTick(() => {
           if (scrollRatio) {
-            let top = this.$refs.documentContainer.offsetTop
             console.log('scrolling to ', scrollRatio)
             if (this.isFramed) {
               let d = getScroll(this.$refs.document)
@@ -442,7 +457,6 @@ export default {
       const sidebar = sidebarContainer.querySelector(
         '.document-preview-pages .scroller'
       )
-      let top = sidebar.offsetTop
       sidebar.scrollTo(0, offset)
     },
     navigate ({number, source, searchIndex, force}) {
