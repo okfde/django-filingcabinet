@@ -25,18 +25,6 @@
   {% include "filingcabinet/_document_viewer.html" with object=object %}
 {% endblock document_main %}
 
-{% block document_footer %}
-<div class="container mb-5">
-  <div class="text-right">
-      <small>
-          {# expose direct links through redirects in case they get copied #}
-          <a href="{{ object.get_document_file_url }}?download">
-              {% trans "Download PDF" %}
-          </a>
-      </small>
-  </div>
-</div>
-{% endblock document_footer %}
 {% endblock %}
 
 {% block css %}
