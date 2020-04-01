@@ -57,6 +57,12 @@
           <i class="fa fa-file-text" />
           <span class="sr-only">{{ i18n.show_text }}</span>
         </button>
+        <a
+          :href="document.file_url"
+          class="btn btn-sm btn-secondary"
+        >
+          <i class="fa fa-download" />
+        </a>
       </div>
     </div>
     <div
