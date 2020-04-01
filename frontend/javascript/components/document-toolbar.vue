@@ -59,7 +59,9 @@
         </button>
         <a
           :href="document.file_url"
-          class="btn btn-sm btn-secondary"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-sm btn-secondary download-link"
         >
           <i class="fa fa-download" />
         </a>
@@ -196,8 +198,11 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .page-number-input {
   width: 70px !important;
+}
+.download-link {
+  color: #fff;
 }
 </style>
