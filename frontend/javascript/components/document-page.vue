@@ -2,42 +2,80 @@
   <div class="row justify-content-center">
     <div :class="{'col-8': showAnnotations, 'col-auto': !showAnnotations}">
       <div class="page-wrapper">
-        <div :id="pageId" class="page">
-          <img v-if="page.image_url" v-show="imageLoaded" ref="image"
-            @load="onImageLoad"
+        <div
+          :id="pageId"
+          class="page"
+        >
+          <img
+            v-if="page.image_url"
+            v-show="imageLoaded"
+            ref="image"
             :src="imageUrl"
             :alt="pageLabel"
             :style="{'width': page.zoomedWidth + 'px'}"
             class="page-image"
             draggable="false"
             :class="{'annotation-form': showAnnotationForm}"
+            @load="onImageLoad"
+          >
+          <div
+            class="pdf-layer"
+            :style="{'width': page.zoomedWidth + 'px'}"
+          >
+            <div
+              ref="textLayer"
+              class="text-layer"
+              :style="{'width': page.zoomedWidth + 'px'}"
             />
-          <div class="page-text" v-if="showText && !showAnnotationForm">
+            <div
+              ref="annotationLayer"
+              class="annotation-layer"
+              :style="{'width': page.zoomedWidth + 'px'}"
+            />
+          </div>
+
+          <div
+            v-if="showText && !showAnnotationForm"
+            class="page-text"
+          >
             <pre :style="imageOverlayStyle">
               {{ page.content }}
             </pre>
           </div>
-          <div v-if="!imageLoaded" class="spinner-grow" role="status">
+          <div
+            v-if="!imageLoaded"
+            class="spinner-grow"
+            role="status"
+          >
             <span class="sr-only">{{ i18n.loading }}</span>
           </div>
-          <div v-if="showAnnotationForm"
-            class="annotation-rect-container" :style="imageOverlayStyle"
+          <div
+            v-if="showAnnotationForm"
+            class="annotation-rect-container"
+            :style="imageOverlayStyle"
             @mousedown="mouseDown"
             @mousemove="mouseMove"
             @mouseup="mouseUp"
-            >
-            <div v-if="annotationRect" :style="annotationRectStyle" class="annotation-rect"></div>
+          >
+            <div
+              v-if="annotationRect"
+              :style="annotationRectStyle"
+              class="annotation-rect"
+            />
           </div>
-          <div v-if="showAnnotations && imageLoaded && !showText && !showAnnotationForm && annotationsWithRect.length"
-            class="annotation-overlay-container" :style="imageOverlayStyle">
-            <page-annotation-overlay v-for="annotation in annotationsWithRect"
+          <div
+            v-if="showAnnotations && imageLoaded && !showText && !showAnnotationForm && annotationsWithRect.length"
+            class="annotation-overlay-container"
+            :style="imageOverlayStyle"
+          >
+            <page-annotation-overlay
+              v-for="annotation in annotationsWithRect"
               :key="annotation.id"
               :page="page"
               :annotation="annotation"
               :current-annotation="currentAnnotation"
               @currentannotation="annotationRectClicked"
-            >
-            </page-annotation-overlay>
+            />
           </div>
         </div>
         <p class="page-number">
@@ -46,7 +84,10 @@
       </div>
     </div>
 
-    <div v-if="showAnnotations" class="col-4 bg-light annotation-sidebar">
+    <div
+      v-if="showAnnotations"
+      class="col-4 bg-light annotation-sidebar"
+    >
       <page-annotations
         :annotations="annotations"
         :page="page"
@@ -66,28 +107,25 @@
 import PageAnnotations from './document-annotations.vue'
 import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
+import {SimpleLinkService} from '../lib/pdfjs-utils.js'
+
 export default {
-  name: 'document-page',
-  props: [
-    'page', 'annotations', 'showText', 'showAnnotations',
-    'currentAnnotation', 'annotationForm', 'width',
-    'canAnnotate'
-  ],
+  name: 'DocumentPage',
   components: {
     PageAnnotationOverlay,
     PageAnnotations
   },
+  props: [
+    'page', 'annotations', 'showText', 'showAnnotations',
+    'currentAnnotation', 'annotationForm', 'width',
+    'canAnnotate', 'pdfDocument'
+  ],
   data () {
     return {
       imageLoaded: false,
+      textLoaded: false,
       annotationRect: null,
       annotating: false,
-    }
-  },
-  beforeDestroy () {
-    if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
-      // Cancel image download on destroy
-      this.$refs.image.setAttribute('src', "")
     }
   },
   computed: {
@@ -146,16 +184,41 @@ export default {
         ratioX: this.page.width / this.imageDimensions.width,
         ratioY: this.page.height / this.imageDimensions.height,
       }
+    },
+    zoomedWidth () {
+      return this.page.zoomedWidth
+    }
+  },
+  watch: {
+    pdfDocument: function (pdfDocument) {
+      if (this.textLoaded) { return }
+      this.loadText(pdfDocument)
+    },
+    zoomedWidth: function () {
+      console.log('width changed')
+      if (this.pdfPage && this.pdfTextContent) {
+        this.renderText(this.pdfPage, this.pdfTextContent, this.pdfAnnotations)
+      }
+    }
+  },
+  mounted () {
+    console.log('mounting', this.page.number)
+    if (this.pdfDocument) {
+      this.loadText(this.pdfDocument)
+    }
+  },
+  beforeDestroy () {
+    if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
+      // Cancel image download on destroy
+      this.$refs.image.setAttribute('src', "")
     }
   },
   methods: {
     onImageLoad () {
       this.imageLoaded = true
-      const image = this.$refs.image
     },
     mouseDown (e) {
       if (!this.annotationForm) { return }
-      const image = this.$refs.image
       this.annotationRect = null
       this.annotationRect = this.makeRect(e)
       this.annotating = true
@@ -225,6 +288,54 @@ export default {
           })
         }
       }
+    },
+    loadText (pdfDocument) {
+      this.textLoaded = true
+      pdfDocument.getPage(this.page.number).then((pdfPage) => {
+        this.pdfPage = pdfPage
+        Promise.all([
+          pdfPage.getTextContent(),
+          pdfPage.getAnnotations({ intent: 'display' })
+        ]).then(([content, annotations]) => {
+          this.pdfAnnotations = annotations
+          this.pdfTextContent = content
+          this.renderText(this.pdfPage, this.pdfTextContent, this.pdfAnnotations)
+        })
+      }).catch((err) => {
+        console.error(err)
+      })
+    },
+    renderText (pdfPage, pdfTextContent, pdfAnnotations) {
+      let viewport = pdfPage.getViewport(
+        this.page.zoomedWidth / pdfPage.view[2]
+      )
+      // Rendering text layer as HTML.
+      console.log('Rendering content', pdfTextContent)
+      this.$root.PDFJS.renderTextLayer({
+        textContent: pdfTextContent,
+        container: this.$refs.textLayer,
+        viewport,
+        enhanceTextSelection: true
+      })
+      
+      if (pdfAnnotations.length === 0) {
+        return
+      }
+      const parameters = {
+        viewport: viewport.clone({ dontFlip: true }),
+        div: this.$refs.annotationLayer,
+        annotations: pdfAnnotations,
+        page: this.pdfPage,
+        // imageResourcesPath: this.imageResourcesPath,
+        renderInteractiveForms: false,
+        linkService: new SimpleLinkService(),
+        // downloadManager: this.downloadManager,
+      };
+      if (this.$refs.annotationLayer.querySelector('section')) {
+        this.$root.PDFJS.AnnotationLayer.update(parameters)
+      } else {
+        this.$root.PDFJS.AnnotationLayer.render(parameters);
+      }
     }
   }
 }
@@ -289,6 +400,53 @@ export default {
   position: absolute;
   border: 3px solid #FCED00;
   pointer-events: none;
+}
+</style>
+<style lang="css">
+/*
+  Needs to be non scoped because it's dynamically inserted
+  and uses the > selector
+ */
+.pdf-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%)
+}
 
+.text-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  text-align: initial;
+  opacity: 0.2;
+  line-height: 1.0;
+  left: 50%;
+  transform: translateX(-50%)
+}
+.text-layer > div {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.annotation-layer section {
+  position: absolute;
+}
+.annotation-layer .linkAnnotation > a {
+  position: absolute;
+  font-size: 1em;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 </style>

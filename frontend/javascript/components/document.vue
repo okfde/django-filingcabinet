@@ -74,6 +74,7 @@
         <document-pages
           :document="document"
           :pages="document.pages"
+          :pdf-document="pdfDocument"
           :annotations="annotations"
           :current-annotation="currentAnnotation"
           :preferences="preferences"
@@ -101,6 +102,8 @@ import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
 
 import {getData, postData} from '../lib/utils.js'
+
+const MAX_PDF_SIZE = 1024 * 1024 * 5
 
 function range(size, startAt = 0) {
     return [...Array(size).keys()].map(i => i + startAt);
@@ -200,6 +203,7 @@ export default {
       preferences: preferences,
       zoom: preferences.defaultZoom,
       document: doc,
+      pdfDocument: null,
       searcher: null,
       searchIndex: null,
       currentPage: 1,
@@ -313,6 +317,9 @@ export default {
       this.document.loaded = true
       Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
       this.willResize()
+      if (this.document.file_size <= MAX_PDF_SIZE) [
+        this.loadPDF()
+      ]
     })
     getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
       let annotations = {}
@@ -632,6 +639,27 @@ export default {
         let url = `${this.config.urls.pageAnnotationApiUrl}${annotation.id}/?document=${this.document.id}`
         postData(url, {}, this.$root.csrfToken, 'DELETE')
       }
+    },
+    loadPDF () {
+      import('pdfjs-dist').then((PDFJS) => {
+        this.$root.PDFJS = PDFJS
+        this.$root.PDFJS.GlobalWorkerOptions.workerSrc = this.config.resources.pdfjsWorker
+        console.log('Loaded PDFJS', this.config.resources.pdfjsWorker, this.$root.PDFJS)
+        console.log('Loading PDF', this.document.file_url)
+        let loadingTask = this.$root.PDFJS.getDocument({
+          url: this.document.file_url,
+          isEvalSupported: false,
+          httpHeaders: {
+            'pragma': 'no-cache',
+            'cache-control': 'no-cache'
+          }
+        })
+        loadingTask.promise.then(pdfDocument => {
+          this.pdfDocument = pdfDocument
+        })
+      }).catch((err) =>{
+        console.log(err)
+      })
     }
   }
 }

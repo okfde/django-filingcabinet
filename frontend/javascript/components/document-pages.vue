@@ -13,6 +13,7 @@
       <document-page
         :key="item.number"
         :page="item"
+        :pdf-document="pdfDocument"
         :annotations="annotations[item.number] || []"
         :show-text="showText"
         :show-annotations="showAnnotations"
@@ -40,7 +41,7 @@ export default {
   name: 'document-pages',
   props: [
     'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
-    'activeAnnotationForm', 'width', 'height', 'canAnnotate'
+    'activeAnnotationForm', 'width', 'height', 'canAnnotate', 'pdfDocument'
   ],
   components: {
     RecycleScroller,
