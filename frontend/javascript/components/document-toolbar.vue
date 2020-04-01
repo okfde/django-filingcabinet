@@ -1,20 +1,36 @@
 <template>
   <div class="row py-2 bg-dark">
-    <div v-if="!isSmallScreen && preferences.showSidebarToggle" class="col-auto">
-      <div class="btn-group" role="group">
-        <button type="button"
-          class="btn btn-sm btn-secondary" :class="{'active': preferences.showSidebar}"
+    <div
+      v-if="!isSmallScreen && preferences.showSidebarToggle"
+      class="col-auto"
+    >
+      <div
+        class="btn-group"
+        role="group"
+      >
+        <button
+          type="button"
+          class="btn btn-sm btn-secondary"
+          :class="{'active': preferences.showSidebar}"
           :disabled="!!searcher"
           @click="toggleShowSidebar"
         >
-          <i class="fa" :class="{'fa-toggle-left': preferences.showSidebar, 'fa-toggle-right': !preferences.showSidebar}"></i>
+          <i
+            class="fa"
+            :class="{'fa-toggle-left': preferences.showSidebar, 'fa-toggle-right': !preferences.showSidebar}"
+          />
         </button>
       </div>
     </div>
-    <div v-if="preferences.showPageNumberInput" class="col-auto">
+    <div
+      v-if="preferences.showPageNumberInput"
+      class="col-auto"
+    >
       <div class="input-group input-group-sm">
-        <input type="number" class="page-number-input form-control bg-light form-control-sm"
+        <input
           v-model="page"
+          type="number"
+          class="page-number-input form-control bg-light form-control-sm"
           min="1"
           :max="document.num_pages"
           @change="submitChange"
@@ -24,57 +40,88 @@
         </div>
       </div>
     </div>
-    <div v-if="preferences.showTextToggle" class="col-auto">
-      <div class="btn-group" role="group">
-        <button type="button"
+    <div
+      v-if="preferences.showTextToggle"
+      class="col-auto"
+    >
+      <div
+        class="btn-group"
+        role="group"
+      >
+        <button
+          type="button"
           class="btn btn-sm btn-secondary"
           :class="{'btn-light': preferences.showText}"
           @click="toggleShowText"
         >
-          <i class="fa fa-file-text"></i>
+          <i class="fa fa-file-text" />
           <span class="sr-only">{{ i18n.show_text }}</span>
         </button>
       </div>
     </div>
-    <div v-if="preferences.showZoom" class="col-auto ml-auto">
-      <div class="btn-group" role="group">
-        <button type="button"
+    <div
+      v-if="preferences.showZoom"
+      class="col-auto ml-auto"
+    >
+      <div
+        class="btn-group"
+        role="group"
+      >
+        <button
+          type="button"
           class="btn btn-sm btn-secondary"
           :disabled="!canZoomOut"
           @click="$emit('zoomout')"
         >
-          <i class="fa fa-search-minus"></i>
+          <i class="fa fa-search-minus" />
         </button>
-        <button type="button"
+        <button
+          type="button"
           class="btn btn-sm btn-secondary"
           :disabled="!canZoomIn"
           @click="$emit('zoomin')"
         >
-          <i class="fa fa-search-plus"></i>
+          <i class="fa fa-search-plus" />
         </button>
       </div>
     </div>
-    <div v-if="!isSmallScreen && preferences.showSearch" class="col-auto ml-2">
+    <div
+      v-if="!isSmallScreen && preferences.showSearch"
+      class="col-auto ml-2"
+    >
       <div class="input-group input-group-sm">
-        <input type="text" class="search-input form-control form-control-sm"
+        <input
           v-model="search"
+          type="text"
+          class="search-input form-control form-control-sm"
           @keydown.enter="runSearch"
         >
         <div class="input-group-append">
-          <button class="btn btn-outline-light" @click="runSearch">
+          <button
+            class="btn btn-outline-light"
+            @click="runSearch"
+          >
             {{ i18n.search }}
           </button>
         </div>
       </div>
     </div>
-    <div v-if="preferences.showAnnotationsToggle" class="col-auto">
-      <div class="btn-group" role="group">
-        <button type="button"
+    <div
+      v-if="preferences.showAnnotationsToggle"
+      class="col-auto"
+    >
+      <div
+        class="btn-group"
+        role="group"
+      >
+        <button
+
+          type="button"
           class="btn btn-sm btn-secondary"
           :class="{'btn-light': preferences.showAnnotations}"
           @click="toggleShowAnnotations"
         >
-          <i class="fa fa-commenting-o"></i>
+          <i class="fa fa-commenting-o" />
         </button>
       </div>
     </div>
@@ -83,7 +130,7 @@
 
 <script>
 export default {
-  name: 'document-toolbar',
+  name: 'DocumentToolbar',
   props: ['document', 'searcher', 'preferences', 'currentPage',
           'zoom', 'defaultSearch', 'isSmallScreen'],
   data () {
