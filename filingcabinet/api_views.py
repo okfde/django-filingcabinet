@@ -56,7 +56,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Document
         fields = (
-            'resource_uri', 'id', 'site_url', 'title', 'description',
+            'resource_uri', 'id', 'site_url', 'title', 'slug', 'description',
             'num_pages', 'public', 'allow_annotation', 'pending',
             'file_url', 'file_size', 'cover_image', 'page_template'
         )
