@@ -11,6 +11,7 @@
       <document-toolbar
         v-if="preferences.showToolbar"
         :document="document"
+        :pdf-document="pdfDocument"
         :searcher="searcher"
         :preferences="preferences"
         :current-page="currentPage"

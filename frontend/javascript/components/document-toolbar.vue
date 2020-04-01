@@ -57,14 +57,12 @@
           <i class="fa fa-file-text" />
           <span class="sr-only">{{ i18n.show_text }}</span>
         </button>
-        <a
-          :href="document.file_url"
-          target="_blank"
-          rel="noopener"
-          class="btn btn-sm btn-secondary download-link"
+        <button
+          class="btn btn-sm btn-secondary"
+          @click="download"
         >
           <i class="fa fa-download" />
-        </a>
+        </button>
       </div>
     </div>
     <div
@@ -137,6 +135,9 @@
 </template>
 
 <script>
+
+import { triggerDownload } from "../lib/utils.js"
+
 export default {
   name: 'DocumentToolbar',
   props: ['document', 'searcher', 'preferences', 'currentPage',
@@ -193,6 +194,26 @@ export default {
     },
     toggleShowAnnotations () {
       this.$emit('updatepreferences', {showAnnotations: !this.preferences.showAnnotations})
+    },
+    download () {
+      let filename = this.document.slug
+      if (filename.length === 0) {
+        filename = `${this.document.id}.pdf`
+      } else {
+        filename = `${filename}.pdf`
+      }
+      if (this.pdfDocument) {
+        this.pdfDocument.getData().then((data) => {
+          const blob = new Blob([data], { type: "application/pdf" });
+          const blobUrl = URL.createObjectURL(blob);
+          triggerDownload(blobUrl, filename)
+        }).catch(() => this.downloadByUrl(filename))
+      } else {
+        this.downloadByUrl(filename)
+      }
+    },
+    downloadByUrl (filename) {
+      triggerDownload(this.document.file_url, filename)
     }
   }
 }
@@ -201,8 +222,5 @@ export default {
 <style lang="scss" scoped>
 .page-number-input {
   width: 70px !important;
-}
-.download-link {
-  color: #fff;
 }
 </style>
