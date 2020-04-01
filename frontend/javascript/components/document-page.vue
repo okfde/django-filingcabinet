@@ -215,6 +215,9 @@ export default {
       this.$refs.image.setAttribute('src', "")
     }
   },
+  destroyed () {
+    this.destroyed = true
+  },
   methods: {
     onImageLoad () {
       this.imageLoaded = true
@@ -294,11 +297,13 @@ export default {
     loadText (pdfDocument) {
       this.textLoaded = true
       pdfDocument.getPage(this.page.number).then((pdfPage) => {
+        if (this.destroyed) { return }
         this.pdfPage = pdfPage
         Promise.all([
           pdfPage.getTextContent(),
           pdfPage.getAnnotations({ intent: 'display' })
         ]).then(([content, annotations]) => {
+          if (this.destroyed) { return }
           this.pdfAnnotations = annotations
           this.pdfTextContent = content
           this.renderText(this.pdfPage, this.pdfTextContent, this.pdfAnnotations)
@@ -308,6 +313,7 @@ export default {
       })
     },
     renderText (pdfPage, pdfTextContent, pdfAnnotations) {
+      if (this.destroyed) { return }
       let viewport = pdfPage.getViewport(
         this.page.zoomedWidth / pdfPage.view[2]
       )
