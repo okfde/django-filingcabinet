@@ -128,7 +128,7 @@ class PDFProcessor(object):
     def get_pdf_reader(self, filename):
         try:
             return PdfFileReader(filename)
-        except (PdfReadError, ValueError, OSError) as e:
+        except (PdfReadError, ValueError, OSError):
             logger.error('Could not read PDF %s', filename)
             pass
         pdf_file_name = rewrite_pdf_in_place(filename)
@@ -140,7 +140,8 @@ class PDFProcessor(object):
             'title': doc_info.title
         }
 
-    def get_images(self, pages=None, resolution=300, chunk_size=20, timeout=5 * 60):
+    def get_images(self, pages=None, resolution=300, chunk_size=20,
+                   timeout=5 * 60):
         white = wand.color.Color('#fff')
         if pages is None:
             pages = list(range(1, self.num_pages + 1))

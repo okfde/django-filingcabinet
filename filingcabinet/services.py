@@ -69,8 +69,8 @@ def queue_missing_pages(doc):
 
     process_pages_task.apply_async(
         args=[doc.id],
-        kwargs={'page_numbers': missing_pages, 'task_page_limit': 20},
-        time_limit=60 + estimate_time(doc.file_size)
+        kwargs={'page_numbers': missing_pages, 'task_page_limit': 10},
+        time_limit=max(60 + estimate_time(doc.file_size), 5 * 60)
     )
 
 
