@@ -8,4 +8,4 @@ def estimate_time(filesize, page_count=None):
     Estimate processing time as
     one minute + 5 seconds per megabyte timeout
     '''
-    return 60 + 5 * filesize / (1024 * 1024)
+    return int(60 + 5 * filesize / (1024 * 1024))
