@@ -195,7 +195,7 @@ class PDFProcessor(object):
                 pil_image, lang=lang, config=config, timeout=timeout
             )
         except RuntimeError:
-            logger.warning('')
+            logger.warning('Timeout on OCR')
             return ''
 
 
