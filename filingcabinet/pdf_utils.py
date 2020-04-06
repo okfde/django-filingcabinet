@@ -20,9 +20,9 @@ from PyPDF2.utils import PdfReadError
 from PIL import Image as PILImage
 
 try:
-    import tesserocr
+    import pytesseract
 except ImportError:
-    tesserocr = None
+    pytesseract = None
 try:
     import pdflib
 except ImportError:
@@ -178,16 +178,25 @@ class PDFProcessor(object):
         for page_no in pages:
             yield self.get_for_page(page_no)
 
-    def run_ocr_on_image(self, image):
-        if tesserocr is None:
+    def run_ocr_on_image(self, image, timeout=30):
+        if pytesseract is None:
             return ''
         img_blob = image.make_blob('RGB')
         pil_image = PILImage.frombytes('RGB', image.size, img_blob)
-        return tesserocr.image_to_text(
-            pil_image,
-            lang=TESSERACT_LANGUAGE[self.language],
-            path=self.config.get('TESSERACT_DATA_PATH', '')
-        )
+
+        lang = TESSERACT_LANGUAGE[self.language]
+        config = ''
+        path = self.config.get('TESSERACT_DATA_PATH', '')
+        if path:
+            config = '--tessdata-dir "{}"'.format(path)
+
+        try:
+            return pytesseract.image_to_string(
+                pil_image, lang=lang, config=config, timeout=timeout
+            )
+        except RuntimeError:
+            logger.warning('')
+            return ''
 
 
 def draw_highlights(highlights):
