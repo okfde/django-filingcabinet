@@ -57,7 +57,7 @@ export default {
       return this.$root.config.i18n
     },
     imageUrl () {
-      return this.image || this.document.cover_image
+      return (this.image || this.document.cover_image).replace(/\{size\}/, 'small')
     },
     documentUrl () {
       let url = this.document.site_url
