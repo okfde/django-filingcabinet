@@ -1,21 +1,41 @@
 <template>
   <div>
-    <a :href="documentUrl" @click="navigate" class="preview-doc" target="_blank">
-      <img v-if="imageUrl" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
-      <div v-if="!imageLoaded" class="spinner-grow" role="status">
+    <a
+      :href="documentUrl"
+      class="preview-doc"
+      target="_blank"
+      @click="navigate"
+    >
+      <img
+        v-if="imageUrl"
+        v-show="imageLoaded"
+        ref="image"
+        :src="imageUrl"
+        alt=""
+        class="img-fluid page-image"
+        @load="onImageLoad"
+      >
+      <div
+        v-if="!imageLoaded"
+        class="spinner-grow"
+        role="status"
+      >
         <span class="sr-only">Loading...</span>
       </div>
       <p class="text-truncate">
         <template v-if="highlight">
-          {{ i18n.page  }} {{ page }}
+          {{ i18n.page }} {{ page }}
         </template>
         <template v-else>
           {{ document.title }}
         </template>
       </p>
     </a>
-    <div class="query-highlight mb-5" v-if="highlight">
-      <span v-html="highlight"></span>
+    <div
+      v-if="highlight"
+      class="query-highlight mb-5"
+    >
+      <span v-html="highlight" />
     </div>
   </div>
 </template>
@@ -23,10 +43,11 @@
 <script>
 
 export default {
-  name: 'document-preview',
+  name: 'DocumentPreview',
   props: {
     document: {
       type: Object,
+      required: true
     },
     page: {
       type: Number,
@@ -46,18 +67,13 @@ export default {
       imageLoaded: false
     }
   },
-  beforeDestroy () {
-    if (this.document.cover_image && !this.imageLoaded) {
-      // Cancel image download on destroy
-      this.$refs.image.setAttribute('src', "")
-    }
-  },
   computed: {
     i18n () {
       return this.$root.config.i18n
     },
     imageUrl () {
-      return (this.image || this.document.cover_image).replace(/\{size\}/, 'small')
+      return decodeURI(this.image || this.document.cover_image)
+        .replace(/\{size\}/, 'small')
     },
     documentUrl () {
       let url = this.document.site_url
@@ -65,6 +81,12 @@ export default {
         url += `?page=${this.page}`
       }
       return url
+    }
+  },
+  beforeDestroy () {
+    if (this.document.cover_image && !this.imageLoaded) {
+      // Cancel image download on destroy
+      this.$refs.image.setAttribute('src', "")
     }
   },
   methods: {
@@ -101,12 +123,9 @@ export default {
 }
 
 .query-highlight {
+  background-color: #fff;
+  padding: 5px;
   font-size: 0.7rem;
-  max-height: 48px;
-  overflow: hidden;
-  span {
-    text-overflow: ellipsis;
-  }
 }
 
 </style>
