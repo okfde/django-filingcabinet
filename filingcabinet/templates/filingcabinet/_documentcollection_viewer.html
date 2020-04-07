@@ -1,11 +1,11 @@
 <div class="container mb-5">
   <div class="document" data-fcdocumentcollectionurl="{% url 'api:documentcollection-detail' pk=object.pk %}" data-fcdocumentcollection="{{ documentcollection_data }}" data-fcconfig="{{ config }}">
     <div class="row">
-      {% for document in documents %}
+      {% for document in documents|slice:":12" %}
         <div class="col-md-3">
           <div class="card">
             <a href="{{ document.get_absolute_url }}">
-              <img src="{{ document.get_cover_image }}" class="card-img-top" alt="{{ document.title }}">
+              <img src="{{ document.get_cover_image }}" class="card-img-top" alt="{{ document.title }}" loading="lazy">
             </a>
             <div class="card-body">
               <h5 class="card-title">
