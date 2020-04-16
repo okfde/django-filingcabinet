@@ -37,3 +37,13 @@ def files_moved_task(doc_pk):
     fix_file_paths(doc)
     doc.pending = False
     doc.save()
+
+
+@shared_task(acks_late=True, time_limit=5 * 60)
+def publish_document(doc_pk, public=True):
+    try:
+        doc = Document.objects.get(pk=doc_pk)
+    except Document.DoesNotExist:
+        return None
+    doc.public = public
+    doc.save()

@@ -67,21 +67,21 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     fix_document_paths.short_description = _("Fix document paths")
 
     def publish_documents(self, request, queryset):
-        for instance in queryset:
-            instance.public = True
-            # Additional housekeeping in save!
-            instance.save()
+        from .tasks import publish_document
 
-        self.message_user(request, _("Published documents..."))
+        for instance in queryset:
+            publish_document.delay(instance.pk, public=True)
+
+        self.message_user(request, _("Publishing documents..."))
     publish_documents.short_description = _("Publish documents")
 
     def unpublish_documents(self, request, queryset):
-        for instance in queryset:
-            instance.public = False
-            # Additional housekeeping in save!
-            instance.save()
+        from .tasks import publish_document
 
-        self.message_user(request, _("Unpublished documents..."))
+        for instance in queryset:
+            publish_document.delay(instance.pk, public=False)
+
+        self.message_user(request, _("Unpublishing documents..."))
     unpublish_documents.short_description = _("Unpublish documents")
 
 
