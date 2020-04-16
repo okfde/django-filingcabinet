@@ -28,7 +28,10 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     readonly_fields = ('uid',)
     prepopulated_fields = {'slug': ('title',)}
-    actions = ['process_document', 'reprocess_document', 'fix_document_paths']
+    actions = [
+        'process_document', 'reprocess_document', 'fix_document_paths',
+        'publish_documents', 'unpublish_documents'
+    ]
 
     def get_inline_instances(self, request, obj=None):
         ''' Only show inline for docs with fewer than 31 pages'''
@@ -62,6 +65,24 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
         self.message_user(request, _("Fixing document paths..."))
     fix_document_paths.short_description = _("Fix document paths")
+
+    def publish_documents(self, request, queryset):
+        for instance in queryset:
+            instance.public = True
+            # Additional housekeeping in save!
+            instance.save()
+
+        self.message_user(request, _("Published documents..."))
+    publish_documents.short_description = _("Publish documents")
+
+    def unpublish_documents(self, request, queryset):
+        for instance in queryset:
+            instance.public = False
+            # Additional housekeeping in save!
+            instance.save()
+
+        self.message_user(request, _("Unpublished documents..."))
+    unpublish_documents.short_description = _("Unpublish documents")
 
 
 class PageAdmin(admin.ModelAdmin):
