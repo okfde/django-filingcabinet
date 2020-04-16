@@ -233,7 +233,7 @@ class AbstractDocument(models.Model):
         self.pending = True
         self.pdf_file = dst_file_name
         try:
-            if src_file_dir != dst_file_dir:
+            if src_file_dir != dst_file_dir and os.path.exists(self.pdf_file.path):
                 shutil.rmtree(dst_file_dir, ignore_errors=True)
             shutil.move(src_file_dir, dst_file_dir)
         except IOError:
