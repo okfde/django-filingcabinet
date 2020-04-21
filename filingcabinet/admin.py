@@ -26,7 +26,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_at', 'num_pages', 'public', 'pending')
     list_filter = ('pending', 'public', 'allow_annotation', 'portal')
     raw_id_fields = ('user',)
-    readonly_fields = ('uid',)
+    readonly_fields = ('uid', 'public', 'pending')
     prepopulated_fields = {'slug': ('title',)}
     actions = [
         'process_document', 'reprocess_document', 'fix_document_paths',
@@ -66,22 +66,32 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         self.message_user(request, _("Fixing document paths..."))
     fix_document_paths.short_description = _("Fix document paths")
 
-    def publish_documents(self, request, queryset):
+    def publish_documents(self, request, queryset, public=True,
+                          message=_("Publishing {} documents...")):
         from .tasks import publish_document
 
+        count = 0
         for instance in queryset:
-            publish_document.delay(instance.pk, public=True)
-
-        self.message_user(request, _("Publishing documents..."))
+            if not instance.pending:
+                publish_document.delay(instance.pk, public=public)
+                count += 1
+        if count:
+            self.message_user(
+                request,
+                message.format(count)
+            )
+        else:
+            self.message_user(
+                request,
+                _("Please select only non-pending documents for publishing.")
+            )
     publish_documents.short_description = _("Publish documents")
 
     def unpublish_documents(self, request, queryset):
-        from .tasks import publish_document
-
-        for instance in queryset:
-            publish_document.delay(instance.pk, public=False)
-
-        self.message_user(request, _("Unpublishing documents..."))
+        return self.publish_documents(
+            request, queryset, public=False,
+            message=_("Unpublishing {} documents...")
+        )
     unpublish_documents.short_description = _("Unpublish documents")
 
 

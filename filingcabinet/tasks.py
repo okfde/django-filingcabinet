@@ -45,5 +45,11 @@ def publish_document(doc_pk, public=True):
         doc = Document.objects.get(pk=doc_pk)
     except Document.DoesNotExist:
         return None
-    doc.public = public
-    doc.save()
+    if doc.pending:
+        return
+    if public != doc.public:
+        doc.public = public
+        doc.pending = True
+        doc.save()
+        doc._move_file()
+        files_moved_task.delay(doc.pk)

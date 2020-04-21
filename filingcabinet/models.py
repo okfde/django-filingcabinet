@@ -141,14 +141,6 @@ class AbstractDocument(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        public_changed = self._old_public != self.public
-        if public_changed and self.pk and self.pdf_file:
-            self._move_file()
-            self._old_public = self.public
-        super().save(*args, **kwargs)
-    save.alters_data = True
-
     def get_absolute_url(self):
         if self.slug:
             return reverse('document-detail', kwargs={
@@ -230,18 +222,15 @@ class AbstractDocument(models.Model):
         dst_file_dir = os.path.dirname(os.path.join(
             settings.MEDIA_ROOT, dst_file_name
         ))
-        self.pending = True
-        self.pdf_file = dst_file_name
         try:
-            if src_file_dir != dst_file_dir and os.path.exists(self.pdf_file.path):
-                shutil.rmtree(dst_file_dir, ignore_errors=True)
-            shutil.move(src_file_dir, dst_file_dir)
+            src_exists = os.path.exists(self.pdf_file.path)
+            if src_exists:
+                if src_file_dir != dst_file_dir and src_exists:
+                    shutil.rmtree(dst_file_dir, ignore_errors=True)
+                shutil.move(src_file_dir, dst_file_dir)
+                self.pdf_file = dst_file_name
         except IOError:
             pass
-
-        from .tasks import files_moved_task
-
-        transaction.on_commit(lambda: files_moved_task.delay(self.id))
 
     def get_page_template(self, page='{page}', size='{size}'):
         return self.get_file_url(filename=get_page_image_filename(
