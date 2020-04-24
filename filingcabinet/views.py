@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import DetailView
 from django.db.models import Q
 from django.utils.translation import ugettext as _
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
