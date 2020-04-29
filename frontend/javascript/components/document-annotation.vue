@@ -14,6 +14,10 @@
     <p v-if="annotation.description.length > 0">
       {{ annotation.description }}
     </p>
+    <time
+      :datetime="annotation.timestamp"
+      class="d-block small text-right text-muted"
+    >{{ annotationTime }}</time>
   </div>
 </template>
 
@@ -33,6 +37,18 @@ export default {
     },
     hasRect () {
       return !!this.annotation.left
+    },
+    dtf () {
+      return new Intl.DateTimeFormat(
+        'de', {
+          year: 'numeric', month: 'numeric',
+          day: 'numeric', hour: 'numeric',
+          minute: 'numeric',
+      })
+    },
+    annotationTime () {
+      const d = new Date(this.annotation.timestamp)
+      return this.dtf.format(d)
     }
   },
   methods: {

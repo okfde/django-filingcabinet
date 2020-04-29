@@ -18,6 +18,7 @@
         :default-search="preferences.defaultSearch"
         :zoom="zoom"
         :is-small-screen="isSmallScreen"
+        :annotation-count="annotationCount"
         @navigate="navigate"
         @search="search"
         @updatepreferences="updatePreferences"
@@ -201,6 +202,7 @@ export default {
       preferences.showPageNumberInput = false
     }
     return {
+      annotationCount: 0,
       preferences: preferences,
       zoom: preferences.defaultZoom,
       document: doc,
@@ -331,6 +333,7 @@ export default {
         annotations[a.number].push(a)
         this.hasAnnotations = true
       })
+      this.annotationCount = results.objects.length
       this.annotations = annotations
       if (this.preferences.showAnnotationsToggle === null) {
         // Only show annotation toggle if explicitly set (non-null)

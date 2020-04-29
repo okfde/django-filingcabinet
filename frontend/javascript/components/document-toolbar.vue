@@ -128,6 +128,12 @@
           @click="toggleShowAnnotations"
         >
           <i class="fa fa-commenting-o" />
+          <span
+            v-if="!preferences.showAnnotations && annotationCount && annotationCount > 0"
+            class="badge badge-light badge-pill badge-annotation-count"
+          >
+            {{ annotationCount }}
+          </span>
         </button>
       </div>
     </div>
@@ -140,8 +146,10 @@ import { triggerDownload } from "../lib/utils.js"
 
 export default {
   name: 'DocumentToolbar',
-  props: ['document', 'searcher', 'preferences', 'currentPage',
-          'zoom', 'defaultSearch', 'isSmallScreen'],
+  props: [
+    'document', 'searcher', 'preferences', 'currentPage',
+    'zoom', 'defaultSearch', 'isSmallScreen', 'annotationCount'
+  ],
   data () {
     return {
       search: this.defaultSearch || '',
@@ -222,5 +230,10 @@ export default {
 <style lang="scss" scoped>
 .page-number-input {
   width: 70px !important;
+}
+.badge-annotation-count {
+  position: absolute !important;
+  top: -5px !important;
+  right: -10px !important;
 }
 </style>
