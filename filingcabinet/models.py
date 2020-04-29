@@ -11,7 +11,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.db import transaction
 
 from taggit.models import TaggedItemBase
 from taggit.managers import TaggableManager
