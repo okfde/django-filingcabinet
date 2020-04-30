@@ -112,6 +112,14 @@ class PageAdmin(admin.ModelAdmin):
 
 class PageAnnotationAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'page',)
+    date_hierarchy = 'timestamp'
+    list_display = ('page', 'user', 'title', 'timestamp')
+    list_filter = ['page__number']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.select_related('user', 'page', 'page__document')
+        return qs
 
 
 class DocumentInline(admin.StackedInline):
