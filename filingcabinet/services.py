@@ -1,16 +1,25 @@
-import os
-import logging
+from io import BytesIO
 import json
+import logging
+import os
+from pathlib import PurePath
+import zipfile
 
 from django.core.files.base import ContentFile
 from django.conf import settings
 
+from . import get_document_model
 from .models import (
-    Page, PageAnnotation,
+    Page, PageAnnotation, CollectionDocument, CollectionDirectory,
     get_page_filename, get_page_annotation_filename
 )
+from .tasks import process_document_task
 from .pdf_utils import PDFProcessor, crop_image, draw_highlights
 from .utils import estimate_time
+
+
+Document = get_document_model()
+
 
 logger = logging.getLogger(__name__)
 
@@ -213,3 +222,109 @@ def fix_file_paths_for_pageannotation(annotation):
     if annotation.image and filename != annotation.image.name:
         annotation.image.name = filename
         annotation.save()
+
+
+class DocumentStorer:
+    ZIP_BLOCK_LIST = set(['__MACOSX'])
+
+    def __init__(self, user, public=False, collection=None, tags=None):
+        self.user = user
+        self.public = public
+        self.collection = collection
+        self.tags = tags
+
+    def __str__(self):
+        return '<DocumentStorer for {} in {} public={} tags={}'.format(
+            self.user, self.collection, self.public, self.tags
+        )
+
+    def create_from_file(self, file_obj, filename, directory=None):
+        title = filename
+        if title.endswith('.pdf'):
+            title = title.rsplit('.pdf')[0]
+
+        doc = Document.objects.create(
+            title=title,
+            user=self.user,
+            public=self.public
+        )
+
+        if file_obj:
+            doc.pdf_file.save(filename, file_obj, save=True)
+            process_document_task.delay(doc.pk)
+
+        if self.tags:
+            doc.tags.set(*self.tags)
+        if self.collection:
+            CollectionDocument.objects.get_or_create(
+                collection=self.collection,
+                document=doc,
+                directory=directory
+            )
+        return doc
+
+    def unpack_upload_zip(self, upload):
+        return self.unpack_zip(upload.get_file())
+
+    def unpack_zip(self, file_obj):
+        if not zipfile.is_zipfile(file_obj):
+            return
+
+        with zipfile.ZipFile(file_obj, 'r') as zf:
+            zip_paths = []
+            # step on collect files
+            for filepath in zf.namelist():
+                path = PurePath(filepath)
+                parts = path.parts
+                if parts[0] in self.ZIP_BLOCK_LIST:
+                    continue
+                if path.suffix == '.pdf':
+                    zip_paths.append(path)
+                # TODO: recursive zip unpacking?
+            if not zip_paths:
+                return
+
+            doc_paths = remove_common_root_path(zip_paths)
+            directories = {}
+            for doc_path, zip_path in zip(doc_paths, zip_paths):
+                self.ensure_directory_exists(doc_path, directories)
+                directory = directories.get(doc_path.parent)
+                file_obj = BytesIO(zf.read(str(zip_path)))
+                self.create_from_file(
+                    file_obj,
+                    doc_path.name,
+                    directory=directory
+                )
+
+    def ensure_directory_exists(self, path, directories):
+        for parent_path in reversed(path.parents):
+            if str(parent_path) == '.':
+                continue
+            if parent_path not in directories:
+                parent_parent_path = parent_path.parent
+                parent_parent_dir = directories.get(parent_parent_path)
+                directory = CollectionDirectory.objects.create(
+                    name=str(parent_path),
+                    user=self.user,
+                    collection=self.collection,
+                    parent=parent_parent_dir
+                )
+                directories[parent_path] = directory
+
+
+def remove_common_root_path(paths):
+    assert len(paths) > 1
+    while True:
+        common_root = None
+        for path in paths:
+            if len(path.parts) == 1:
+                return paths
+            if common_root is None:
+                common_root = path.parts[0]
+                continue
+            if common_root != path.parts[0]:
+                return paths
+        paths = [
+            PurePath(os.path.join(*p.parts[1:])) for p in paths
+        ]
+    return paths
