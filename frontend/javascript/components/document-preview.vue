@@ -22,7 +22,10 @@
       >
         <span class="sr-only">Loading...</span>
       </div>
-      <p class="text-truncate">
+      <p
+        class="text-truncate"
+        :title="document.title"
+      >
         <template v-if="highlight">
           {{ i18n.page }} {{ page }}
         </template>
