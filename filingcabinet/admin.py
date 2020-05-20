@@ -2,7 +2,9 @@ from django.contrib import admin
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import Page, CollectionDocument
+from mptt.admin import MPTTModelAdmin
+
+from .models import Page, CollectionDocument, CollectionDirectory
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -127,6 +129,11 @@ class DocumentInline(admin.StackedInline):
     raw_id_fields = ('document',)
 
 
+class CollectionDirectoryAdmin(MPTTModelAdmin):
+    raw_id_fields = ('user', 'collection', 'parent')
+    list_display = ('name', 'collection', 'created_at', 'updated_at')
+
+
 class DocumentCollectionBaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'documents',)
     inlines = [DocumentInline]
@@ -147,7 +154,7 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
 
 class CollectionDocumentBaseAdmin(admin.ModelAdmin):
     list_display = ('document', 'collection', 'order')
-    raw_id_fields = ('document', 'collection',)
+    raw_id_fields = ('document', 'collection', 'directory')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

@@ -40,6 +40,8 @@ setup(
         'pypdf2',
         'Pillow',
         'django-filter',
+        'django-taggit',
+        'django-mptt'
     ],
     include_package_data=True,
     classifiers=[

@@ -15,6 +15,8 @@ from django.conf import settings
 from taggit.models import TaggedItemBase
 from taggit.managers import TaggableManager
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 from .storage import OverwriteStorage
 from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
@@ -434,6 +436,45 @@ class PageAnnotation(models.Model):
                 self.height is not None)
 
 
+class CollectionDirectory(MPTTModel):
+    name = models.CharField(max_length=255)
+    collection = models.ForeignKey(
+        FILINGCABINET_DOCUMENTCOLLECTION_MODEL,
+        on_delete=models.CASCADE
+    )
+    parent = TreeForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children'
+    )
+
+    created_at = models.DateTimeField(
+        _('created at'), default=timezone.now
+    )
+    updated_at = models.DateTimeField(
+        default=timezone.now, null=True
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True,
+        on_delete=models.SET_NULL,
+        related_name='%(app_label)s_%(class)s',
+        verbose_name=_("User")
+    )
+
+    class MPTTMeta:
+        order_insertion_by = ['name']
+
+    class Meta:
+        verbose_name = _('Collection directory')
+        verbose_name_plural = _('Collection directories')
+
+    def __str__(self):
+        return self.name
+
+
 class CollectionDocument(models.Model):
     collection = models.ForeignKey(
         FILINGCABINET_DOCUMENTCOLLECTION_MODEL,
@@ -448,9 +489,24 @@ class CollectionDocument(models.Model):
     order = models.PositiveIntegerField(
         default=0, blank=False, null=False
     )
+    directory = models.ForeignKey(
+        CollectionDirectory,
+        verbose_name=_('directory'),
+        related_name='documents',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
     class Meta:
         ordering = ['order', 'document__title']
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(
+                    directory__collection=models.F('collection')
+                ), name='collection_directory_same'
+            ),
+        ]
 
 
 class AbstractDocumentCollection(models.Model):
