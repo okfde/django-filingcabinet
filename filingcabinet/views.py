@@ -112,7 +112,7 @@ def get_document_collection_context(collection, request):
     context = {
         'object': collection
     }
-    context['documents'] = collection.documents.all()
+    context['documents'] = collection.ordered_documents
     serializer_klass = collection.get_serializer_class()
     api_ctx = {
         'request': request

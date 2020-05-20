@@ -549,10 +549,29 @@ class AbstractDocumentCollection(models.Model):
     @property
     def ordered_documents(self):
         if not hasattr(self, '_ordered_documents'):
-            self._ordered_documents = self.documents.all().order_by(
-                'filingcabinet_collectiondocument__order'
-            )
+            self._ordered_documents = self.get_documents()
         return self._ordered_documents
+
+    def get_documents(self, directory=None):
+        return self.documents.all().filter(
+                filingcabinet_collectiondocument__directory=directory
+            ).order_by(
+            'filingcabinet_collectiondocument__order'
+        )
+
+    @property
+    def root_directories(self):
+        if not hasattr(self, '_root_directories'):
+            self._root_directories = self.get_directories()
+        return self._root_directories
+
+    def get_directories(self, parent_directory=None):
+        return CollectionDirectory.objects.all().filter(
+            collection=self,
+            parent=parent_directory
+        ).order_by(
+            'name'
+        )
 
     def get_absolute_url(self):
         if self.slug:
