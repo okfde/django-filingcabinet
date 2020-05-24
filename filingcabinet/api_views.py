@@ -133,7 +133,7 @@ class DocumentCollectionViewSet(
 
         # FIXME: check if directory is part of this collection
         try:
-            dir_id = int(self.request.GET.get('directory'))
+            dir_id = int(self.request.GET.get('directory', ''))
             parent_directory = CollectionDirectory.objects.get(
                 id=dir_id
             )
