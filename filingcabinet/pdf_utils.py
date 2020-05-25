@@ -203,6 +203,7 @@ class PDFProcessor(object):
 
 def draw_highlights(highlights):
     def apply_highlights(img):
+        img.colorspace = 'rgb'
         for highlight in highlights:
             crop = img[
                 highlight['left']:highlight['left'] + highlight['width'],
