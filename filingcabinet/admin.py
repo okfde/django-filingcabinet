@@ -117,6 +117,7 @@ class PageAnnotationAdmin(admin.ModelAdmin):
     date_hierarchy = 'timestamp'
     list_display = ('page', 'user', 'title', 'timestamp')
     list_filter = ['page__number']
+    save_on_top = True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
