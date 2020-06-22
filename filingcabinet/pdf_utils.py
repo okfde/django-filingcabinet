@@ -157,7 +157,7 @@ class PikePDFProcessor:
     def iter_markdown_outline(self):
         outline_generator = self.get_outline()
         for depth, title, page_number in outline_generator:
-            yield '{indent} - [{title}](#page-{page_number})\n'.format(
+            yield '{indent}- [{title}](#page-{page_number})\n'.format(
                 indent='  ' * depth, title=title, page_number=page_number
             )
 
