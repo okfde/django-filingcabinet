@@ -38,10 +38,11 @@ setup(
         'Django',
         'wand',
         'pypdf2',
+        'pikepdf',
         'Pillow',
         'django-filter',
         'django-taggit',
-        'django-mptt'
+        'django-mptt',
     ],
     include_package_data=True,
     classifiers=[

@@ -19,6 +19,8 @@ from PyPDF2 import PdfFileReader
 from PyPDF2.utils import PdfReadError
 from PIL import Image as PILImage
 
+import pikepdf
+
 try:
     import pytesseract
 except ImportError:
@@ -118,6 +120,51 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
             pdf_file = next_pdf_file
 
 
+class PikePDFProcessor:
+    def __init__(self, filename):
+        self._pdf = None
+        self.filename = filename
+
+    def open(self):
+        if self._pdf is None:
+            self._pdf = pikepdf.Pdf.open(self.filename)
+
+    def close(self):
+        if self._pdf is not None:
+            self._pdf.close()
+            self._pdf = None
+
+    def __enter__(self):
+        self.open()
+        self.page_list = list(self._pdf.pages)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def get_page_number_for_page(self, page):
+        return self.page_list.index(page) + 1
+
+    def get_outline(self, outlines=None, depth=0):
+        if outlines is None:
+            outline = self._pdf.open_outline()
+            outlines = outline.root
+        for item in outlines:
+            page_number = self.get_page_number_for_page(item.destination[0])
+            yield depth, item.title, page_number
+            yield from self.get_outline(item.children, depth=depth + 1)
+
+    def iter_markdown_outline(self):
+        outline_generator = self.get_outline()
+        for depth, title, page_number in outline_generator:
+            yield '{indent} - [{title}](#page-{page_number})\n'.format(
+                indent='  ' * depth, title=title, page_number=page_number
+            )
+
+    def get_markdown_outline(self):
+        return ''.join(self.iter_markdown_outline())
+
+
 class PDFProcessor(object):
     def __init__(self, filename, copy_func=None, language=None, config=None):
         filename, pdf_reader = get_readable_pdf(filename, copy_func)
@@ -139,8 +186,16 @@ class PDFProcessor(object):
     def get_meta(self):
         doc_info = self.pdf_reader.getDocumentInfo()
         return {
-            'title': doc_info.title
+            'title': doc_info.title,
+            'author': doc_info.author,
+            'creator': doc_info.creator,
+            'producer': doc_info.producer,
+            'subject': doc_info.subject,
         }
+
+    def get_markdown_outline(self):
+        with PikePDFProcessor(self.filename) as pike_pdf:
+            return pike_pdf.get_markdown_outline()
 
     def get_images(self, pages=None, resolution=300, chunk_size=20,
                    timeout=5 * 60):

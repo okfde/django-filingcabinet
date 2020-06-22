@@ -7,6 +7,7 @@ import zipfile
 
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.utils.text import slugify
 
 from . import get_document_model
 from .models import (
@@ -49,6 +50,19 @@ def process_document(doc):
     pdf = get_pdf_processor(doc)
     doc.num_pages = pdf.num_pages
     doc.file_size = os.path.getsize(doc.get_file_path())
+
+    meta = pdf.get_meta()
+    doc.properties.update(meta)
+    if doc.title.endswith('.pdf'):
+        if doc.properties['title']:
+            doc.title = doc.properties['title']
+        else:
+            doc.title = doc.title.rsplit('.pdf')[0]
+
+    if not doc.slug and doc.title:
+        doc.slug = slugify(doc.title)
+
+    doc.outline = pdf.get_markdown_outline()
     doc.save()
 
     queue_missing_pages(doc)
@@ -240,13 +254,12 @@ class DocumentStorer:
 
     def create_from_file(self, file_obj, filename, directory=None):
         title = filename
-        if title.endswith('.pdf'):
-            title = title.rsplit('.pdf')[0]
 
         doc = Document.objects.create(
             title=title,
             user=self.user,
-            public=self.public
+            public=self.public,
+            pending=True
         )
 
         if file_obj:
