@@ -500,13 +500,6 @@ class CollectionDocument(models.Model):
 
     class Meta:
         ordering = ['order', 'document__title']
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(
-                    directory__collection=models.F('collection')
-                ), name='collection_directory_same'
-            ),
-        ]
 
 
 class AbstractDocumentCollection(models.Model):
