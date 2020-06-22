@@ -20,6 +20,17 @@
             :class="{'fa-toggle-left': preferences.showSidebar, 'fa-toggle-right': !preferences.showSidebar}"
           />
         </button>
+        <button
+          v-if="preferences.showOutlineToggle"
+          type="button"
+          class="btn btn-sm btn-secondary"
+          :class="{'active': preferences.showOutline}"
+          @click="toggleShowOutline"
+        >
+          <i
+            class="fa fa-list-ul"
+          />
+        </button>
       </div>
     </div>
     <div
@@ -199,6 +210,12 @@ export default {
     },
     toggleShowSidebar () {
       this.$emit('updatepreferences', {showSidebar: !this.preferences.showSidebar})
+    },
+    toggleShowOutline () {
+      if (!this.preferences.showSidebar) {
+        this.$emit('updatepreferences', {showSidebar: true})
+      }
+      this.$emit('updatepreferences', {showOutline: !this.preferences.showOutline})
     },
     toggleShowAnnotations () {
       this.$emit('updatepreferences', {showAnnotations: !this.preferences.showAnnotations})

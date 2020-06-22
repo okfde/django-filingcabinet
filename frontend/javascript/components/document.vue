@@ -58,6 +58,12 @@
               :height="sidebarContentHeight"
               @navigate="navigate"
             />
+            <document-outline-sidebar
+              v-else-if="preferences.showOutline"
+              :outline="document.outline"
+              :height="sidebarContentHeight"
+              @navigate="navigate"
+            />
             <document-preview-sidebar
               v-else
               :pages="document.pages"
@@ -99,6 +105,7 @@ import Vue from 'vue'
 
 import DocumentPages from './document-pages.vue'
 import DocumentPreviewSidebar from './document-preview-sidebar.vue'
+import DocumentOutlineSidebar from './document-outline-sidebar.vue'
 import DocumentSearchSidebar from './document-search-sidebar.vue'
 import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
@@ -146,6 +153,7 @@ export default {
     DocumentPages,
     DocumentPreviewSidebar,
     DocumentSearchSidebar,
+    DocumentOutlineSidebar,
   },
   props: {
     documentUrl: {
@@ -186,9 +194,11 @@ export default {
       showZoom: true,
       showSearch: true,
       showSidebarToggle: true,
+      showOutlineToggle: doc.outline.length > 0,
       showAnnotationsToggle: null,
       showText: false,
       showSidebar: true,
+      showOutline: false,
       showAnnotations: false,
       maxHeight: null,
       defaultSearch: null,
@@ -468,7 +478,9 @@ export default {
       const sidebar = sidebarContainer.querySelector(
         '.document-preview-pages .scroller'
       )
-      sidebar.scrollTo(0, offset)
+      if (sidebar) {
+        sidebar.scrollTo(0, offset)
+      }
     },
     navigate ({number, source, searchIndex, force}) {
       if (number === this.currentPage && !force) {
@@ -487,7 +499,7 @@ export default {
       }
       this.currentPage = number
       console.log('navigate scroll', offset)
-      if (source !== 'sidebar' && source !== 'search') {
+      if (source === 'toolbar') {
         this.navigateSidebar(number)
       }
       if (searchIndex !== undefined) {
