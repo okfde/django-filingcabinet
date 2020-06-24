@@ -20,13 +20,17 @@ DEFAULT_PREFERENCES = {
 
 def get_viewer_preferences(input_data):
     preferences = dict(DEFAULT_PREFERENCES)
-    preferences.update(input_data)
+    preferences.update({
+        k: input_data.get(k) for k in preferences
+        if k in input_data
+    })
     form = ViewerPreferenceForm(data=preferences)
     if form.is_valid():
         return {
             k: v for k, v in form.cleaned_data.items()
             if v is not None
         }
+    return dict(DEFAULT_PREFERENCES)
 
 
 class ViewerPreferenceForm(forms.Form):
