@@ -1,8 +1,10 @@
 from django.conf.urls import url
 from django.utils.translation import pgettext_lazy
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
-    DocumentView, DocumentCollectionView
+    DocumentView, DocumentCollectionView,
+    DocumentEmbedView
 )
 
 app_name = 'filingcabinet'
@@ -22,4 +24,13 @@ urlpatterns = [
         name="document-detail"),
     url(r"^(?P<pk>\d+)/$", DocumentView.as_view(),
         name="document-detail_short"),
+    url(r"^(?P<pk>\d+)\-(?P<slug>[-\w]+)/embed/$",
+        xframe_options_exempt(
+            DocumentEmbedView.as_view()
+        ),
+        name="document-detail"),
+    url(r"^(?P<pk>\d+)/embed/$", xframe_options_exempt(
+            DocumentEmbedView.as_view()
+        ),
+        name="document-detail_embed"),
 ]

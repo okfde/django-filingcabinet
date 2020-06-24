@@ -108,6 +108,10 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
         return ctx
 
 
+class DocumentEmbedView(DocumentView):
+    template_name = 'filingcabinet/document_detail_embed.html'
+
+
 def get_document_collection_context(collection, request):
     context = {
         'object': collection
