@@ -1,6 +1,5 @@
 <template>
   <div
-    class="document-preview-pages"
     :style="{'height': height}"
   >
     <div

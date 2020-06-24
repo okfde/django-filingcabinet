@@ -35,7 +35,7 @@
     </div>
     <div
       v-if="preferences.showPageNumberInput"
-      class="col-auto"
+      class="col col-md-auto"
     >
       <div class="input-group input-group-sm">
         <input
@@ -104,7 +104,7 @@
     </div>
     <div
       v-if="!isSmallScreen && preferences.showSearch"
-      class="col-auto ml-2"
+      class="col col-md-auto ml-2"
     >
       <div class="input-group input-group-sm">
         <input
