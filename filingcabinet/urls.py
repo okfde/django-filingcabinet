@@ -28,9 +28,9 @@ urlpatterns = [
         xframe_options_exempt(
             DocumentEmbedView.as_view()
         ),
-        name="document-detail"),
+        name="document-detail_embed"),
     url(r"^(?P<pk>\d+)/embed/$", xframe_options_exempt(
             DocumentEmbedView.as_view()
         ),
-        name="document-detail_embed"),
+        name="document-detail_embed_short"),
 ]
