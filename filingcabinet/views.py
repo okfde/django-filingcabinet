@@ -9,6 +9,7 @@ from django.templatetags.static import static
 
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
+from .forms import get_viewer_preferences
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -104,6 +105,7 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
             start_from = 1
         ctx.update(get_document_viewer_context(
             self.object, self.request, page_number=start_from,
+            defaults=get_viewer_preferences(self.request.GET)
         ))
         return ctx
 
