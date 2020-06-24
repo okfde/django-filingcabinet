@@ -35,7 +35,7 @@
     </div>
     <div
       v-if="preferences.showPageNumberInput"
-      class="col col-md-auto"
+      class="col-auto"
     >
       <div class="input-group input-group-sm">
         <input
