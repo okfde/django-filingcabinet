@@ -1,48 +1,67 @@
 <template>
   <div class="row py-1 bg-secondary text-white document-searchbar">
     <div class="col-auto">
-      <div class="input-group input-group-sm">
-      </div>
-    </div>
-    <div class="col-auto ml-auto">
-      <div v-if="searching" class="spinner-border spinner-border-sm" role="status">
-        <span class="sr-only">{{ i18n.searching }}</span>
-      </div>
-      <small>
-        {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
-      </small>
-      <div class="btn-group" role="group">
-        <button type="button"
+      <div
+        v-if="searcher"
+        class="btn-group"
+        role="group"
+      >
+        <button
+          type="button"
           class="btn btn-sm btn-light"
           :disabled="!hasPrev"
           @click="prevSearchResult"
         >
-          <i class="fa fa-chevron-left"></i>
+          <i class="fa fa-chevron-left" />
         </button>
-        <button type="button"
+        <button
+          type="button"
           class="btn btn-sm btn-light"
           :disabled="!hasNext"
           @click="nextSearchResult"
         >
-          <i class="fa fa-chevron-right"></i>
+          <i class="fa fa-chevron-right" />
         </button>
       </div>
-      <button type="button"
-          class="btn btn-sm btn-light"
-          @click="clear"
+      <small v-if="searcher">
+        {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
+      </small>
+    </div>
+    <div class="col col-md-auto ml-auto">
+      <div
+        v-if="searching"
+        class="spinner-border spinner-border-sm"
+        role="status"
+      >
+        <span class="sr-only">{{ i18n.searching }}</span>
+      </div>
+      <div class="input-group input-group-sm">
+        <input
+          v-model="search"
+          type="text"
+          class="search-input form-control form-control-sm"
+          @keydown.enter="runSearch"
         >
-          <i class="fa fa-close"></i>
-        </button>
+        <div class="input-group-append">
+          <button
+            class="btn btn-outline-light"
+            @click="runSearch"
+          >
+            {{ i18n.search }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'document-searchbar',
-  props: ['searcher', 'searchIndex', 'pages'],
+  name: 'DocumentSearchbar',
+  props: ['searcher', 'searchIndex', 'pages', 'defaultSearch'],
   data () {
     return {
+      search: this.defaultSearch || '',
     }
   },
   computed: {
@@ -50,7 +69,7 @@ export default {
       return this.$root.config.i18n
     },
     searching () {
-      return !this.searcher.done
+      return this.searcher && !this.searcher.done
     },
     hasNext () {
       return this.pages.length > 0 && this.searchIndex < this.pages.length - 1
@@ -60,6 +79,9 @@ export default {
     }
   },
   methods: {
+    runSearch () {
+      this.$emit('search', this.search)
+    },
     prevSearchResult () {
       this.$emit('movesearchindex', -1)
     },

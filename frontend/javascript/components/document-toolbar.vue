@@ -1,8 +1,8 @@
 <template>
   <div class="row py-2 bg-dark">
     <div
-      v-if="!isSmallScreen && preferences.showSidebarToggle"
-      class="col-auto"
+      v-if="preferences.showSidebarToggle"
+      class="col col-md-auto px-0 px-sm-2"
     >
       <div
         class="btn-group"
@@ -35,7 +35,7 @@
     </div>
     <div
       v-if="preferences.showPageNumberInput"
-      class="col-auto"
+      class="col col-md-auto pr-0 pl-1 px-sm-2"
     >
       <div class="input-group input-group-sm">
         <input
@@ -47,13 +47,13 @@
           @change="submitChange"
         >
         <div class="input-group-append">
-          <span class="input-group-text">/ {{ document.num_pages }}</span>
+          <span class="d-none d-sm-inline input-group-text">/ {{ document.num_pages }}</span>
         </div>
       </div>
     </div>
     <div
       v-if="preferences.showTextToggle"
-      class="col-auto"
+      class="col col-md-auto pl-0 pr-1 px-sm-2"
     >
       <div
         class="btn-group"
@@ -78,7 +78,7 @@
     </div>
     <div
       v-if="preferences.showZoom"
-      class="col-auto ml-auto"
+      class="col col-md-auto px-1 px-sm-2"
     >
       <div
         class="btn-group"
@@ -103,29 +103,21 @@
       </div>
     </div>
     <div
-      v-if="!isSmallScreen && preferences.showSearch"
-      class="col col-md-auto ml-2"
+      v-if="preferences.showSearch"
+      class="col col-sm-auto pr-0 pl-1 px-sm-2 ml-auto"
     >
-      <div class="input-group input-group-sm">
-        <input
-          v-model="search"
-          type="text"
-          class="search-input form-control form-control-sm"
-          @keydown.enter="runSearch"
-        >
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-light"
-            @click="runSearch"
-          >
-            {{ i18n.search }}
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        class="btn btn-sm btn-secondary"
+        :class="{'btn-light': preferences.showSearchbar}"
+        @click="toggleShowSearchbar"
+      >
+        <i class="fa fa-search" />
+      </button>
     </div>
     <div
       v-if="preferences.showAnnotationsToggle"
-      class="col-auto"
+      class="col col-sm-auto pl-0 pr-1 px-sm-2"
     >
       <div
         class="btn-group"
@@ -159,11 +151,10 @@ export default {
   name: 'DocumentToolbar',
   props: [
     'document', 'searcher', 'preferences', 'currentPage',
-    'zoom', 'defaultSearch', 'isSmallScreen', 'annotationCount'
+    'zoom', 'isSmallScreen', 'annotationCount'
   ],
   data () {
     return {
-      search: this.defaultSearch || '',
       storedPage: this.currentPage
     }
   },
@@ -202,14 +193,14 @@ export default {
         source: 'toolbar'
       })
     },
-    runSearch () {
-      this.$emit('search', this.search)
-    },
     toggleShowText () {
       this.$emit('updatepreferences', {showText: !this.preferences.showText})
     },
     toggleShowSidebar () {
       this.$emit('updatepreferences', {showSidebar: !this.preferences.showSidebar})
+    },
+    toggleShowSearchbar () {
+      this.$emit('updatepreferences', {showSearchbar: !this.preferences.showSearchbar})
     },
     toggleShowOutline () {
       if (!this.preferences.showSidebar) {
@@ -246,11 +237,11 @@ export default {
 
 <style lang="scss" scoped>
 .page-number-input {
-  width: 70px !important;
+  width: auto !important;
 }
 .badge-annotation-count {
   position: absolute !important;
   top: -5px !important;
-  right: -10px !important;
+  right: -5px !important;
 }
 </style>

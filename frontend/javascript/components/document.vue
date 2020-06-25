@@ -15,23 +15,22 @@
         :searcher="searcher"
         :preferences="preferences"
         :current-page="currentPage"
-        :default-search="preferences.defaultSearch"
         :zoom="zoom"
         :is-small-screen="isSmallScreen"
         :annotation-count="annotationCount"
         @navigate="navigate"
-        @search="search"
         @updatepreferences="updatePreferences"
         @zoomin="zoomIn"
         @zoomout="zoomOut"
       />
       <document-searchbar
-        v-if="searcher"
+        v-if="preferences.showSearchbar"
         :searcher="searcher"
         :search-index="searchIndex"
         :pages="pagesWithMatches"
+        :default-search="preferences.defaultSearch"
+        @search="search"
         @movesearchindex="moveSearchIndex"
-        @clearsearch="clearSearch"
       />
     </div>
     <div class="row">
@@ -205,6 +204,7 @@ export default {
       defaultSearch: null,
       defaultZoom: 1,
       pageRange: null,
+      showSearchbar: false,
       showPageNumberInput: true
     }
     Object.assign(preferences, this.defaults)
@@ -409,10 +409,10 @@ export default {
       if (this.$refs.document) {
         this.documentHeight = this.$refs.document.clientHeight
       }
-      if (this.isSmallScreen) {
-        this.preferences.showSidebar = false
-        this.preferences.showSidebarToggle = false
-      }
+      // if (this.isSmallScreen) {
+      //   this.preferences.showSidebar = false
+      //   this.preferences.showSidebarToggle = false
+      // }
     },
     getLocationHashPage () {
       let match = document.location.hash.match(/page-(\d+)/)
@@ -492,6 +492,9 @@ export default {
       let offset = this.processedPages.filter((p) => p.number < number)
         .map((p) => p.normalSize)
         .reduce((a, v) => a + v, 0)
+
+      const barOffset = this.$refs.toolbar.clientHeight
+      offset -= barOffset
       if (this.isFramed) {
         getScroll(this.$refs.document).scrollTo(0, offset)
       } else {
