@@ -24,6 +24,7 @@
         @currentannotation="$emit('currentannotation', $event)"
         @activateannotationform="$emit('activateannotationform', $event)"
         @deleteannotation="$emit('deleteannotation', $event)"
+        @navigate="$emit('navigate', $event)"
       />
     </RecycleScroller>
   </div>

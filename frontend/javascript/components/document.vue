@@ -94,6 +94,7 @@
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
+          @navigate="navigate"
         />
       </div>
     </div>

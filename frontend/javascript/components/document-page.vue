@@ -107,7 +107,8 @@
 import PageAnnotations from './document-annotations.vue'
 import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
-import {SimpleLinkService} from '../lib/pdfjs-utils.js'
+import {FilingcabinetLinkService} from '../lib/pdfjs-utils.js'
+
 
 export default {
   name: 'DocumentPage',
@@ -330,6 +331,21 @@ export default {
       if (pdfAnnotations.length === 0) {
         return
       }
+      const linkService = new FilingcabinetLinkService({
+        externalLinkTarget: 2,
+        externalLinkRel: "noopener nofollow noreferrer",
+        externalLinkEnabled: true,
+      })
+      linkService.setDocument(this.pdfDocument)
+      // Set shim viewer to navigate
+      linkService.setViewer({
+        scrollPageIntoView: (options) => {
+          this.$emit('navigate', {
+            number: options.pageNumber,
+            source: 'link'
+          })
+        }
+      })
       const parameters = {
         viewport: viewport.clone({ dontFlip: true }),
         div: this.$refs.annotationLayer,
@@ -337,7 +353,7 @@ export default {
         page: this.pdfPage,
         // imageResourcesPath: this.imageResourcesPath,
         renderInteractiveForms: false,
-        linkService: new SimpleLinkService(),
+        linkService: linkService,
         // downloadManager: this.downloadManager,
       };
       if (this.$refs.annotationLayer.querySelector('section')) {
