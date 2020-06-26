@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-06 17:08+0100\n"
-"PO-Revision-Date: 2019-12-06 17:09+0100\n"
+"POT-Creation-Date: 2020-06-25 19:57+0200\n"
+"PO-Revision-Date: 2020-06-25 19:58+0200\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -16,61 +16,105 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.3\n"
 
-#: admin.py:40
+#: admin.py:53
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py:41
+#: admin.py:54
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py:46
+#: admin.py:59
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py:47
+#: admin.py:60
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
 
-#: admin.py:55
+#: admin.py:68
 msgid "Fixing document paths..."
 msgstr "Dokumentenpfade werden repariert..."
 
-#: admin.py:56
+#: admin.py:69
 msgid "Fix document paths"
 msgstr "Repariere Dokumentenpfade"
+
+#: admin.py:72
+msgid "Publishing {} documents..."
+msgstr "{} Dokumente werden veröffentlicht..."
+
+#: admin.py:88
+msgid "Please select only non-pending documents for publishing."
+msgstr "Bitte wählen Sie nur fertige Dokumente zur Veröffentlichung."
+
+#: admin.py:90
+msgid "Publish documents"
+msgstr "Dokumente veröffentlichen"
+
+#: admin.py:95
+msgid "Unpublishing {} documents..."
+msgstr "{} Dokumente werden depubliziert..."
+
+#: admin.py:97
+msgid "Unpublish documents"
+msgstr "Dokumente depublizieren"
 
 #: apps.py:7
 msgid "Filing Cabinet"
 msgstr "Aktenschrank"
 
-#: models.py:66
+#: models.py:37
+msgid "document portal"
+msgstr "Dokumentenportal"
+
+#: models.py:38
+msgid "document portals"
+msgstr "Dokumentenportale"
+
+#: models.py:84
 msgid "Document Tag"
 msgstr "Dokumenten-Schlagwort"
 
-#: models.py:67
+#: models.py:85
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py:91 models.py:389 models.py:452
+#: models.py:109 models.py:408 models.py:468 models.py:518
 msgid "User"
 msgstr "Nutzer"
 
-#: models.py:113
+#: models.py:138
 msgid "document"
 msgstr "Dokument"
 
-#: models.py:114 views.py:63
+#: models.py:139 views.py:69
 msgid "documents"
 msgstr "Dokumente"
 
-#: models.py:469
+#: models.py:458
+msgid "created at"
+msgstr "erstellt am"
+
+#: models.py:475
+msgid "Collection directory"
+msgstr "Sammlungsverzeichnis"
+
+#: models.py:476
+msgid "Collection directories"
+msgstr "Sammlungsverzeichnisse"
+
+#: models.py:498
+msgid "directory"
+msgstr "Verzeichnis"
+
+#: models.py:539
 msgid "document collection"
 msgstr "Dokumentensammlung"
 
-#: models.py:470
+#: models.py:540
 msgid "document collections"
 msgstr "Dokumentensammlungen"
 
@@ -86,85 +130,86 @@ msgstr "Anmerkung schreiben"
 msgid "This document is still being processed..."
 msgstr "Dieses Dokument wird noch verarbeitet..."
 
-#: templates/filingcabinet/document_detail.html:12
+#: templates/filingcabinet/document_detail.html:14
 msgid "private"
 msgstr "privat"
 
-#: templates/filingcabinet/document_detail.html:32
-msgid "Download PDF"
-msgstr "PDF herunterladen"
-
-#: urls.py:13
+#: urls.py:15
 msgctxt "url part"
 msgid "^collection/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
 msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
 
-#: urls.py:18
+#: urls.py:20
 msgctxt "url part"
 msgid "^collection/(?P<pk>\\d+)/$"
 msgstr "^sammlung/(?P<pk>\\d+)/$"
 
-#: views.py:48
+#: views.py:53
 msgid "Loading..."
 msgstr "Wird geladen..."
 
-#: views.py:49
+#: views.py:54
 msgid "page"
 msgstr "Seite"
 
-#: views.py:50
+#: views.py:55
 msgid "pages"
 msgstr "Seiten"
 
-#: views.py:51
+#: views.py:56
+msgid "one match"
+msgstr "ein Ergebnis"
+
+#: views.py:57
 msgid "matches"
 msgstr "Ergebnisse"
 
-#: views.py:52
+#: views.py:58
 msgid "Search"
 msgstr "Suchen"
 
-#: views.py:53
+#: views.py:59
 msgid "Searching..."
 msgstr "Suche läuft..."
 
-#: views.py:54
+#: views.py:60
 msgid "Found on"
 msgstr "Gefunden auf"
 
-#: views.py:55
-#, fuzzy
-#| msgid "Found"
+#: views.py:61
 msgid "found"
 msgstr "gefunden"
 
-#: views.py:56
+#: views.py:62
 msgid "Show/hide Text"
 msgstr "Zeige/verstecke Text"
 
-#: views.py:57
+#: views.py:63
 msgid "Title"
 msgstr "Titel"
 
-#: views.py:58
+#: views.py:64
 msgid "Description"
 msgstr "Beschreibung"
 
-#: views.py:59
+#: views.py:65
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: views.py:60
+#: views.py:66
 msgid "Add annotation"
 msgstr "Annotation hinzufügen"
 
-#: views.py:61
+#: views.py:67
 msgid "Delete this annotation?"
 msgstr "Diese Annotation löschen?"
 
-#: views.py:62
+#: views.py:68
 msgid "Back to collection"
 msgstr "Zurück zur Sammlung"
+
+#~ msgid "Download PDF"
+#~ msgstr "PDF herunterladen"
 
 #~ msgid "Found in"
 #~ msgstr "Gefunden in"
