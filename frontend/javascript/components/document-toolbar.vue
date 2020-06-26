@@ -2,7 +2,7 @@
   <div class="row py-2 bg-dark toolbar-row">
     <div
       v-if="preferences.showSidebarToggle || preferences.showOutlineToggle"
-      class="col col-md-auto px-1 px-sm-2"
+      class="col-auto px-1 px-sm-2"
     >
       <div
         class="btn-group"
@@ -105,7 +105,7 @@
     </div>
     <div
       v-if="preferences.showSearch"
-      class="col col-sm-auto pr-0 pl-1 px-sm-2 ml-auto"
+      class="col col-sm-auto px-1 px-sm-2 ml-auto text-right"
     >
       <button
         type="button"
@@ -118,7 +118,7 @@
     </div>
     <div
       v-if="preferences.showAnnotationsToggle"
-      class="col col-sm-auto pl-0 pr-1 px-sm-2 text-right"
+      class="col-auto px-1 px-sm-2 text-right"
     >
       <div
         class="btn-group"
@@ -251,7 +251,7 @@ export default {
   z-index: 30;
 }
 .page-number-input {
-  width: auto !important;
+  max-width: 70px;
 }
 .badge-annotation-count {
   position: absolute !important;
