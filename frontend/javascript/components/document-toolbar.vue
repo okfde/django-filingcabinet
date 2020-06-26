@@ -1,14 +1,15 @@
 <template>
-  <div class="row py-2 bg-dark">
+  <div class="row py-2 bg-dark toolbar-row">
     <div
-      v-if="preferences.showSidebarToggle"
-      class="col col-md-auto px-0 px-sm-2"
+      v-if="preferences.showSidebarToggle || preferences.showOutlineToggle"
+      class="col col-md-auto px-1 px-sm-2"
     >
       <div
         class="btn-group"
         role="group"
       >
         <button
+          v-if="preferences.showSidebarToggle"
           type="button"
           class="btn btn-sm btn-secondary"
           :class="{'active': preferences.showSidebar}"
@@ -117,7 +118,7 @@
     </div>
     <div
       v-if="preferences.showAnnotationsToggle"
-      class="col col-sm-auto pl-0 pr-1 px-sm-2"
+      class="col col-sm-auto pl-0 pr-1 px-sm-2 text-right"
     >
       <div
         class="btn-group"
@@ -151,7 +152,7 @@ export default {
   name: 'DocumentToolbar',
   props: [
     'document', 'searcher', 'preferences', 'currentPage',
-    'zoom', 'isSmallScreen', 'annotationCount'
+    'zoom', 'isSmallScreen', 'annotationCount', 'pdfDocument'
   ],
   data () {
     return {
@@ -197,10 +198,19 @@ export default {
       this.$emit('updatepreferences', {showText: !this.preferences.showText})
     },
     toggleShowSidebar () {
+      if (this.preferences.showSidebar) {
+        if (this.preferences.showOutline) {
+          this.$emit('updatepreferences', {showOutline: !this.preferences.showOutline})
+        }
+      }
       this.$emit('updatepreferences', {showSidebar: !this.preferences.showSidebar})
     },
     toggleShowSearchbar () {
-      this.$emit('updatepreferences', {showSearchbar: !this.preferences.showSearchbar})
+      if (this.preferences.showSearchbar) {
+        this.$emit('clearsearch')
+      } else {
+        this.$emit('updatepreferences', {showSearchbar: true})
+      }
     },
     toggleShowOutline () {
       if (!this.preferences.showSidebar) {
@@ -236,6 +246,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.toolbar-row {
+  position: relative;
+  z-index: 30;
+}
 .page-number-input {
   width: auto !important;
 }

@@ -49,9 +49,32 @@ function triggerDownload (blobUrl, filename) {
   a.remove();
 }
 
+function findPageByOffset(ar, scrollTop, viewportHeight) {
+
+  var triggerPoint = scrollTop + viewportHeight / 2
+  var m = 0;
+  var n = ar.length - 1;
+  while (m <= n) {
+      var k = (n + m) >> 1;
+      if (triggerPoint > ar[k].offset) {
+          m = k + 1;
+      } else if(triggerPoint < ar[k].offset) {
+          let prev = ar[k-1]
+          if (!prev || triggerPoint > prev.offset) {
+            return ar[k].number
+          }
+          n = k - 1;
+      } else {
+          return ar[k].number;
+      }
+  }
+  return ar[ar.length - 1].number;
+}
+
 
 export {
   getData,
   postData,
-  triggerDownload
+  triggerDownload,
+  findPageByOffset
 }

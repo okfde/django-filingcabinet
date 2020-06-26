@@ -1,8 +1,8 @@
 <template>
-  <div class="row py-1 bg-secondary text-white document-searchbar">
+  <div class="row py-2 bg-secondary text-white document-searchbar">
     <div class="col-auto">
       <div
-        v-if="searcher"
+        v-if="searcher && !isSmallScreen"
         class="btn-group"
         role="group"
       >
@@ -22,23 +22,27 @@
         >
           <i class="fa fa-chevron-right" />
         </button>
+        <div
+          v-if="searching"
+          class="spinner-border spinner-border-sm"
+          role="status"
+        >
+          <span class="sr-only">{{ i18n.searching }}</span>
+        </div>
       </div>
-      <small v-if="searcher">
+      <small
+        v-if="searcher && searcher.done"
+        class="d-none d-sm-inline"
+      >
         {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
       </small>
     </div>
     <div class="col col-md-auto ml-auto">
-      <div
-        v-if="searching"
-        class="spinner-border spinner-border-sm"
-        role="status"
-      >
-        <span class="sr-only">{{ i18n.searching }}</span>
-      </div>
       <div class="input-group input-group-sm">
         <input
           v-model="search"
           type="text"
+          ref="searchInput"
           class="search-input form-control form-control-sm"
           @keydown.enter="runSearch"
         >
@@ -58,7 +62,10 @@
 <script>
 export default {
   name: 'DocumentSearchbar',
-  props: ['searcher', 'searchIndex', 'pages', 'defaultSearch'],
+  props: [
+    'searcher', 'searchIndex', 'pages', 'defaultSearch',
+    'isSmallScreen'
+  ],
   data () {
     return {
       search: this.defaultSearch || '',
@@ -78,6 +85,9 @@ export default {
       return this.pages.length > 0 && this.searchIndex > 0
     }
   },
+  mounted () {
+    this.$refs.searchInput.focus()
+  },
   methods: {
     runSearch () {
       this.$emit('search', this.search)
@@ -96,5 +106,8 @@ export default {
 </script>
 
 <style lang="scss">
-
+.document-searchbar {
+  position: relative;
+  z-index: 30;
+}
 </style>

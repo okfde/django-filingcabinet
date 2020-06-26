@@ -8,41 +8,70 @@
       ref="toolbar"
       class="toolbar"
     >
-      <document-toolbar
-        v-if="preferences.showToolbar"
-        :document="document"
-        :pdf-document="pdfDocument"
-        :searcher="searcher"
-        :preferences="preferences"
-        :current-page="currentPage"
-        :zoom="zoom"
-        :is-small-screen="isSmallScreen"
-        :annotation-count="annotationCount"
-        @navigate="navigate"
-        @updatepreferences="updatePreferences"
-        @zoomin="zoomIn"
-        @zoomout="zoomOut"
-      />
-      <document-searchbar
-        v-if="preferences.showSearchbar"
-        :searcher="searcher"
-        :search-index="searchIndex"
-        :pages="pagesWithMatches"
-        :default-search="preferences.defaultSearch"
-        @search="search"
-        @movesearchindex="moveSearchIndex"
-      />
+      <div ref="toolbarBars">
+        <document-toolbar
+          v-if="preferences.showToolbar"
+          :document="document"
+          :pdf-document="pdfDocument"
+          :searcher="searcher"
+          :preferences="preferences"
+          :current-page="currentPage"
+          :zoom="zoom"
+          :is-small-screen="isSmallScreen"
+          :annotation-count="annotationCount"
+          @navigate="navigate"
+          @updatepreferences="updatePreferences"
+          @clearsearch="clearSearch"
+          @zoomin="zoomIn"
+          @zoomout="zoomOut"
+        />
+        <document-searchbar
+          v-if="preferences.showSearchbar"
+          :searcher="searcher"
+          :search-index="searchIndex"
+          :pages="pagesWithMatches"
+          :is-small-screen="isSmallScreen"
+          :default-search="preferences.defaultSearch"
+          @search="search"
+          @movesearchindex="moveSearchIndex"
+        />
+      </div>
+      <transition
+        v-if="isSmallScreen"
+        name="slidedown"
+      >
+        <div
+          v-if="preferences.showSearchResults || preferences.showOutline"
+          class="row toolbar-extended"
+          :class="{'bg-dark': !preferences.showSearchResults, 'bg-secondary': !!preferences.showSearchResults}"
+        >
+          <document-search-sidebar
+            v-if="preferences.showSearchResults"
+            :document-pages="document.pages"
+            :pages="pagesWithMatches"
+            :current-page="currentPage"
+            :height="sidebarContentHeight"
+            @navigate="navigate"
+          />
+          <document-outline-sidebar
+            v-else-if="preferences.showOutline"
+            :outline="document.outline"
+            :height="sidebarContentHeight"
+            @navigate="navigate"
+          />
+        </div>
+      </transition>
     </div>
-    <div class="row">
+    <div class="row main-row">
       <div
-        v-if="preferences.showSidebar || searcher"
+        v-if="!isSmallScreen && sidebarVisible"
         ref="sidebarContainer"
-        class="col-md-3 col-2 px-0"
-        :class="{'bg-dark': !searcher, 'bg-secondary': !!searcher}"
+        class="sidebar-container col-md-3 col-2 px-0"
+        :class="{'bg-dark': !preferences.showSearchResults, 'bg-secondary': !!preferences.showSearchResults}"
       >
         <div
           class="sidebar"
-          :class="{'preview': !searcher, 'search': !!searcher}"
+          :class="{'preview': !preferences.showSearchResults, 'search': !!preferences.showSearchResults}"
           :style="sidebarStyle"
         >
           <div
@@ -50,7 +79,7 @@
             :style="sidebarContentStyle"
           >
             <document-search-sidebar
-              v-if="searcher"
+              v-if="preferences.showSearchResults"
               :document-pages="document.pages"
               :pages="pagesWithMatches"
               :current-page="currentPage"
@@ -110,8 +139,11 @@ import DocumentSearchSidebar from './document-search-sidebar.vue'
 import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
 
-import {getData, postData} from '../lib/utils.js'
+import {getData, postData, findPageByOffset} from '../lib/utils.js'
 
+const BOOTSTRAP_MD = 768
+const BOOTSTRAP_LG = 992
+const GUTTER = 30
 const MAX_PDF_SIZE = 1024 * 1024 * 5
 
 function range(size, startAt = 0) {
@@ -205,6 +237,7 @@ export default {
       defaultZoom: 1,
       pageRange: null,
       showSearchbar: false,
+      showSearchResults: false,
       showPageNumberInput: true
     }
     Object.assign(preferences, this.defaults)
@@ -294,7 +327,7 @@ export default {
       if (this.isFramed) {
         if (this.toolbarHeight) {
           return {
-            height: (this.documentHeight - this.toolbarHeight) + 'px'
+            height: this.documentViewHeight
           }
         }
       } else {
@@ -308,14 +341,28 @@ export default {
         height: '90vh'
       }
     },
+    sidebarVisible () {
+      return (
+        this.preferences.showSidebar ||
+        this.preferences.showOutline ||
+        this.preferences.showSearchResults
+      )
+    },
     sidebarContentHeight () {
       return this.sidebarContentStyle.height
     },
     documentViewHeight () {
       if (this.isFramed) {
-        return (this.documentHeight - this.toolbarHeight) + 'px'
+        return this.viewPortHeight + 'px'
       }
       return null
+    },
+    viewPortHeight () {
+      if (this.isFramed) {
+        return this.documentHeight - this.toolbarHeight
+      } else {
+        return window.innerHeight - this.toolbarHeight
+      }
     }
   },
   created () {
@@ -394,8 +441,9 @@ export default {
     },
     calcResponsive () {
       if (this.$refs.document) {
-        this.isMediumScreen = this.$refs.document.clientWidth < 960
-        this.isSmallScreen = this.$refs.document.clientWidth < 600
+        const documentWidth = this.$refs.document.clientWidth + GUTTER
+        this.isMediumScreen = documentWidth < BOOTSTRAP_LG
+        this.isSmallScreen = documentWidth < BOOTSTRAP_MD
       }
       if (this.$refs.documentContainer) {
         this.documentContainerWidth = this.$refs.documentContainer.clientWidth - 30 // - padding
@@ -403,16 +451,16 @@ export default {
       if (this.$refs.sidebarContainer) {
         this.sidebarContainerWidth = this.$refs.sidebarContainer.clientWidth
       }
-      if (this.$refs.toolbar) {
-        this.toolbarHeight = this.$refs.toolbar.clientHeight
+      if (this.$refs.toolbarBars) {
+        this.toolbarHeight = this.$refs.toolbarBars.clientHeight
       }
       if (this.$refs.document) {
         this.documentHeight = this.$refs.document.clientHeight
       }
-      // if (this.isSmallScreen) {
-      //   this.preferences.showSidebar = false
-      //   this.preferences.showSidebarToggle = false
-      // }
+      if (this.isSmallScreen) {
+        this.preferences.showSidebar = false
+        this.preferences.showSidebarToggle = false
+      }
     },
     getLocationHashPage () {
       let match = document.location.hash.match(/page-(\d+)/)
@@ -440,21 +488,26 @@ export default {
       if (this.sidebarContainerWidth) {
         smallWidth = Math.min(this.sidebarContainerWidth, smallWidth)
       }
-
+      let offset = 0
       let processedPages = pages.map((p, index) => {
         if (p === undefined || p.width === undefined) {
           return {
             zoomedWidth: zoomedWidth,
             normalSize: 1000,
+            offset: 0,
             smallSize: 255,
             number: index + 1,
           }
         }
         p.image_url = this.pageTemplate.replace(/\{page\}/, p.number)
         let ratio = p.height / p.width
+        let normalSize =  Math.ceil(zoomedWidth * ratio) + 60
+        offset += normalSize
+        p.offset = offset
         Vue.set(p, 'zoomedWidth', zoomedWidth)
-        Vue.set(p, 'normalSize', Math.ceil(zoomedWidth * ratio) + 60)
+        Vue.set(p, 'normalSize', normalSize)
         Vue.set(p, 'smallSize', Math.ceil(smallWidth * ratio) + 40)
+
         return p
       })
       if (this.pageRange === null) {
@@ -465,7 +518,7 @@ export default {
       return processedPages.filter((p) => !!pageMap[p.number])
     },
     navigateSidebar (number) {
-      if (this.searcher !== null) {
+      if (this.preferences.showSearchResults) {
         return
       }
       let offset = this.processedPages.filter((p) => p.number < number)
@@ -484,7 +537,7 @@ export default {
       }
     },
     navigate ({number, source, searchIndex, force}) {
-      if (number === this.currentPage && !force) {
+      if (!this.isSmallScreen && number === this.currentPage && !force) {
         console.log('Not Navigate', this.currentPage, number, source)
         return
       }
@@ -493,18 +546,24 @@ export default {
         .map((p) => p.normalSize)
         .reduce((a, v) => a + v, 0)
 
-      const barOffset = this.$refs.toolbar.clientHeight
-      offset -= barOffset
       if (this.isFramed) {
         getScroll(this.$refs.document).scrollTo(0, offset)
       } else {
-        let top = this.$refs.documentContainer.offsetTop
-        window.scrollTo(0, top + offset)
+        const top = this.$refs.documentContainer.offsetTop
+        const barHeight = this.$refs.toolbarBars.clientHeight
+        window.scrollTo(0, top + offset - barHeight)
       }
       this.currentPage = number
       console.log('navigate scroll', offset)
       if (source === 'toolbar') {
         this.navigateSidebar(number)
+      }
+      if (this.isSmallScreen) {
+        if (source === 'outline') {
+          this.preferences.showOutline = false
+        } else if (source === 'search') {
+          this.preferences.showSearchResults = false
+        }
       }
       if (searchIndex !== undefined) {
         this.searchIndex = searchIndex
@@ -515,11 +574,16 @@ export default {
       if (this.isMediumScreen && this.preferences.showAnnotations) {
         Vue.set(this.preferences, 'showAnnotations', false)
       }
+      if (this.searcher && this.searcher.term === term) {
+        this.preferences.showSearchResults = true
+        return
+      }
       this.searcher = {
         term: term,
         done: false,
         results: []
       }
+      this.preferences.showSearchResults = true
       let searchUrl = `${this.config.urls.pageApiUrl}?document=${this.document.id}&q=${encodeURIComponent(term)}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
@@ -527,10 +591,12 @@ export default {
         this.searcher.results = response.objects
         if (this.searcher.results.length > 0) {
           this.searchIndex = 0
-          this.navigate({
-            number: this.searcher.results[0].number,
-            source: 'search'
-          })
+          if (!this.isSmallScreen) {
+            this.navigate({
+              number: this.searcher.results[0].number,
+              source: 'search'
+            })
+          }
         }
         let pages = {}
         let pageCount = 0
@@ -554,6 +620,8 @@ export default {
     },
     clearSearch () {
       this.searcher = null
+      this.preferences.showSearchResults = false
+      this.preferences.showSearchbar = false
       this.willResize()
     },
     zoomIn () {
@@ -600,20 +668,19 @@ export default {
         
       this.resize(scrollRatio)
     },
-    updateCurrentPage ({start, end}) {
+    getDocumentScrollTop () {
+      if (this.isFramed) {
+        return getScroll(this.$refs.document).scrollTop
+      } else {
+        return document.documentElement.scrollTop - this.$refs.documentContainer.offsetTop
+      }
+    },
+    updateCurrentPage () {
       if (this.resizing || !this.document.loaded) {
         return
       }
-
-      let currentIndex
-      let diff = end - start
-      if (diff <= 2) {
-        // top of page, default to top
-        currentIndex = start
-      } else {
-        currentIndex = start + Math.floor(diff / 2)
-      }
-      let page = this.document.pages[currentIndex].number
+      const top = this.getDocumentScrollTop()
+      const page = findPageByOffset(this.processedPages, top, this.viewPortHeight)
       if (page !== this.currentPage) {
         this.currentPage = page
         this.navigateSidebar(this.currentPage)
@@ -686,14 +753,36 @@ export default {
   position: sticky;
   top: 0;
   z-index: 30;
+  padding: 0 15px;
+  margin: 0 -15px;
+  overflow: hidden;
 }
+
 .sidebar {
   position: sticky;
 }
+
 .sidebar-content {
   overflow: auto;
 }
 .document-pages-container {
   position: relative;
 }
+
+.toolbar-extended {
+  position: relative;
+  z-index: 25;
+}
+
+.slidedown-leave-active,
+.slidedown-enter-active {
+  transition: 0.3s;
+}
+.slidedown-enter {
+  transform: translate(0, -100%);
+}
+.slidedown-leave-to {
+  transform: translate(0, -100%);
+}
+
 </style>

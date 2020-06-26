@@ -28,11 +28,11 @@ import DocumentSearchPreview from './document-search-preview.vue'
 
 export default {
   name: 'document-search-sidebar',
-  props: ['documentPages', 'pages', 'currentPage', 'height'],
   components: {
     DocumentSearchPreview,
     RecycleScroller
   },
+  props: ['documentPages', 'pages', 'currentPage', 'height'],
   computed: {
   },
   methods: {
@@ -40,7 +40,7 @@ export default {
       let searchIndex = this.pages.findIndex((i) => i === item)
       this.$emit('navigate', {
         number: item.number,
-        source: 'sidebar',
+        source: 'search',
         searchIndex: searchIndex
       })
     }
@@ -51,5 +51,6 @@ export default {
 <style lang="scss">
 .document-search-pages {
   padding: 0.5rem 0;
+  width: 100%;
 }
 </style>
