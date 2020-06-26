@@ -53,6 +53,7 @@ def get_js_config(request, obj):
             'loading': _('Loading...'),
             'page': _('page'),
             'pages': _('pages'),
+            'one_match': _('one match'),
             'matches': _('matches'),
             'search': _('Search'),
             'searching': _('Searching...'),
