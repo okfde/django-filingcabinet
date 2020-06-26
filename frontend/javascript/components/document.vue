@@ -378,9 +378,9 @@ export default {
       this.document.loaded = true
       Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
       this.willResize()
-      if (this.document.file_size <= MAX_PDF_SIZE) [
+      if (this.document.file_size <= MAX_PDF_SIZE || this.document.properties._force_load_pdf) {
         this.loadPDF()
-      ]
+      }
     })
     getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
       let annotations = {}
