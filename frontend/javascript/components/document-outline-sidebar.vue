@@ -105,6 +105,9 @@ export default {
   li ul {
     padding-left: 0.5rem;
   }
+  ul {
+    color: #fff;
+  }
   a, a:hover, a:visited {
     color: #fff;
   }
