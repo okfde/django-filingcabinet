@@ -150,8 +150,13 @@ class PikePDFProcessor:
             outline = self._pdf.open_outline()
             outlines = outline.root
         for item in outlines:
+            if not item or not item.destination:
+                continue
             page_number = self.get_page_number_for_page(item.destination[0])
-            yield depth, item.title, page_number
+            title = item.title
+            # Remove unicode 0 bytes
+            title = title.replace('\u0000', '')
+            yield depth, title, page_number
             yield from self.get_outline(item.children, depth=depth + 1)
 
     def iter_markdown_outline(self):
