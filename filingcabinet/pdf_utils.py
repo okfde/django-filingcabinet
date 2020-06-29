@@ -153,9 +153,7 @@ class PikePDFProcessor:
             if not item or not item.destination:
                 continue
             page_number = self.get_page_number_for_page(item.destination[0])
-            title = item.title
-            # Remove unicode 0 bytes
-            title = title.replace('\u0000', '')
+            title = fix_text(item.title)
             yield depth, title, page_number
             yield from self.get_outline(item.children, depth=depth + 1)
 
@@ -168,6 +166,10 @@ class PikePDFProcessor:
 
     def get_markdown_outline(self):
         return ''.join(self.iter_markdown_outline())
+
+
+def fix_text(text):
+    return text.replace('\u0000', '')
 
 
 class PDFProcessor(object):
@@ -191,11 +193,11 @@ class PDFProcessor(object):
     def get_meta(self):
         doc_info = self.pdf_reader.getDocumentInfo()
         return {
-            'title': doc_info.title,
-            'author': doc_info.author,
-            'creator': doc_info.creator,
-            'producer': doc_info.producer,
-            'subject': doc_info.subject,
+            'title': fix_text(doc_info.title),
+            'author': fix_text(doc_info.author),
+            'creator': fix_text(doc_info.creator),
+            'producer': fix_text(doc_info.producer),
+            'subject': fix_text(doc_info.subject),
         }
 
     def get_markdown_outline(self):
