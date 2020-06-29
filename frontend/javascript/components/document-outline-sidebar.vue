@@ -100,10 +100,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
 .outline-wrapper {
   overflow: auto;
 }
+</style>
+
+<style lang="scss">
 .document-outline {
   li ul {
     padding-left: 0.5rem;
