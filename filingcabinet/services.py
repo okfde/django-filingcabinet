@@ -62,7 +62,9 @@ def process_document(doc):
     if not doc.slug and doc.title:
         doc.slug = slugify(doc.title)
 
-    doc.outline = pdf.get_markdown_outline()
+    if not doc.outline:
+        doc.outline = pdf.get_markdown_outline()
+
     doc.save()
 
     queue_missing_pages(doc)
