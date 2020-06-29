@@ -169,6 +169,8 @@ class PikePDFProcessor:
 
 
 def fix_text(text):
+    if text is None:
+        return None
     return text.replace('\u0000', '')
 
 
