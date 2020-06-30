@@ -219,7 +219,7 @@ class AbstractDocument(models.Model):
         This uses direct filesystem operations for efficiency
         and not replicating/copying all thumbnails
         """
-        if not self.pdf_file:
+        if not self.pdf_file or not self.pending:
             # Original data holder is responsible for secure serving
             return
         src_file_dir = os.path.dirname(self.pdf_file.path)

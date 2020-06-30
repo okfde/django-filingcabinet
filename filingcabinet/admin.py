@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from mptt.admin import MPTTModelAdmin
 
-from .models import Page, CollectionDocument, CollectionDirectory
+from .models import Page, CollectionDocument
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
