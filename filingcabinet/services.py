@@ -54,7 +54,7 @@ def process_document(doc):
     meta = pdf.get_meta()
     doc.properties.update(meta)
     if doc.title.endswith('.pdf'):
-        if doc.properties['title']:
+        if doc.properties.get('title'):
             doc.title = doc.properties['title']
         else:
             doc.title = doc.title.rsplit('.pdf')[0]
