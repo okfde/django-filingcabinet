@@ -47,6 +47,8 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         return qs
 
     def processed_pages_percentage(self, obj):
+        if not obj.num_pages:
+            return '-'
         return '{:.2f}%'.format(obj.ready_page_count / obj.num_pages * 100)
     processed_pages_percentage.admin_order_field = 'ready_page_count'
     processed_pages_percentage.short_description = _('Processed')
