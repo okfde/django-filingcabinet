@@ -103,6 +103,8 @@ class PageAdmin(admin.ModelAdmin):
     list_filter = ('pending', 'corrected', 'number',)
     list_display = ('show_title', 'number', 'pending', 'corrected')
 
+    actions = ['set_pending']
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.select_related('document')
@@ -110,6 +112,10 @@ class PageAdmin(admin.ModelAdmin):
 
     def show_title(self, obj):
         return obj.document.title
+
+    def set_pending(self, request, queryset):
+        queryset.update(pending=True)
+    set_pending.short_description = _('Set to pending')
 
 
 class PageAnnotationAdmin(admin.ModelAdmin):
