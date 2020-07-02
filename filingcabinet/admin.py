@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q, Count
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -25,7 +26,10 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('title',)
     date_hierarchy = 'created_at'
-    list_display = ('title', 'created_at', 'num_pages', 'public', 'pending')
+    list_display = (
+        'title', 'created_at', 'public', 'num_pages', 'pending',
+        'processed_pages_percentage'
+    )
     list_filter = ('pending', 'public', 'allow_annotation', 'portal')
     raw_id_fields = ('user',)
     readonly_fields = ('uid', 'public', 'pending')
@@ -34,6 +38,18 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         'process_document', 'reprocess_document', 'fix_document_paths',
         'publish_documents', 'unpublish_documents'
     ]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(
+            ready_page_count=Count('pages', filter=Q(pending=False)),
+        )
+        return qs
+
+    def processed_pages_percentage(self, obj):
+        return '{:.2f}%'.format(obj.ready_page_count / obj.num_pages * 100)
+    processed_pages_percentage.admin_order_field = 'ready_page_count'
+    processed_pages_percentage.short_description = _('Processed')
 
     def get_inline_instances(self, request, obj=None):
         ''' Only show inline for docs with fewer than 31 pages'''
