@@ -169,7 +169,7 @@ class AbstractDocument(models.Model):
 
     def get_progress(self):
         if self.num_pages:
-            pages_done = self.page_set.filter(pending=False).count()
+            pages_done = self.pages.filter(pending=False).count()
             return int(pages_done / self.num_pages * 100)
         return None
 
@@ -330,6 +330,7 @@ class Page(models.Model):
 
     document = models.ForeignKey(
         FILINGCABINET_DOCUMENT_MODEL,
+        related_name='pages',
         on_delete=models.CASCADE
     )
     number = models.IntegerField(default=1)

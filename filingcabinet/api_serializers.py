@@ -58,7 +58,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 
 class PagesMixin(object):
     def get_pages(self, obj):
-        pages = obj.page_set.all()
+        pages = obj.pages.all()
         serializer = PageSerializer(
             pages,
             many=True,

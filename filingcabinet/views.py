@@ -72,7 +72,7 @@ def get_js_config(request, obj):
 
 
 def get_document_viewer_context(doc, request, page_number=1, defaults=None):
-    pages = doc.page_set.all()
+    pages = doc.pages.all()
     pages = pages.filter(number__gte=page_number)[:PREVIEW_PAGE_COUNT]
 
     ctx = {
