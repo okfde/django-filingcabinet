@@ -194,6 +194,8 @@ class PDFProcessor(object):
 
     def get_meta(self):
         doc_info = self.pdf_reader.getDocumentInfo()
+        if doc_info is None:
+            return {}
         return {
             'title': fix_text(doc_info.title),
             'author': fix_text(doc_info.author),
