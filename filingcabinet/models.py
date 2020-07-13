@@ -45,14 +45,14 @@ class DocumentManager(models.Manager):
     pass
 
 
-def get_document_file_path(instance, filename):
+def get_document_file_path(instance, filename, public=None):
     # UUID field is already filled
     hex_name = instance.uid.hex
     hex_name_02 = hex_name[:2]
     hex_name_24 = hex_name[2:4]
     hex_name_46 = hex_name[4:6]
     prefix = settings.FILINGCABINET_MEDIA_PUBLIC_PREFIX
-    if not instance.public:
+    if public is False or not instance.public:
         prefix = settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX
     return os.path.join(prefix, hex_name_02, hex_name_24,
                         hex_name_46, hex_name, filename)
@@ -219,20 +219,30 @@ class AbstractDocument(models.Model):
         This uses direct filesystem operations for efficiency
         and not replicating/copying all thumbnails
         """
-        if not self.pdf_file or not self.pending:
-            # Original data holder is responsible for secure serving
+        if not self.pending:
             return
-        src_file_dir = os.path.dirname(self.pdf_file.path)
-        dst_file_name = get_document_path(self, self.get_document_filename())
-        dst_file_dir = os.path.dirname(os.path.join(
-            settings.MEDIA_ROOT, dst_file_name
-        ))
+        dummy_src_file_name = get_document_file_path(
+                self, 'dummy.pdf', not self.public
+        )
+        src_file_dir = os.path.dirname(
+            os.path.join(settings.MEDIA_ROOT, dummy_src_file_name)
+        )
+
+        if self.pdf_file:
+            dst_file_name = get_document_path(
+                self, self.get_document_filename()
+            )
+        else:
+            dst_file_name = get_document_file_path(self, 'dummy.pdf')
+        dst_file_dir = os.path.dirname(
+            os.path.join(settings.MEDIA_ROOT, dst_file_name)
+        )
         try:
-            src_exists = os.path.exists(self.pdf_file.path)
-            if src_exists:
-                if src_file_dir != dst_file_dir and src_exists:
-                    shutil.rmtree(dst_file_dir, ignore_errors=True)
-                shutil.move(src_file_dir, dst_file_dir)
+            src_exists = os.path.exists(src_file_dir)
+            if src_file_dir != dst_file_dir and src_exists:
+                shutil.rmtree(dst_file_dir, ignore_errors=True)
+            shutil.move(src_file_dir, dst_file_dir)
+            if self.pdf_file:
                 self.pdf_file = dst_file_name
         except IOError:
             pass
