@@ -42,7 +42,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(
-            ready_page_count=Count('pages', filter=Q(pending=False)),
+            ready_page_count=Count('pages', filter=Q(pages__pending=False)),
         )
         return qs
 
