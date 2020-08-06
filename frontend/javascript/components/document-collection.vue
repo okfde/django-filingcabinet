@@ -36,7 +36,7 @@
               {{ collection.title }}
             </template>
             <template v-else>
-              {{ collection.documents.length }} {{ i18n.documents }}
+              {{ collection.document_count }} {{ i18n.documents }}
             </template>
           </span>
           <button
