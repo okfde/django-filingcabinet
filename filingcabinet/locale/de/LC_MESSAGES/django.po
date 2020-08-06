@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 19:57+0200\n"
-"PO-Revision-Date: 2020-06-25 19:58+0200\n"
+"POT-Creation-Date: 2020-08-06 17:23+0200\n"
+"PO-Revision-Date: 2020-08-06 17:23+0200\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -18,49 +18,57 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
 
-#: admin.py:53
+#: admin.py:54
+msgid "Processed"
+msgstr "Verarbeitet"
+
+#: admin.py:71
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py:54
+#: admin.py:72
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py:59
+#: admin.py:77
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py:60
+#: admin.py:78
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
 
-#: admin.py:68
+#: admin.py:86
 msgid "Fixing document paths..."
 msgstr "Dokumentenpfade werden repariert..."
 
-#: admin.py:69
+#: admin.py:87
 msgid "Fix document paths"
 msgstr "Repariere Dokumentenpfade"
 
-#: admin.py:72
+#: admin.py:90
 msgid "Publishing {} documents..."
 msgstr "{} Dokumente werden veröffentlicht..."
 
-#: admin.py:88
+#: admin.py:106
 msgid "Please select only non-pending documents for publishing."
 msgstr "Bitte wählen Sie nur fertige Dokumente zur Veröffentlichung."
 
-#: admin.py:90
+#: admin.py:108
 msgid "Publish documents"
 msgstr "Dokumente veröffentlichen"
 
-#: admin.py:95
+#: admin.py:113
 msgid "Unpublishing {} documents..."
 msgstr "{} Dokumente werden depubliziert..."
 
-#: admin.py:97
+#: admin.py:115
 msgid "Unpublish documents"
 msgstr "Dokumente depublizieren"
+
+#: admin.py:136
+msgid "Set to pending"
+msgstr "Auf unverarbeitet setzen"
 
 #: apps.py:7
 msgid "Filing Cabinet"
@@ -82,7 +90,7 @@ msgstr "Dokumenten-Schlagwort"
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py:109 models.py:408 models.py:468 models.py:518
+#: models.py:109 models.py:419 models.py:479 models.py:529
 msgid "User"
 msgstr "Nutzer"
 
@@ -94,27 +102,27 @@ msgstr "Dokument"
 msgid "documents"
 msgstr "Dokumente"
 
-#: models.py:458
+#: models.py:469
 msgid "created at"
 msgstr "erstellt am"
 
-#: models.py:475
+#: models.py:486
 msgid "Collection directory"
 msgstr "Sammlungsverzeichnis"
 
-#: models.py:476
+#: models.py:487
 msgid "Collection directories"
 msgstr "Sammlungsverzeichnisse"
 
-#: models.py:498
+#: models.py:509
 msgid "directory"
 msgstr "Verzeichnis"
 
-#: models.py:539
+#: models.py:550
 msgid "document collection"
 msgstr "Dokumentensammlung"
 
-#: models.py:540
+#: models.py:551
 msgid "document collections"
 msgstr "Dokumentensammlungen"
 
@@ -143,6 +151,11 @@ msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
 msgctxt "url part"
 msgid "^collection/(?P<pk>\\d+)/$"
 msgstr "^sammlung/(?P<pk>\\d+)/$"
+
+#: urls.py:25
+msgctxt "url part"
+msgid "^collection/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/embed/$"
+msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/embed/$"
 
 #: views.py:53
 msgid "Loading..."
