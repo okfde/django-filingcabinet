@@ -1,5 +1,5 @@
 from django.db.models import (
-    Q, Value, BooleanField, Case, When
+    Q, Value, BooleanField, Case, When, Count
 )
 
 from rest_framework import (
@@ -120,6 +120,7 @@ class DocumentCollectionViewSet(
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
         qs = DocumentCollection.objects.filter(cond)
+        qs = qs.annotate(document_count=Count('documents'))
         qs = qs.prefetch_related('documents')
         return qs
 

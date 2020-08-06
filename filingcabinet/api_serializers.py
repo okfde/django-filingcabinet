@@ -122,6 +122,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         source='get_cover_image'
     )
     documents = serializers.SerializerMethodField()
+    document_count = serializers.SerializerMethodField()
     directories = serializers.SerializerMethodField()
 
     class Meta:
@@ -129,8 +130,14 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
             'public', 'created_at', 'updated_at',
+            'document_count',
             'cover_image', 'directories', 'documents',
         )
+
+    def get_document_count(self, obj):
+        if hasattr(obj, 'document_count'):
+            return obj.document_count
+        return obj.documents.all().count()
 
     def get_documents(self, obj):
         parent = self.context.get('parent_directory')
