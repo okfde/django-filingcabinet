@@ -148,3 +148,7 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
             get_document_collection_context(self.object, self.request)
         )
         return context
+
+
+class DocumentCollectionEmbedView(DocumentCollectionView):
+    template_name = 'filingcabinet/documentcollection_detail_embed.html'
