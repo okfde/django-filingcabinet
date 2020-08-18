@@ -1359,35 +1359,6 @@ var PDFViewerApplication = {
     _boundEvents.windowAfterPrint = null;
   }
 };
-var validateFileURL = void 0;
-{
-  var HOSTED_VIEWER_ORIGINS = ['null', 'https://static.frag-den-staat.de'];
-  validateFileURL = function validateFileURL(file) {
-    if (file === undefined) {
-      return;
-    }
-    try {
-      var viewerOrigin = new URL(window.location.href).origin || 'null';
-      if (HOSTED_VIEWER_ORIGINS.includes(viewerOrigin)) {
-        return;
-      }
-
-      var _ref6 = new URL(file, window.location.href),
-          origin = _ref6.origin,
-          protocol = _ref6.protocol;
-
-      if (origin !== viewerOrigin && protocol !== 'blob:') {
-        throw new Error('file origin does not match viewer\'s');
-      }
-    } catch (ex) {
-      var message = ex && ex.message;
-      PDFViewerApplication.l10n.get('loading_error', null, 'An error occurred while loading the PDF.').then(function (loadingErrorMessage) {
-        PDFViewerApplication.error(loadingErrorMessage, { message: message });
-      });
-      throw ex;
-    }
-  };
-}
 function loadFakeWorker() {
   if (!_pdfjsLib.GlobalWorkerOptions.workerSrc) {
     _pdfjsLib.GlobalWorkerOptions.workerSrc = _app_options.AppOptions.get('workerSrc');
@@ -1407,7 +1378,7 @@ function webViewerInitialized() {
   var queryString = document.location.search.substring(1);
   var params = (0, _ui_utils.parseQueryString)(queryString);
   file = 'file' in params ? params.file : _app_options.AppOptions.get('defaultUrl');
-  validateFileURL(file);
+  // validateFileURL(file);
   var fileInput = document.createElement('input');
   fileInput.id = appConfig.openFileInputName;
   fileInput.className = 'fileInput';
