@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.clickjacking import xframe_options_exempt
 
@@ -10,34 +10,34 @@ from .views import (
 app_name = 'filingcabinet'
 
 urlpatterns = [
-    url(pgettext_lazy(
+    path(pgettext_lazy(
             'url part',
-            r'^collection/(?P<pk>\d+)\-(?P<slug>[-\w]+)/$'
+            'collection/<int:pk>-<slug:slug>/'
         ),
         DocumentCollectionView.as_view(), name='document-collection'),
-    url(pgettext_lazy(
+    path(pgettext_lazy(
             'url part',
-            r'^collection/(?P<pk>\d+)/$'
+            'collection/<int:pk>/'
         ),
         DocumentCollectionView.as_view(), name='document-collection_short'),
-    url(pgettext_lazy(
+    path(pgettext_lazy(
             'url part',
-            r'^collection/(?P<pk>\d+)\-(?P<slug>[-\w]+)/embed/$',
+            'collection/<int:pk>-<slug:slug>/embed/',
         ),
         xframe_options_exempt(
             DocumentCollectionEmbedView.as_view()
         ),
         name="document-collection_embed"),
-    url(r"^(?P<pk>\d+)\-(?P<slug>[-\w]+)/$", DocumentView.as_view(),
-        name="document-detail"),
-    url(r"^(?P<pk>\d+)/$", DocumentView.as_view(),
-        name="document-detail_short"),
-    url(r"^(?P<pk>\d+)\-(?P<slug>[-\w]+)/embed/$",
-        xframe_options_exempt(
+    path("<int:pk>-<slug:slug>/", DocumentView.as_view(),
+         name="document-detail"),
+    path("<int:pk>/", DocumentView.as_view(),
+         name="document-detail_short"),
+    path("<int:pk>-<slug:slug>/embed/",
+         xframe_options_exempt(
             DocumentEmbedView.as_view()
-        ),
-        name="document-detail_embed"),
-    url(r"^(?P<pk>\d+)/embed/$", xframe_options_exempt(
+         ),
+         name="document-detail_embed"),
+    path("<int:pk>/embed/", xframe_options_exempt(
             DocumentEmbedView.as_view()
         ),
         name="document-detail_embed_short"),
