@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-06 17:23+0200\n"
-"PO-Revision-Date: 2020-08-06 17:23+0200\n"
+"POT-Creation-Date: 2020-12-21 17:10+0000\n"
+"PO-Revision-Date: 2020-12-21 17:11+0000\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -144,18 +144,18 @@ msgstr "privat"
 
 #: urls.py:15
 msgctxt "url part"
-msgid "^collection/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
-msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/$"
+msgid "collection/<int:pk>-<slug:slug>/"
+msgstr "sammlung/<int:pk>-<slug:slug>/"
 
 #: urls.py:20
 msgctxt "url part"
-msgid "^collection/(?P<pk>\\d+)/$"
-msgstr "^sammlung/(?P<pk>\\d+)/$"
+msgid "collection/<int:pk>/"
+msgstr "sammlung/<int:pk>/"
 
 #: urls.py:25
 msgctxt "url part"
-msgid "^collection/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/embed/$"
-msgstr "^sammlung/(?P<pk>\\d+)\\-(?P<slug>[-\\w]+)/embed/$"
+msgid "collection/<int:pk>-<slug:slug>/embed/"
+msgstr "sammlung/<int:pk>-<slug:slug>/embed/"
 
 #: views.py:53
 msgid "Loading..."
