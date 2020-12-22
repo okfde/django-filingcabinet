@@ -6,7 +6,6 @@ import uuid
 from django.conf.locale import LANG_INFO
 from django.utils import timezone
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.core.files.base import File
 from django.urls import reverse
 from django.utils.text import slugify
@@ -120,7 +119,7 @@ class AbstractDocument(models.Model):
 
     public = models.BooleanField(default=False)
     allow_annotation = models.BooleanField(default=False)
-    properties = JSONField(blank=True, default=dict)
+    properties = models.JSONField(blank=True, default=dict)
     outline = models.TextField(blank=True)
 
     tags = TaggableManager(
