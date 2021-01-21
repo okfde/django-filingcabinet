@@ -214,11 +214,19 @@ export default {
     if (doc !== null) {
       this.pageTemplate = decodeURI(this.documentPreview.page_template)
       doc.pages = doc.pages || []
-      doc.pages = [
-        ...Array(this.page - 1),
-        ...doc.pages,
-        ...Array(doc.num_pages - doc.pages.length - (this.page - 1))
-      ]
+      if (doc.pages.length != doc.num_pages) {
+        let head = []
+        let tail = []
+        if (doc.pages.length > 0) {
+          head = Array(doc.pages[0].number - 1)
+          tail = Array(doc.pages[doc.num_pages - doc.pages.length - 1].number)
+        }
+        doc.pages = [
+          ...head,
+          ...doc.pages,
+          ...tail
+        ]
+      }
     }
     let preferences = {
       showToolbar: true,
