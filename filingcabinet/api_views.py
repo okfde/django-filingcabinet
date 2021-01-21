@@ -69,6 +69,15 @@ class DocumentViewSet(mixins.ListModelMixin,
             qs = qs.filter(
                 filingcabinet_collectiondocument__directory_id=directory
             )
+        try:
+            ids = [
+                int(x) for x in
+                self.request.query_params.get('ids', '').split(',') if x
+            ]
+        except ValueError:
+            ids = None
+        if ids:
+            qs = qs.filter(id__in=ids)
         return qs
 
 
