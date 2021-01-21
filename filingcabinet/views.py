@@ -47,6 +47,7 @@ def get_js_config(request, obj):
         },
         'urls': {
             'pageApiUrl': reverse('api:page-list'),
+            'documentApiUrl': reverse('api:document-list'),
             'pageAnnotationApiUrl': reverse('api:pageannotation-list'),
         },
         'i18n': {

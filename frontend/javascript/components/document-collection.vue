@@ -39,22 +39,24 @@
               {{ collection.document_count }} {{ i18n.documents }}
             </template>
           </span>
-          <button
-            v-if="!showSearch"
-            type="button"
-            class="ml-2 btn btn-sm btn-secondary"
-            @click="enableSearch"
-          >
-            <i class="fa fa-search" />
-          </button>
-          <button
-            v-else
-            type="button"
-            class="ml-2 btn btn-sm btn-secondary"
-            @click="clearSearch"
-          >
-            <i class="fa fa-close" />
-          </button>
+          <template v-if="!document">
+            <button
+              v-if="!showSearch"
+              type="button"
+              class="ml-2 btn btn-sm btn-secondary"
+              @click="enableSearch"
+            >
+              <i class="fa fa-search" />
+            </button>
+            <button
+              v-else
+              type="button"
+              class="ml-2 btn btn-sm btn-secondary"
+              @click="clearSearch"
+            >
+              <i class="fa fa-close" />
+            </button>
+          </template>
         </div>
       </div>
       <document-collection-searchbar
@@ -234,33 +236,55 @@ export default {
       let searchUrl = `${this.config.urls.pageApiUrl}?collection=${this.collection.id}&q=${encodeURIComponent(term)}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
-        this.searcher.done = true
-        const docsWithPages = []
-        let docs = {}
-        let docCount = 0
+        let missingDocs = []
         response.objects.forEach((p) => {
           const docId = getIDFromURL(p.document)
           let document = this.collection.documents[this.collectionIndex[docId]]
-          let docResult = {
-            image: p.image.replace(/\{size\}/, 'small'),
-            number: p.number,
-            query_highlight: p.query_highlight
+          if (document === undefined) {
+            missingDocs.push(docId)
           }
-          if (docs[p.document] === undefined) {
-            docs[p.document] = docCount
-            docCount += 1
-            docsWithPages.push({
-              document: document,
-              pages: [docResult]
-            })
-          } else {
-            docsWithPages[docs[p.document]].pages.push(docResult)
-          }
-
         })
-        this.searcher.results = docsWithPages
-        Vue.set(this.searcher, 'docCount', docCount)
+        if (missingDocs.length > 0) {
+          let docsUrl = `${this.config.urls.documentApiUrl}?ids=${missingDocs.join(',')}`
+          getData(docsUrl).then((docsResponse) => {
+            this.setSearchResults(response.objects, docsResponse.objects)
+          })
+        } else {
+          this.setSearchResults(response.objects, [])
+        }
       })
+    },
+    setSearchResults (results, resultDocuments) {
+      const docsWithPages = []
+      let docs = {}
+      let docCount = 0
+      let docIndex = {}
+      resultDocuments.forEach((d, i) => docIndex[d.id] = i)
+      results.forEach((p) => {
+        const docId = getIDFromURL(p.document)
+        let docResult = {
+          image: p.image.replace(/\{size\}/, 'small'),
+          number: p.number,
+          query_highlight: p.query_highlight
+        }
+        if (docs[p.document] === undefined) {
+          let document = this.collection.documents[this.collectionIndex[docId]]
+          if (document === undefined) {
+            document = resultDocuments[docIndex[docId]]
+          }
+          docs[p.document] = docCount
+          docCount += 1
+          docsWithPages.push({
+            document: document,
+            pages: [docResult]
+          })
+        } else {
+          docsWithPages[docs[p.document]].pages.push(docResult)
+        }
+      })
+      this.searcher.results = docsWithPages
+      Vue.set(this.searcher, 'docCount', docCount)
+      this.searcher.done = true
     },
     selectDirectory (directory) {
       if (directory) {
