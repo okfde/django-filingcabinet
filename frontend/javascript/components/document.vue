@@ -219,7 +219,7 @@ export default {
         let tail = []
         if (doc.pages.length > 0) {
           head = Array(doc.pages[0].number - 1)
-          tail = Array(doc.pages[doc.num_pages - doc.pages.length - 1].number)
+          tail = Array(doc.num_pages - doc.pages[doc.pages.length - 1].number)
         }
         doc.pages = [
           ...head,
