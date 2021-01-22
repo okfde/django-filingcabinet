@@ -424,6 +424,9 @@ export default {
   methods: {
     resize (scrollRatio) {
       console.log('resize called', scrollRatio)
+      if (!this.document) {
+        return
+      }
       this.resizing = true
       Vue.nextTick(() => {
         this.calcResponsive()
