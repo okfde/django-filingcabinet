@@ -79,6 +79,8 @@ def try_reading_pdf(pdf_file, password=None):
         pdf_reader.getNumPages()
     except KeyError as e:  # catch KeyError '/Pages'
         raise PDFException(e, 'rewrite')
+    except ValueError as e:  # catch invalid literal for int() with base 10
+        raise PDFException(e, 'rewrite')
     except RecursionError as e:  # catch RecursionError in PyPDF2
         raise PDFException(e, 'rewrite')
     except PdfReadError as e:
