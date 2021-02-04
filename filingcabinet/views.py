@@ -18,10 +18,13 @@ PREVIEW_PAGE_COUNT = 10
 
 
 class PkSlugMixin:
+    def get_redirect(self, obj):
+        return redirect(obj)
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.slug != self.kwargs.get('slug', ''):
-            return redirect(self.object)
+            return self.get_redirect(self.object)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 
@@ -115,6 +118,9 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
 class DocumentEmbedView(DocumentView):
     template_name = 'filingcabinet/document_detail_embed.html'
 
+    def get_redirect(self, obj):
+        return redirect('document-detail_embed', slug=obj.slug, pk=obj.pk)
+
 
 def get_document_collection_context(collection, request):
     context = {
@@ -135,13 +141,6 @@ def get_document_collection_context(collection, request):
 class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     model = DocumentCollection
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.slug and self.kwargs.get('slug') is None:
-            return redirect(self.object)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -153,3 +152,6 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
 
 class DocumentCollectionEmbedView(DocumentCollectionView):
     template_name = 'filingcabinet/documentcollection_detail_embed.html'
+
+    def get_redirect(self, obj):
+        return redirect('document-collection_embed', slug=obj.slug, pk=obj.pk)
