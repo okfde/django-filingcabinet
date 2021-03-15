@@ -3,7 +3,6 @@ import json
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView
-from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.templatetags.static import static
 
@@ -31,13 +30,7 @@ class PkSlugMixin:
 
 class AuthMixin:
     def get_queryset(self):
-        qs = super().get_queryset()
-        cond = Q(public=True)
-        if self.request.user.is_authenticated:
-            if self.request.user.is_superuser:
-                return qs
-            cond |= Q(user=self.request.user)
-        return qs.filter(cond)
+        return self.model.objects.get_authenticated_queryset(self.request)
 
 
 def get_js_config(request, obj):

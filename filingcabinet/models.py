@@ -40,7 +40,18 @@ class DocumentPortal(models.Model):
         return self.title
 
 
-class DocumentManager(models.Manager):
+class AuthQuerysetMixin:
+    def get_authenticated_queryset(self, request):
+        qs = self.get_queryset()
+        cond = models.Q(public=True)
+        if self.request.user.is_authenticated:
+            if self.request.user.is_superuser:
+                return qs
+            cond |= models.Q(user=self.request.user)
+        return qs.filter(cond)
+
+
+class DocumentManager(AuthQuerysetMixin, models.Manager):
     pass
 
 
@@ -516,6 +527,10 @@ class CollectionDocument(models.Model):
         ordering = ['order', 'document__title']
 
 
+class DocumentCollectionManager(AuthQuerysetMixin, models.Manager):
+    pass
+
+
 class AbstractDocumentCollection(models.Model):
     title = models.CharField(max_length=255, blank=True)
     slug = models.SlugField(max_length=250, blank=True)
@@ -544,6 +559,8 @@ class AbstractDocumentCollection(models.Model):
         DocumentPortal, null=True, blank=True,
         on_delete=models.SET_NULL
     )
+
+    objects = DocumentCollectionManager()
 
     class Meta:
         verbose_name = _('document collection')
