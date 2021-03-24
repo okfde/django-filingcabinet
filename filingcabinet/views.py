@@ -3,7 +3,7 @@ import json
 from django.shortcuts import redirect, Http404
 from django.urls import reverse
 from django.views.generic import DetailView
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.templatetags.static import static
 
 from . import get_document_model, get_documentcollection_model
