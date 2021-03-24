@@ -2,7 +2,7 @@
 
 {% load i18n %}
 {% load static %}
-{% load markup %}
+
 
 {% block title %}{{ object.title }}{% endblock %}
 
@@ -15,7 +15,7 @@
     {% endif %}
     {% if object.description %}
       <p>
-         {{ object.description|markdown }} 
+         {{ object.description }}
       </p>
     {% endif %}
   </div>

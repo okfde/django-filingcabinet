@@ -2,19 +2,20 @@
 
 {% load i18n %}
 {% load static %}
-{% load markup %}
 
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block body %}
+{% block documentcollection_top %}
 <div class="container mt-3 mb-5">
     <h2>{{ object.title }}</h2>
     {% if object.description %}
       <p>
-         {{ object.description|markdown }} 
+         {{ object.description }} 
       </p>
     {% endif %}
 </div>
+{% endblock documentcollection_top %}
 
 {% include "filingcabinet/_documentcollection_viewer.html" %}
 

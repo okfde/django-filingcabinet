@@ -94,6 +94,7 @@ def get_document_viewer_context(doc, request, page_number=1, defaults=None):
 
 class DocumentView(AuthMixin, PkSlugMixin, DetailView):
     model = Document
+    template_name = 'filingcabinet/document_detail.html'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -136,6 +137,7 @@ def get_document_collection_context(collection, request):
 
 class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     model = DocumentCollection
+    template_name = 'filingcabinet/documentcollection_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

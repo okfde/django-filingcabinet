@@ -159,16 +159,16 @@ class AbstractDocument(models.Model):
 
     def get_absolute_url(self):
         if self.slug:
-            return reverse('document-detail', kwargs={
+            return reverse('filingcabinet:document-detail', kwargs={
                 'pk': self.pk,
                 'slug': self.slug
             })
-        return reverse('document-detail_short', kwargs={
+        return reverse('filingcabinet:document-detail_short', kwargs={
             'pk': self.pk
         })
 
     def get_absolute_domain_url(self):
-        return settings.SITE_URL + self.get_absolute_url()
+        return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
 
     @property
     def has_original(self):
@@ -620,16 +620,16 @@ class AbstractDocumentCollection(models.Model):
 
     def get_absolute_url(self):
         if self.slug:
-            return reverse('document-collection', kwargs={
+            return reverse('filingcabinet:document-collection', kwargs={
                 'pk': self.pk,
                 'slug': self.slug
             })
-        return reverse('document-collection_short', kwargs={
+        return reverse('filingcabinet:document-collection_short', kwargs={
             'pk': self.pk
         })
 
     def get_absolute_domain_url(self):
-        return settings.SITE_URL + self.get_absolute_url()
+        return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
 
     def get_cover_image(self):
         try:

@@ -33,7 +33,7 @@ setup(
     long_description=read('README.md'),
     author='Stefan Wehrmeyer',
     author_email='mail@stefanwehrmeyer.com',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests", "test_project")),
     install_requires=[
         'Django',
         'wand',
@@ -43,6 +43,10 @@ setup(
         'django-filter',
         'django-taggit',
         'django-mptt',
+        'djangorestframework'
+    ],
+    test_requires=[
+        'factory_boy'
     ],
     include_package_data=True,
     classifiers=[
