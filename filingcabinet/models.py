@@ -228,6 +228,12 @@ class AbstractDocument(models.Model):
                 'filename': filename
             })
 
+    def delete(self, **kwargs):
+        res = super().delete(**kwargs)
+        dir_path = os.path.dirname(get_document_file_path(self, 'foo'))
+        shutil.rmtree(dir_path, ignore_errors=True)
+        return res
+
     def _move_file(self):
         """
         Move the file from src to dst.
