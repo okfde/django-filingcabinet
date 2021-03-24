@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, Http404
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.utils.translation import ugettext as _
@@ -23,7 +23,10 @@ class PkSlugMixin:
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.slug != self.kwargs.get('slug', ''):
-            return self.get_redirect(self.object)
+            if self.object.can_read(request):
+                # only redirect if we can access
+                return self.get_redirect(self.object)
+            raise Http404
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
 

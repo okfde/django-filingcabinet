@@ -38,6 +38,18 @@ class IsUserOrReadOnly(permissions.BasePermission):
         return False
 
 
+class CanReadWritePermission(permissions.BasePermission):
+    """
+    Object-level permission to only allow owners of an object to edit it.
+    Assumes the model instance has an `owner` attribute.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return obj.can_read(request)
+        return obj.can_write(request)
+
+
 class DocumentViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
@@ -47,7 +59,7 @@ class DocumentViewSet(mixins.ListModelMixin,
         'retrieve': DocumentDetailSerializer,
         'update': UpdateDocumentSerializer
     }
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (CanReadWritePermission,)
 
     def get_serializer_class(self):
         try:
@@ -56,7 +68,10 @@ class DocumentViewSet(mixins.ListModelMixin,
             return DocumentSerializer
 
     def get_base_queryset(self):
-        cond = Q(public=True)
+        if self.action == 'list':
+            cond = Q(public=True, listed=True)
+        else:
+            cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
         return Document.objects.filter(cond)
@@ -116,7 +131,7 @@ class DocumentCollectionViewSet(
     serializer_action_classes = {
         'list': DocumentCollectionSerializer,
     }
-    permission_classes = (IsUserOrReadOnly,)
+    permission_classes = (CanReadWritePermission,)
 
     def get_serializer_class(self):
         try:
@@ -125,7 +140,10 @@ class DocumentCollectionViewSet(
             return DocumentCollectionSerializer
 
     def get_queryset(self):
-        cond = Q(public=True)
+        if self.action == 'list':
+            cond = Q(public=True, listed=True)
+        else:
+            cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
         qs = DocumentCollection.objects.filter(cond)
@@ -175,6 +193,8 @@ class PageAnnotationViewSet(
         try:
             doc = Document.objects.filter(cond).get(pk=document_id)
         except (ValueError, Document.DoesNotExist):
+            return PageAnnotation.objects.none()
+        if not doc.can_read(self.request):
             return PageAnnotation.objects.none()
         return PageAnnotation.objects.filter(page__document=doc)
 

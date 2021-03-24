@@ -305,6 +305,12 @@ export default {
       })
       return resultPages
     },
+    docAuth () {
+      if (!this.document.listed) {
+        return `uid=${this.document.uid}`
+      }
+      return ''
+    },
     isFramed () {
       return !!this.preferences.maxHeight
     },
@@ -390,7 +396,7 @@ export default {
         this.loadPDF()
       }
     })
-    getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}`).then((results) => {
+    getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}&${this.docAuth}`).then((results) => {
       let annotations = {}
       results.objects.forEach((a) => {
         if (annotations[a.number] === undefined) {
@@ -595,7 +601,7 @@ export default {
         results: []
       }
       this.preferences.showSearchResults = true
-      let searchUrl = `${this.config.urls.pageApiUrl}?document=${this.document.id}&q=${encodeURIComponent(term)}`
+      let searchUrl = `${this.config.urls.pageApiUrl}?document=${this.document.id}&q=${encodeURIComponent(term)}&${this.docAuth}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
         this.searcher.done = true

@@ -50,9 +50,9 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         model = Document
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'slug', 'description',
-            'num_pages', 'public', 'allow_annotation', 'pending',
+            'num_pages', 'public', 'listed', 'allow_annotation', 'pending',
             'file_url', 'file_size', 'cover_image', 'page_template',
-            'outline', 'properties'
+            'outline', 'properties', 'uid'
         )
 
 
@@ -129,8 +129,8 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         model = get_documentcollection_model()
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
-            'public', 'created_at', 'updated_at',
-            'document_count',
+            'public', 'listed', 'created_at', 'updated_at',
+            'document_count', 'uid',
             'cover_image', 'directories', 'documents',
         )
 

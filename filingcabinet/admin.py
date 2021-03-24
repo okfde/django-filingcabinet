@@ -36,7 +36,8 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     actions = [
         'process_document', 'reprocess_document', 'fix_document_paths',
-        'publish_documents', 'unpublish_documents'
+        'publish_documents', 'unpublish_documents',
+        'mark_unlisted', 'mark_listed',
     ]
 
     def get_queryset(self, request):
@@ -113,6 +114,14 @@ class DocumentBaseAdmin(admin.ModelAdmin):
             message=_("Unpublishing {} documents...")
         )
     unpublish_documents.short_description = _("Unpublish documents")
+
+    def mark_listed(self, request, queryset):
+        queryset.update(listed=True)
+    mark_listed.short_description = _("Mark as listed")
+
+    def mark_unlisted(self, request, queryset):
+        queryset.update(listed=False)
+    mark_unlisted.short_description = _("Mark as unlisted")
 
 
 class PageAdmin(admin.ModelAdmin):

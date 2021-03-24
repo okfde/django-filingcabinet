@@ -192,6 +192,12 @@ export default {
       return {
         maxHeight: '90vh'
       }
+    },
+    collectionAuth () {
+      if (!this.collection.listed) {
+        return `uid=${this.collection.uid}`
+      }
+      return ''
     }
   },
   created () {
@@ -201,8 +207,13 @@ export default {
   },
   methods: {
     getCollectionData () {
-      const url = `${this.documentCollectionUrl}?directory=${this.currentDirectory ? this.currentDirectory.id : ''}`
-      getData(url).then((docCollection) => {
+      let url = [this.documentCollectionUrl]
+      if (url[0].indexOf('?') !== -1) {
+        url.push('?')
+        url.push(`${this.collectionAuth}&`)
+      }
+      url.push(`directory=${this.currentDirectory ? this.currentDirectory.id : ''}`)
+      getData(url.join('')).then((docCollection) => {
         this.collection = docCollection
         this.documents = docCollection.documents
         this.directories = docCollection.directories

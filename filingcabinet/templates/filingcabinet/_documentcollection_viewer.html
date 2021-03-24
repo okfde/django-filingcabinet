@@ -1,5 +1,8 @@
 <div class="{% if container_fluid %}container-fluid{% else %}container mb-5{% endif %}">
-  <div class="document" data-fcdocumentcollectionurl="{% url 'api:documentcollection-detail' pk=object.pk %}" data-fcdocumentcollection="{{ documentcollection_data }}" data-fcconfig="{{ config }}">
+  <div class="document"
+    data-fcdocumentcollectionurl="{% url 'api:documentcollection-detail' pk=object.pk %}{% if object.unlisted %}?uid={{ object.uid }}{% endif %}" 
+    data-fcdocumentcollection="{{ documentcollection_data }}"
+    data-fcconfig="{{ config }}">
     <div class="row">
       {% for document in documents|slice:":12" %}
         <div class="col-md-3">

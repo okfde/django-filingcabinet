@@ -44,10 +44,10 @@ class AuthQuerysetMixin:
     def get_authenticated_queryset(self, request):
         qs = self.get_queryset()
         cond = models.Q(public=True)
-        if self.request.user.is_authenticated:
-            if self.request.user.is_superuser:
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
                 return qs
-            cond |= models.Q(user=self.request.user)
+            cond |= models.Q(user=request.user)
         return qs.filter(cond)
 
 
@@ -129,6 +129,7 @@ class AbstractDocument(models.Model):
                                 choices=settings.LANGUAGES)
 
     public = models.BooleanField(default=False)
+    listed = models.BooleanField(default=True)
     allow_annotation = models.BooleanField(default=False)
     properties = models.JSONField(blank=True, default=dict)
     outline = models.TextField(blank=True)
@@ -176,6 +177,10 @@ class AbstractDocument(models.Model):
         if not self.original_id:
             return False
         return True
+
+    @property
+    def unlisted(self):
+        return not self.listed
 
     def get_progress(self):
         if self.num_pages:
@@ -273,14 +278,24 @@ class AbstractDocument(models.Model):
         ))
 
     def get_serializer_class(self, detail=False):
-        from .api_views import DocumentSerializer, DocumentDetailSerializer
+        from .api_serializers import (
+            DocumentSerializer, DocumentDetailSerializer
+        )
 
         if detail:
             return DocumentDetailSerializer
         return DocumentSerializer
 
+    def can_read_unlisted(self, request):
+        if self.public and not self.listed:
+            if request.GET.get('uid') == str(self.uid):
+                return True
+        return False
+
     def can_read(self, request):
-        if self.public:
+        if self.public and self.listed:
+            return True
+        if self.can_read_unlisted(request):
             return True
         if request.user.is_superuser:
             return True
@@ -535,6 +550,7 @@ class AbstractDocumentCollection(models.Model):
     title = models.CharField(max_length=255, blank=True)
     slug = models.SlugField(max_length=250, blank=True)
     description = models.TextField(blank=True)
+    uid = models.UUIDField(default=uuid.uuid4, editable=False)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True,
@@ -547,6 +563,7 @@ class AbstractDocumentCollection(models.Model):
     updated_at = models.DateTimeField(default=timezone.now, null=True)
 
     public = models.BooleanField(default=True)
+    listed = models.BooleanField(default=True)
 
     documents = models.ManyToManyField(
         FILINGCABINET_DOCUMENT_MODEL,
@@ -589,6 +606,10 @@ class AbstractDocumentCollection(models.Model):
             self._root_directories = self.get_directories()
         return self._root_directories
 
+    @property
+    def unlisted(self):
+        return not self.listed
+
     def get_directories(self, parent_directory=None):
         return CollectionDirectory.objects.all().filter(
             collection=self,
@@ -617,8 +638,21 @@ class AbstractDocumentCollection(models.Model):
         except IndexError:
             return None
 
+    def get_serializer_class(self, detail=False):
+        from .api_serializers import DocumentCollectionSerializer
+
+        return DocumentCollectionSerializer
+
+    def can_read_unlisted(self, request):
+        if self.public and not self.listed:
+            if request.GET.get('uid') == str(self.uid):
+                return True
+        return False
+
     def can_read(self, request):
-        if self.public:
+        if self.public and self.listed:
+            return True
+        if self.can_read_unlisted(request):
             return True
         if request.user.is_superuser:
             return True
