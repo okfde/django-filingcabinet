@@ -174,8 +174,37 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('title',)
     date_hierarchy = 'created_at'
-    list_display = ('title', 'created_at', 'public', 'user')
+    list_display = (
+        'title', 'created_at', 'public', 'listed', 'user',
+        'get_document_count',
+        'processed_documents_percentage'
+    )
     prepopulated_fields = {'slug': ('title',)}
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(
+            document_count=Count('documents'),
+            ready_document_count=Count(
+                'documents',
+                filter=Q(documents__pending=False)
+            ),
+        )
+        return qs
+
+    def get_document_count(self, obj):
+        return obj.document_count
+    get_document_count.admin_order_field = 'document_count'
+    get_document_count.short_description = _('Documents')
+
+    def processed_documents_percentage(self, obj):
+        if not obj.document_count:
+            return '-'
+        return '{:.2f}%'.format(
+            obj.ready_document_count / obj.document_count * 100
+        )
+    processed_documents_percentage.admin_order_field = 'ready_document_count'
+    processed_documents_percentage.short_description = _('Processed')
 
     def get_inline_instances(self, request, obj=None):
         ''' Only show inline for docs with fewer than 31 pages'''
