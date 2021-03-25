@@ -208,11 +208,12 @@ export default {
   methods: {
     getCollectionData () {
       let url = [this.documentCollectionUrl]
-      if (url[0].indexOf('?') !== -1) {
+      if (url[0].indexOf('?') === -1) {
         url.push('?')
-        url.push(`${this.collectionAuth}&`)
+      } else {
+        url.push(`&${this.collectionAuth}`)
       }
-      url.push(`directory=${this.currentDirectory ? this.currentDirectory.id : ''}`)
+      url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : ''}`)
       getData(url.join('')).then((docCollection) => {
         this.collection = docCollection
         this.documents = docCollection.documents
