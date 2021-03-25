@@ -27,7 +27,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     date_hierarchy = 'created_at'
     list_display = (
-        'title', 'created_at', 'public', 'num_pages', 'pending',
+        'title', 'created_at', 'public', 'listed', 'num_pages', 'pending',
         'processed_pages_percentage'
     )
     list_filter = ('pending', 'public', 'allow_annotation', 'portal')
