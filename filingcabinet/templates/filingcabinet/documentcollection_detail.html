@@ -5,6 +5,15 @@
 
 {% block title %}{{ object.title }}{% endblock %}
 
+{% block css %}
+  {{ block.super }}
+  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
+
+  <link rel="alternate" type="application/json+oembed"
+  href="{{ SITE_URL }}{% url 'api:documentcollection-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
+  title="{% translate 'Document Collection oEmbed Profile' %}" />
+{% endblock %}
+
 {% block body %}
 {% block documentcollection_top %}
 <div class="container mt-3 mb-5">
@@ -19,12 +28,6 @@
 
 {% include "filingcabinet/_documentcollection_viewer.html" %}
 
-{% endblock %}
-
-
-{% block css %}
-  {{ block.super }}
-  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}

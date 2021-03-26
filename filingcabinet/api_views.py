@@ -6,6 +6,7 @@ from rest_framework import (
     viewsets, mixins, permissions, filters, status
 )
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from . import get_document_model, get_documentcollection_model
 from .models import Page, PageAnnotation, CollectionDirectory
@@ -15,6 +16,7 @@ from .api_serializers import (
     PageAnnotationSerializer, CreatePageAnnotationSerializer,
     DocumentCollectionSerializer
 )
+from .api_utils import make_oembed_response
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -95,6 +97,10 @@ class DocumentViewSet(mixins.ListModelMixin,
             qs = qs.filter(id__in=ids)
         return qs
 
+    @action(detail=False, methods=['get'])
+    def oembed(self, request):
+        return make_oembed_response(request, Document)
+
 
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
@@ -172,6 +178,10 @@ class DocumentCollectionViewSet(
             'parent_directory': parent_directory
         })
         return ctx
+
+    @action(detail=False, methods=['get'])
+    def oembed(self, request):
+        return make_oembed_response(request, DocumentCollection)
 
 
 class PageAnnotationViewSet(

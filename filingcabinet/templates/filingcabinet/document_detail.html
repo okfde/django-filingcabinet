@@ -6,6 +6,18 @@
 
 {% block title %}{{ object.title }}{% endblock %}
 
+{% block css %}
+{{ block.super }}
+{% if object.pending %}
+<meta http-equiv="refresh" content="30">
+{% endif %}
+<link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
+
+<link rel="alternate" type="application/json+oembed"
+  href="{{ SITE_URL }}{% url 'api:document-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
+  title="{% translate 'Document oEmbed Profile' %}" />
+{% endblock %}
+
 {% block body %}
 {% block document_top %}
   <div class="container mt-3 mb-5">
@@ -25,14 +37,6 @@
   {% include "filingcabinet/_document_viewer.html" with object=object %}
 {% endblock document_main %}
 
-{% endblock %}
-
-{% block css %}
-  {{ block.super }}
-  {% if object.pending %}
-    <meta http-equiv="refresh" content="30">
-  {% endif %}
-  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}

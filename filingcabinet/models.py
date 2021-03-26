@@ -1,6 +1,7 @@
 import functools
 import os
 import shutil
+import urllib.parse
 import uuid
 
 from django.conf.locale import LANG_INFO
@@ -11,6 +12,7 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.urls import resolve, Resolver404
 
 from taggit.models import TaggedItemBase
 from taggit.managers import TaggableManager
@@ -51,7 +53,27 @@ class AuthQuerysetMixin:
         return qs.filter(cond)
 
 
-class DocumentManager(AuthQuerysetMixin, models.Manager):
+class OEmbedMixin:
+    def get_public_via_url(self, url):
+        result = urllib.parse.urlparse(url)
+        try:
+            match = resolve(result.path)
+        except Resolver404:
+            return None
+        pk = match.kwargs.get('pk')
+        if pk is None:
+            return None
+        try:
+            # either listed or known by slug
+            return self.get_queryset().filter(
+                models.Q(public=True, listed=True) |
+                models.Q(public=True, slug=match.kwargs.get('slug', ''))
+            ).get(id=pk)
+        except models.Model.DoesNotExist:
+            return None
+
+
+class DocumentManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
     pass
 
 
@@ -169,6 +191,13 @@ class AbstractDocument(models.Model):
 
     def get_absolute_domain_url(self):
         return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
+
+    def get_absolute_domain_embed_url(self):
+        path = reverse('filingcabinet:document-detail_embed', kwargs={
+            'pk': self.pk,
+            'slug': self.slug
+        })
+        return getattr(settings, 'SITE_URL', '') + path
 
     @property
     def has_original(self):
@@ -548,7 +577,7 @@ class CollectionDocument(models.Model):
         ordering = ['order', 'document__title']
 
 
-class DocumentCollectionManager(AuthQuerysetMixin, models.Manager):
+class DocumentCollectionManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
     pass
 
 
@@ -636,6 +665,13 @@ class AbstractDocumentCollection(models.Model):
 
     def get_absolute_domain_url(self):
         return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
+
+    def get_absolute_domain_embed_url(self):
+        path = reverse('filingcabinet:document-collection_embed', kwargs={
+            'pk': self.pk,
+            'slug': self.slug
+        })
+        return getattr(settings, 'SITE_URL', '') + path
 
     def get_cover_image(self):
         try:
