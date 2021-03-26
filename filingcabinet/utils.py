@@ -1,6 +1,6 @@
-def chunks(l, n):
+def chunks(li, n):
     n = max(1, n)
-    return (l[i:i+n] for i in range(0, len(l), n))
+    return (li[i:i+n] for i in range(0, len(li), n))
 
 
 def estimate_time(filesize, page_count=None):
