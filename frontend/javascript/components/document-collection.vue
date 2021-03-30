@@ -245,7 +245,7 @@ export default {
         done: false,
         results: []
       }
-      let searchUrl = `${this.config.urls.pageApiUrl}?collection=${this.collection.id}&q=${encodeURIComponent(term)}`
+      let searchUrl = `${this.config.urls.pageApiUrl}?collection=${this.collection.id}&q=${encodeURIComponent(term)}&${this.collectionAuth}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
         let missingDocs = []

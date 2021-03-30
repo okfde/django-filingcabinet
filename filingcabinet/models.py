@@ -322,14 +322,14 @@ class AbstractDocument(models.Model):
         return DocumentSerializer
 
     def can_read_unlisted(self, request):
+        if self.public and self.listed:
+            return True
         if self.public and not self.listed:
             if request.GET.get('uid') == str(self.uid):
                 return True
         return False
 
     def can_read(self, request):
-        if self.public and self.listed:
-            return True
         if self.can_read_unlisted(request):
             return True
         if request.user.is_superuser:
@@ -687,14 +687,14 @@ class AbstractDocumentCollection(models.Model):
         return DocumentCollectionSerializer
 
     def can_read_unlisted(self, request):
+        if self.public and self.listed:
+            return True
         if self.public and not self.listed:
             if request.GET.get('uid') == str(self.uid):
                 return True
         return False
 
     def can_read(self, request):
-        if self.public and self.listed:
-            return True
         if self.can_read_unlisted(request):
             return True
         if request.user.is_superuser:

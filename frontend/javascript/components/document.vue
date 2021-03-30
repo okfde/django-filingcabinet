@@ -386,7 +386,17 @@ export default {
     }
     this.document.pages = this.processPages(this.document.pages)
     this.resizing = true
-    getData(this.documentUrl).then((doc) => {
+    let url = this.documentUrl
+    if (this.documentPreview) {
+      if (!this.documentPreview.listed) {
+        if (url.indexOf('?') == -1) {
+          url += `?uid=${this.documentPreview.uid}`
+        } else {
+          url += `&uid=${this.documentPreview.uid}`
+        }
+      }
+    }
+    getData(url).then((doc) => {
       this.pageTemplate = decodeURI(doc.page_template)
       this.document = doc
       this.document.loaded = true
