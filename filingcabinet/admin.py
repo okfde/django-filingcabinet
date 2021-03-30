@@ -180,6 +180,9 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
         'processed_documents_percentage'
     )
     prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = (
+        'uid', 'created_at'
+    )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

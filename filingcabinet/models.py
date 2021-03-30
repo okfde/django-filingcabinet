@@ -577,7 +577,8 @@ class CollectionDocument(models.Model):
         ordering = ['order', 'document__title']
 
 
-class DocumentCollectionManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
+class DocumentCollectionManager(OEmbedMixin, AuthQuerysetMixin,
+                                models.Manager):
     pass
 
 
