@@ -110,20 +110,21 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         document_id = self.request.query_params.get('document', '')
         collection_id = self.request.query_params.get('collection', '')
-        cond = Q(public=True)
-        if self.request.user.is_authenticated:
-            cond |= Q(user=self.request.user)
 
         pages = Page.objects.all()
         try:
-            doc = Document.objects.filter(cond).get(pk=document_id)
+            doc = Document.objects.get(pk=document_id)
+            if not doc.can_read(self.request):
+                return Page.objects.none()
             pages = pages.filter(document=doc)
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
         try:
-            collection = DocumentCollection.objects.filter(cond).get(
+            collection = DocumentCollection.objects.get(
                 pk=collection_id
             )
+            if not collection.can_read(self.request):
+                return Page.objects.none()
             pages = pages.filter(document__in=collection.documents.all())
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
