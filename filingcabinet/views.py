@@ -18,7 +18,9 @@ PREVIEW_PAGE_COUNT = 10
 
 class PkSlugMixin:
     def get_redirect(self, obj):
-        url = reverse(self.redirect_url_name, kwargs={'slug': obj.slug, 'pk': obj.pk})
+        url = reverse(self.redirect_url_name, kwargs={
+            'slug': obj.slug, 'pk': obj.pk
+        })
         return redirect('{}?{}'.format(url, self.request.META['QUERY_STRING']))
 
     def get(self, request, *args, **kwargs):

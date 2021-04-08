@@ -19,8 +19,14 @@ def make_oembed_response(request, model):
         max_height = int(request.GET.get('maxheight', DUMMY))
     except ValueError:
         return Response({}, status=status.HTTP_400_BAD_REQUEST)
-    width = min(640, max_width)
-    height = min(800, max_height)
+    if max_width == DUMMY:
+        width = '100%'
+    else:
+        width = '{}px'.format(min(640, max_width))
+    if max_height == DUMMY:
+        height = '80vh'
+    else:
+        height = '{}px'.format(min(640, max_height))
     iframe_url = obj.get_absolute_domain_embed_url()
     return Response({
         "version": "1.0",
@@ -31,8 +37,7 @@ def make_oembed_response(request, model):
         "height": height,
         "title": obj.title,
         "html": '''
-<iframe style="width:{width}px;border:0;height:{height}px"
-height="{height}"
-src="{url}?maxHeight={height}px"></iframe>
+<iframe style="width:{width};border:0;height:{height}"
+src="{url}?maxHeight={height}"></iframe>
         '''.format(url=iframe_url, height=height, width=width).strip(),
     })
