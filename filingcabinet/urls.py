@@ -28,6 +28,14 @@ urlpatterns = [
             DocumentCollectionEmbedView.as_view()
         ),
         name="document-collection_embed"),
+    path(pgettext_lazy(
+            'url part',
+            'collection/<int:pk>/embed/',
+        ),
+        xframe_options_exempt(
+            DocumentCollectionEmbedView.as_view()
+        ),
+        name="document-collection_embed_short"),
     path("<int:pk>-<slug:slug>/", DocumentView.as_view(),
          name="document-detail"),
     path("<int:pk>/", DocumentView.as_view(),

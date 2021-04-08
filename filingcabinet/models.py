@@ -193,9 +193,8 @@ class AbstractDocument(models.Model):
         return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
 
     def get_absolute_domain_embed_url(self):
-        path = reverse('filingcabinet:document-detail_embed', kwargs={
+        path = reverse('filingcabinet:document-detail_embed_short', kwargs={
             'pk': self.pk,
-            'slug': self.slug
         })
         return getattr(settings, 'SITE_URL', '') + path
 
@@ -668,10 +667,8 @@ class AbstractDocumentCollection(models.Model):
         return getattr(settings, 'SITE_URL', '') + self.get_absolute_url()
 
     def get_absolute_domain_embed_url(self):
-        path = reverse('filingcabinet:document-collection_embed', kwargs={
-            'pk': self.pk,
-            'slug': self.slug
-        })
+        path = reverse('filingcabinet:document-collection_embed_short',
+                       kwargs={'pk': self.pk})
         return getattr(settings, 'SITE_URL', '') + path
 
     def get_cover_image(self):
