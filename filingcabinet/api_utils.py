@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 
 
-
 def make_oembed_response(request, model):
     format = request.GET.get('format')
     if format != 'json':
@@ -34,6 +33,6 @@ def make_oembed_response(request, model):
         "html": '''
 <iframe style="width:{width}px;border:0;height:{height}px"
 height="{height}"
-src="{url}"></iframe>
+src="{url}?maxHeight={height}px"></iframe>
         '''.format(url=iframe_url, height=height, width=width).strip(),
     })

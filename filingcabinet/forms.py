@@ -14,7 +14,8 @@ DEFAULT_PREFERENCES = {
     "showAnnotations": '',
     "defaultSearch": '',
     "defaultZoom": 1,
-    "showPageNumberInput": True
+    "showPageNumberInput": True,
+    "maxHeight": None
 }
 
 
@@ -72,3 +73,4 @@ class ViewerPreferenceForm(forms.Form):
     )
     defaultSearch = forms.CharField(required=False)
     defaultZoom = forms.IntegerField(min_value=1, max_value=3)
+    maxHeight = forms.CharField(required=False)
