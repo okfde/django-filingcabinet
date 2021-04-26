@@ -18,9 +18,14 @@ PREVIEW_PAGE_COUNT = 10
 
 class PkSlugMixin:
     def get_redirect(self, obj):
-        url = reverse(self.redirect_url_name, kwargs={
-            'slug': obj.slug, 'pk': obj.pk
-        })
+        if obj.slug:
+            url = reverse(self.redirect_url_name, kwargs={
+                'slug': obj.slug, 'pk': obj.pk
+            })
+        else:
+            url = reverse(self.redirect_short_url_name, kwargs={
+                'pk': obj.pk
+            })
         return redirect('{}?{}'.format(url, self.request.META['QUERY_STRING']))
 
     def get(self, request, *args, **kwargs):
@@ -99,6 +104,7 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
     model = Document
     template_name = 'filingcabinet/document_detail.html'
     redirect_url_name = 'filingcabinet:document-detail'
+    redirect_short_url_name = 'filingcabinet:document-detail_short'
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -119,6 +125,7 @@ class DocumentView(AuthMixin, PkSlugMixin, DetailView):
 class DocumentEmbedView(DocumentView):
     template_name = 'filingcabinet/document_detail_embed.html'
     redirect_url_name = 'filingcabinet:document-detail_embed'
+    redirect_short_url_name = 'filingcabinet:document-detail_embed_short'
 
 
 def get_document_collection_context(collection, request):
@@ -141,6 +148,7 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     model = DocumentCollection
     template_name = 'filingcabinet/documentcollection_detail.html'
     redirect_url_name = 'filingcabinet:document-collection'
+    redirect_short_url_name = 'filingcabinet:document-collection_short'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -154,3 +162,4 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
 class DocumentCollectionEmbedView(DocumentCollectionView):
     template_name = 'filingcabinet/documentcollection_detail_embed.html'
     redirect_url_name = 'filingcabinet:document-collection_embed'
+    redirect_short_url_name = 'filingcabinet:document-collection_embed_short'
