@@ -26,7 +26,10 @@ class PkSlugMixin:
             url = reverse(self.redirect_short_url_name, kwargs={
                 'pk': obj.pk
             })
-        return redirect('{}?{}'.format(url, self.request.META['QUERY_STRING']))
+        query = self.request.META['QUERY_STRING']
+        if query:
+            return redirect('{}?{}'.format(url, query))
+        return redirect(url)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
