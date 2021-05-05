@@ -1,14 +1,17 @@
 <template>
-  <div class="document-pages" :style="{'height': height}">
+  <div
+    class="document-pages"
+    :style="{'height': height}"
+  >
     <RecycleScroller
+      v-slot="{ item }"
       class="scroller"
       :items="pages"
       :page-mode="isPageMode"
       key-field="number"
-      sizeField="normalSize"
-      :emitUpdate="true"
+      size-field="normalSize"
+      :emit-update="true"
       @update="updateCurrentPage"
-      v-slot="{ item }"
     >
       <document-page
         :key="item.number"
@@ -39,15 +42,15 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 import DocumentPage from './document-page.vue'
 
 export default {
-  name: 'document-pages',
-  props: [
-    'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
-    'activeAnnotationForm', 'width', 'height', 'canAnnotate', 'pdfDocument'
-  ],
+  name: 'DocumentPages',
   components: {
     RecycleScroller,
     DocumentPage
   },
+  props: [
+    'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
+    'activeAnnotationForm', 'width', 'height', 'canAnnotate', 'pdfDocument'
+  ],
   computed: {
     showText () {
       return this.preferences.showText
