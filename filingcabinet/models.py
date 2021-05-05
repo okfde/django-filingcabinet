@@ -311,7 +311,8 @@ class AbstractDocument(models.Model):
             page=1, size='original'
         ))
 
-    def get_serializer_class(self, detail=False):
+    @classmethod
+    def get_serializer_class(cls, detail=False):
         from .api_serializers import (
             DocumentSerializer, DocumentDetailSerializer
         )
@@ -678,7 +679,8 @@ class AbstractDocumentCollection(models.Model):
         except IndexError:
             return None
 
-    def get_serializer_class(self, detail=False):
+    @classmethod
+    def get_serializer_class(cls, detail=False):
         from .api_serializers import DocumentCollectionSerializer
 
         return DocumentCollectionSerializer
