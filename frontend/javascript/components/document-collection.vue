@@ -173,20 +173,26 @@ export default {
     }
   },
   data () {
+    let documents = []
+    let directories = []
+    let collection = {
+      documents, directories
+    }
+    if (this.documentCollectionPreview) {
+      collection = this.documentCollectionPreview
+    }
     return {
       document: null,
-      collection: this.documentCollectionPreview || {
-        documents: [], directories: []
-      },
+      collection: collection,
       showSearch: false,
       searcher: null,
       documentPage: 1,
       currentDirectory: null,
       directoryStack: [],
-      documents: [],
-      directories: [],
-      documentOffsets: null,
-      documentsUri: null,
+      documents: this.makeDocuments(collection),
+      directories: collection.directories,
+      documentOffsets: this.makeOffsets(collection),
+      documentsUri: collection.documents_uri || null,
     }
   },
   computed: {
@@ -214,7 +220,9 @@ export default {
     }
   },
   created () {
-    this.getCollectionData()
+    if (!this.documentCollectionPreview || !this.collection.id) {
+      this.getCollectionData()
+    }
   },
   mounted () {
   },
@@ -230,18 +238,30 @@ export default {
       getData(url.join('')).then((docCollection) => {
         this.collection = docCollection
         this.documentsUri = docCollection.documents_uri
-        let offsetSteps = docCollection.documents.length / DOCUMENTS_API_LIMIT
-        this.documentOffsets = new Set()
-        for (var i = 0; i < offsetSteps; i += 1) {
-          this.documentOffsets.add(i)
-        }
-        this.documents = [
-          ...docCollection.documents,
-          ...new Array(docCollection.document_directory_count - docCollection.documents.length).fill(null)
-        ]
-        
+        this.documentOffsets = this.makeOffsets(docCollection)
+        this.documents = this.makeDocuments(docCollection)
         this.directories = docCollection.directories
       })
+    },
+    makeOffsets (collection) {
+      if (!collection.id) {
+        return null
+      }
+      let offsetSteps = collection.documents.length / DOCUMENTS_API_LIMIT
+      let documentOffsets = new Set()
+      for (var i = 0; i < offsetSteps; i += 1) {
+        documentOffsets.add(i)
+      }
+      return documentOffsets
+    },
+    makeDocuments(collection) {
+      if (!collection.id) {
+        return []
+      }
+      return [
+        ...collection.documents,
+        ...new Array(collection.document_directory_count - collection.documents.length).fill(null)
+      ]
     },
     loadMoreDocuments (offset) {
       offset = offset - (offset % DOCUMENTS_API_LIMIT)
