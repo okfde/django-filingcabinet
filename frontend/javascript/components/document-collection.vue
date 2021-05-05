@@ -5,7 +5,7 @@
       class="collection-toolbar"
     >
       <div class="row py-2 bg-dark">
-        <div class="col-4">
+        <div class="col-4 col-md-3">
           <div
             v-if="document"
             class="btn-group"
@@ -20,7 +20,17 @@
             </button>
           </div>
         </div>
-        <div class="col-4 mr-auto ml-auto text-center">
+        <div class="col-auto order-md-3 ml-auto">
+          <span class="text-muted d-inline-block text-truncate">
+            <template v-if="document">
+              {{ collection.title }}
+            </template>
+            <template v-else>
+              {{ collection.document_count }} {{ i18n.documents }}
+            </template>
+          </span>
+        </div>
+        <div class="col-10 col-md order-md-2 text-center">
           <h4 class="text-white text-truncate mb-0">
             <template v-if="document">
               {{ document.title }}
@@ -30,33 +40,27 @@
             </template>
           </h4>
         </div>
-        <div class="col-4 text-right">
-          <span class="text-muted">
-            <template v-if="document">
-              {{ collection.title }}
-            </template>
-            <template v-else>
-              {{ collection.document_count }} {{ i18n.documents }}
-            </template>
-          </span>
-          <template v-if="!document">
-            <button
-              v-if="!showSearch"
-              type="button"
-              class="ml-2 btn btn-sm btn-secondary"
-              @click="enableSearch"
-            >
-              <i class="fa fa-search" />
-            </button>
-            <button
-              v-else
-              type="button"
-              class="ml-2 btn btn-sm btn-secondary"
-              @click="clearSearch"
-            >
-              <i class="fa fa-close" />
-            </button>
-          </template>
+
+        <div
+          v-if="!document"
+          class="col-auto order-md-4 ml-auto"
+        >
+          <button
+            v-if="!showSearch"
+            type="button"
+            class="ml-2 btn btn-sm btn-secondary"
+            @click="enableSearch"
+          >
+            <i class="fa fa-search" />
+          </button>
+          <button
+            v-else
+            type="button"
+            class="ml-2 btn btn-sm btn-secondary"
+            @click="clearSearch"
+          >
+            <i class="fa fa-close" />
+          </button>
         </div>
       </div>
       <document-collection-searchbar
@@ -94,30 +98,35 @@
       v-show="!document && !searcher"
       class="document-collection"
     >
-      <div class="list-group list-group-flush">
-        <button
-          v-if="currentDirectory != null"
-          type="button"
-          class="list-group-item list-group-item-action list-group-item-dark text-center"
-          @click="selectDirectory()"
-        >
-          <i class="fa fa-arrow-left float-left" />
-          {{ currentDirectory.name }}
-        </button>
-        <button
-          v-for="directory in directories"
-          :key="directory.id"
-          type="button"
-          class="list-group-item list-group-item-action list-group-item-secondary"
-          @click="selectDirectory(directory)"
-        >
-          {{ directory.name }}
-        </button>
+      <div class="row bg-secondary">
+        <div class="col px-0">
+          <div class="list-group list-group-flush">
+            <button
+              v-if="currentDirectory != null"
+              type="button"
+              class="list-group-item list-group-item-action list-group-item-dark text-center"
+              @click="selectDirectory()"
+            >
+              <i class="fa fa-arrow-left float-left" />
+              {{ currentDirectory.name }}
+            </button>
+            <button
+              v-for="directory in directories"
+              :key="directory.id"
+              type="button"
+              class="list-group-item list-group-item-action list-group-item-secondary"
+              @click="selectDirectory(directory)"
+            >
+              {{ directory.name }}
+            </button>
+          </div>
+          <document-preview-grid
+            :documents="documents"
+            @navigate="navigate"
+            @loadmore="loadMoreDocuments"
+          />
+        </div>
       </div>
-      <document-preview-grid
-        :documents="documents"
-        @navigate="navigate"
-      />
     </div>
   </div>
 </template>
@@ -131,6 +140,8 @@ import DocumentCollectionSearchResults from './document-collection-searchresults
 import Document from './document.vue'
 
 import {getData} from '../lib/utils.js'
+
+const DOCUMENTS_API_LIMIT = 50
 
 function getIDFromURL (s) {
   const parts = s.split('/')
@@ -173,7 +184,9 @@ export default {
       currentDirectory: null,
       directoryStack: [],
       documents: [],
-      directories: []
+      directories: [],
+      documentOffsets: null,
+      documentsUri: null,
     }
   },
   computed: {
@@ -181,7 +194,7 @@ export default {
       return this.config.i18n
     },
     collectionIndex () {
-      const documents = this.collection.documents
+      const documents = this.documents
       const collectionIndex = {}
       documents.forEach((d, i) => {
         collectionIndex[d.id] = i
@@ -216,8 +229,39 @@ export default {
       url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : ''}`)
       getData(url.join('')).then((docCollection) => {
         this.collection = docCollection
-        this.documents = docCollection.documents
+        this.documentsUri = docCollection.documents_uri
+        let offsetSteps = docCollection.documents.length / DOCUMENTS_API_LIMIT
+        this.documentOffsets = new Set()
+        for (var i = 0; i < offsetSteps; i += 1) {
+          this.documentOffsets.add(i)
+        }
+        this.documents = [
+          ...docCollection.documents,
+          ...new Array(docCollection.document_directory_count - docCollection.documents.length).fill(null)
+        ]
+        
         this.directories = docCollection.directories
+      })
+    },
+    loadMoreDocuments (offset) {
+      offset = offset - (offset % DOCUMENTS_API_LIMIT)
+      let offsetStep = offset / DOCUMENTS_API_LIMIT
+      if (!this.documentOffsets.has(offsetStep)) {
+        this.documentOffsets.add(offsetStep)
+        this.getDocuments(offset)
+      }
+    },
+    getDocuments(offset) {
+      let url = [this.documentsUri]
+      url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : '-'}`)
+      url.push(`&offset=${offset}&limit=${DOCUMENTS_API_LIMIT}`)
+      this.documentOffset = offset + DOCUMENTS_API_LIMIT
+      getData(url.join('')).then(result => {
+        this.documents = [
+          ...this.documents.slice(0, offset),
+          ...result.objects,
+          ...this.documents.slice(offset + result.objects.length),
+        ]
       })
     },
     navigate ({document, page}) {

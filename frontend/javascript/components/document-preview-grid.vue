@@ -10,8 +10,13 @@
       :items="documentRows"
       :item-size="itemSize"
       key-field="rowId"
+      :emit-update="true"
+      @update="showRow"
     >
-      <div class="row pt-3">
+      <div
+        v-if="item.loaded"
+        class="row pt-3"
+      >
         <div
           v-for="document in item.documents"
           :key="document.id"
@@ -69,9 +74,11 @@ export default {
     documentRows () {
       const rows = []
       for (let i = 0; i < this.documents.length; i += this.colCount) {
+        let rowDocs = this.documents.slice(i, i + this.colCount)
         rows.push({
           rowId: i,
-          documents: this.documents.slice(i, i + this.colCount)
+          loaded: rowDocs.every(d => d !== null),
+          documents: rowDocs
         })
       }
       return rows         
@@ -88,7 +95,17 @@ export default {
   methods: {
     navigate (docAndPage) {
       this.$emit('navigate', docAndPage)
+    },
+    showRow (startIndex, endIndex) {
+      let currentDocs = this.documents.slice(
+        startIndex * this.colCount, endIndex * this.colCount + this.colCount
+      )
+      if (currentDocs.some(d => d === null)) {
+        let firstNull = currentDocs.map((d, i) => [d, i]).filter(d => d[0] === null)[0][1]
+        this.$emit('loadmore', startIndex * this.colCount + firstNull)
+      }
     }
+
   }
 }
 </script>

@@ -1,6 +1,7 @@
 from django.template.defaultfilters import slugify
 
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from . import get_document_model, get_documentcollection_model
 from .models import Page, PageAnnotation, CollectionDirectory
@@ -109,6 +110,9 @@ class CollectionDirectorySerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
+MAX_COLLECTION_DOCS = 100
+
+
 class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name='api:documentcollection-detail',
@@ -121,8 +125,10 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     cover_image = serializers.CharField(
         source='get_cover_image'
     )
-    documents = serializers.SerializerMethodField()
     document_count = serializers.SerializerMethodField()
+    documents = serializers.SerializerMethodField()
+    document_directory_count = serializers.SerializerMethodField()
+    documents_uri = serializers.SerializerMethodField()
     directories = serializers.SerializerMethodField()
 
     class Meta:
@@ -130,8 +136,8 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'resource_uri', 'id', 'site_url', 'title', 'description',
             'public', 'listed', 'created_at', 'updated_at',
-            'document_count', 'uid',
-            'cover_image', 'directories', 'documents',
+            'document_count', 'document_directory_count', 'uid',
+            'cover_image', 'directories', 'documents', 'documents_uri'
         )
 
     def get_document_count(self, obj):
@@ -139,13 +145,27 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             return obj.document_count
         return obj.documents.all().count()
 
+    def get_document_directory_count(self, obj):
+        parent = self.context.get('parent_directory')
+        if hasattr(obj, 'document_directory_count'):
+            return obj.document_directory_count
+        return obj.documents.all().filter(
+            filingcabinet_collectiondocument__directory=parent
+        ).count()
+
     def get_documents(self, obj):
         parent = self.context.get('parent_directory')
-        docs = obj.get_documents(directory=parent)
-        return DocumentSerializer(
+        docs = obj.get_documents(directory=parent)[:MAX_COLLECTION_DOCS]
+        return Document.get_serializer_class()(
             docs, many=True,
             context=self.context
         ).data
+
+    def get_documents_uri(self, obj):
+        return '{}?collection={}'.format(
+            reverse('api:document-list'),
+            obj.id
+        )
 
     def get_directories(self, obj):
         parent = self.context.get('parent_directory')

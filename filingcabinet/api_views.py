@@ -17,6 +17,7 @@ from .api_serializers import (
     DocumentCollectionSerializer
 )
 from .api_utils import make_oembed_response
+from .filters import DocumentFilter
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -62,6 +63,7 @@ class DocumentViewSet(mixins.ListModelMixin,
         'update': UpdateDocumentSerializer
     }
     permission_classes = (CanReadWritePermission,)
+    filterset_class = DocumentFilter
 
     def get_serializer_class(self):
         try:
@@ -80,21 +82,6 @@ class DocumentViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         qs = self.get_base_queryset()
-        directory = self.request.query_params.get('directory', None)
-        if directory is not None:
-            directory = directory or None
-            qs = qs.filter(
-                filingcabinet_collectiondocument__directory_id=directory
-            )
-        try:
-            ids = [
-                int(x) for x in
-                self.request.query_params.get('ids', '').split(',') if x
-            ]
-        except ValueError:
-            ids = None
-        if ids:
-            qs = qs.filter(id__in=ids)
         return qs
 
     @action(detail=False, methods=['get'])
@@ -155,6 +142,10 @@ class DocumentCollectionViewSet(
             cond |= Q(user=self.request.user)
         qs = DocumentCollection.objects.filter(cond)
         qs = qs.annotate(document_count=Count('documents'))
+        # TODO: annotate doc count for directory for performance
+        # qs = qs.annotate(document_directory_count=Count(
+        #     'documents', filter=Q(filingcabinet)
+        # ))
         qs = qs.prefetch_related('documents')
         return qs
 
