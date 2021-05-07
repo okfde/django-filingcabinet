@@ -34,6 +34,8 @@ class DocumentPortal(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     public = models.BooleanField(default=False)
 
+    settings = models.JSONField(blank=True, default=dict)
+
     class Meta:
         verbose_name = _('document portal')
         verbose_name_plural = _('document portals')
@@ -154,6 +156,7 @@ class AbstractDocument(models.Model):
     listed = models.BooleanField(default=True)
     allow_annotation = models.BooleanField(default=False)
     properties = models.JSONField(blank=True, default=dict)
+    data = models.JSONField(blank=True, default=dict)
     outline = models.TextField(blank=True)
 
     tags = TaggableManager(
@@ -597,6 +600,7 @@ class AbstractDocumentCollection(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now, null=True)
     updated_at = models.DateTimeField(default=timezone.now, null=True)
+    settings = models.JSONField(blank=True, default=dict)
 
     public = models.BooleanField(default=True)
     listed = models.BooleanField(default=True)
