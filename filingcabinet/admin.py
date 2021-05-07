@@ -165,11 +165,6 @@ class PageAnnotationAdmin(admin.ModelAdmin):
         return qs
 
 
-class DocumentInline(admin.StackedInline):
-    model = CollectionDocument
-    raw_id_fields = ('document',)
-
-
 class CollectionDirectoryAdmin(MPTTModelAdmin):
     raw_id_fields = ('user', 'collection', 'parent')
     list_display = ('name', 'collection', 'created_at', 'updated_at')
@@ -177,7 +172,6 @@ class CollectionDirectoryAdmin(MPTTModelAdmin):
 
 class DocumentCollectionBaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'documents',)
-    inlines = [DocumentInline]
     save_on_top = True
     search_fields = ('title',)
     date_hierarchy = 'created_at'
