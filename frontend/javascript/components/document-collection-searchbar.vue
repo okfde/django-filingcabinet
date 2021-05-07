@@ -1,21 +1,79 @@
 <template>
   <div class="row py-1 bg-dark text-white document-searchbar">
-    <div class="col-auto mr-auto">
-      <div v-if="searching" class="spinner-border spinner-border-sm" role="status">
-        <span class="sr-only">{{ i18n.searching }}</span>
+    <div class="col-12">
+      <div
+        v-if="hasFilters"
+        class="row"
+      >
+        <div class="col">
+          <div class="form-group row">
+            <label
+              for="document-collection-search"
+              class="col-sm-2 col-form-label"
+            >
+              {{ i18n.searchTerm }}
+            </label>
+            <div class="col-sm-10">
+              <input
+                id="document-collection-search"
+                v-model="search"
+                type="search"
+                class="search-input form-control"
+                @keydown.enter="runSearch"
+              >
+            </div>
+          </div>
+          <document-filter
+            v-for="filter in filters"
+            :key="filter.id"
+            :filter="filter"
+            :initial-value="filterValues[filter.id] || ''"
+            @change="updateFilter"
+          />
+        </div>
       </div>
-      <small v-if="searcher">
-        {{ resultCount }} {{ i18n.documents }} {{ i18n.found }} 
-      </small>
-    </div>
-    <div class="col-auto ml-auto">
-      <div class="input-group input-group-sm">
-        <input type="text" class="search-input form-control form-control-sm"
-          v-model="search"
-          @keydown.enter="runSearch"
-        >
-        <div class="input-group-append">
-          <button class="btn btn-outline-light" @click="runSearch">
+      <div class="row mb-2">
+        <div class="col mr-auto">
+          <div
+            v-if="searching"
+            class="spinner-border spinner-border-sm"
+            role="status"
+          />
+          <small v-if="searching">{{ i18n.searching }}</small>
+          <small v-if="searcher && searcher.done">
+            <template v-if="resultCount == 1">
+              {{ resultCount }} {{ i18n.document }} {{ i18n.found }} 
+            </template>
+            <template v-else>
+              {{ resultCount }} {{ i18n.documents }} {{ i18n.found }} 
+            </template>
+          </small>
+        </div>
+        <div class="col-auto ml-auto">
+          <div
+            v-if="!hasFilters"
+            class="input-group input-group-sm"
+          >
+            <input
+              v-model="search"
+              type="search"
+              class="search-input form-control form-control-sm"
+              @keydown.enter="runSearch"
+            >
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-light"
+                @click="runSearch"
+              >
+                {{ i18n.search }}
+              </button>
+            </div>
+          </div>
+          <button
+            v-else
+            class="btn btn-outline-light"
+            @click="runSearch"
+          >
             {{ i18n.search }}
           </button>
         </div>
@@ -25,12 +83,19 @@
 </template>
 
 <script>
+
+import DocumentFilter from './document-filter.vue'
+
 export default {
-  name: 'document-collection-searchbar',
-  props: ['searcher'],
+  name: 'DocumentCollectionSearchbar',
+  components: {
+    DocumentFilter
+  },
+  props: ['searcher', 'filters'],
   data () {
     return {
-      search: ''
+      search: this.searcher?.term || '',
+      filterValues: this.searcher?.filters || new Map(),
     }
   },
   computed: {
@@ -39,6 +104,9 @@ export default {
     },
     searching () {
       return this.searcher && !this.searcher.done
+    },
+    hasFilters () {
+      return !!this.filters && this.filters.length > 0
     },
     resultCount () {
       if (this.searcher !== null) {
@@ -52,7 +120,13 @@ export default {
       this.$emit('clearsearch')
     },
     runSearch () {
-      this.$emit('search', this.search)
+      this.$emit('search', {
+        term: this.search,
+        filters: this.filterValues
+      })
+    },
+    updateFilter ({key, value}) {
+      this.filterValues.set(key, value)
     }
   }
 }

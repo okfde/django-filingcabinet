@@ -56,8 +56,6 @@ def get_js_config(request, obj):
             'pdfjsWorker': static('js/pdf.worker.min.js')
         },
         'urls': {
-            'pageApiUrl': reverse('api:page-list'),
-            'documentApiUrl': reverse('api:document-list'),
             'pageAnnotationApiUrl': reverse('api:pageannotation-list'),
         },
         'i18n': {
@@ -67,6 +65,7 @@ def get_js_config(request, obj):
             'one_match': _('one match'),
             'matches': _('matches'),
             'search': _('Search'),
+            'searchTerm': _('Search term'),
             'searching': _('Searching...'),
             'found_on': _('Found on'),
             'found': _('found'),

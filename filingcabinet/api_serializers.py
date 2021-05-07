@@ -53,7 +53,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'resource_uri', 'id', 'site_url', 'title', 'slug', 'description',
             'num_pages', 'public', 'listed', 'allow_annotation', 'pending',
             'file_url', 'file_size', 'cover_image', 'page_template',
-            'outline', 'properties', 'uid'
+            'outline', 'properties', 'uid', 'data'
         )
 
 
@@ -129,6 +129,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     documents = serializers.SerializerMethodField()
     document_directory_count = serializers.SerializerMethodField()
     documents_uri = serializers.SerializerMethodField()
+    pages_uri = serializers.SerializerMethodField()
     directories = serializers.SerializerMethodField()
 
     class Meta:
@@ -137,7 +138,8 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             'resource_uri', 'id', 'site_url', 'title', 'description',
             'public', 'listed', 'created_at', 'updated_at',
             'document_count', 'document_directory_count', 'uid',
-            'cover_image', 'directories', 'documents', 'documents_uri'
+            'cover_image', 'directories', 'documents', 'documents_uri',
+            'pages_uri', 'settings'
         )
 
     def get_document_count(self, obj):
@@ -164,6 +166,12 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     def get_documents_uri(self, obj):
         return '{}?collection={}'.format(
             reverse('api:document-list'),
+            obj.id
+        )
+
+    def get_pages_uri(self, obj):
+        return '{}?collection={}'.format(
+            reverse('api:page-list'),
             obj.id
         )
 

@@ -66,6 +66,7 @@
       <document-collection-searchbar
         v-if="showSearch && !document"
         :searcher="searcher"
+        :filters="settings.filters"
         @search="search"
       />
     </div>
@@ -86,13 +87,25 @@
       </div>
     </div>
     <div v-if="!document && searcher">
-      <document-collection-search-results
-        v-for="result in searcher.results"
-        :key="result.document.id"
-        :document="result.document"
-        :pages="result.pages"
-        @navigate="navigate"
-      />
+      <template v-if="searcher.term">
+        <document-collection-search-results
+          v-for="result in searcher.results"
+          :key="result.document.id"
+          :document="result.document"
+          :pages="result.pages"
+          @navigate="navigate"
+        />
+      </template>
+      <template v-else>
+        <div class="row bg-secondary">
+          <div class="col px-0">
+            <document-preview-grid
+              :documents="searcher.documents"
+              @navigate="navigate"
+            />
+          </div>
+        </div>
+      </template>
     </div>
     <div
       v-show="!document && !searcher"
@@ -184,6 +197,7 @@ export default {
     return {
       document: null,
       collection: collection,
+      settings: collection.settings || {},
       showSearch: false,
       searcher: null,
       documentPage: 1,
@@ -203,7 +217,9 @@ export default {
       const documents = this.documents
       const collectionIndex = {}
       documents.forEach((d, i) => {
-        collectionIndex[d.id] = i
+        if (d !== null) {
+          collectionIndex[d.id] = i
+        }
       })
       return collectionIndex
     },
@@ -241,6 +257,9 @@ export default {
         this.documentOffsets = this.makeOffsets(docCollection)
         this.documents = this.makeDocuments(docCollection)
         this.directories = docCollection.directories
+        if (!this.settings) {
+          this.settings = docCollection.settings
+        }
       })
     },
     makeOffsets (collection) {
@@ -301,15 +320,37 @@ export default {
       this.searcher = null
       this.showSearch = false
     },
-    search (term) {
+    search ({ term, filters }) {
       this.document = null
-      console.log('searching for term', term)
+      console.log('searching for term', term, 'with filters', filters)
+      let params = [
+        this.collectionAuth,
+      ]
+      let hasSearch = false
+      if (term) {
+        params.push(`q=${encodeURIComponent(term)}`)
+        hasSearch = true
+      } else {
+        params.push('number=1')
+      }
+      for (let [key, value] of filters.entries()) {
+        if (value) {
+          params.push(`${key}=${encodeURIComponent(value)}`)
+          hasSearch = true
+        }
+      }
+      if (!hasSearch) {
+        this.searcher = null
+        return
+      }
       this.searcher = {
         term: term,
+        filters: filters,
         done: false,
-        results: []
+        results: [],
+        documents: []
       }
-      let searchUrl = `${this.config.urls.pageApiUrl}?collection=${this.collection.id}&q=${encodeURIComponent(term)}&${this.collectionAuth}`
+      let searchUrl = `${this.collection.pages_uri}${this.collection.pages_uri.includes('?') ? '&' : '?'}${params.join('&')}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
         let missingDocs = []
@@ -321,7 +362,7 @@ export default {
           }
         })
         if (missingDocs.length > 0) {
-          let docsUrl = `${this.config.urls.documentApiUrl}?ids=${missingDocs.join(',')}`
+          let docsUrl = `${this.collection.documents_uri}${this.collection.documents_uri.includes('?') ? '&' : '?'}ids=${missingDocs.join(',')}`
           getData(docsUrl).then((docsResponse) => {
             this.setSearchResults(response.objects, docsResponse.objects)
           })
@@ -335,6 +376,7 @@ export default {
       let docs = {}
       let docCount = 0
       let docIndex = {}
+      let searcherDocs = []
       resultDocuments.forEach((d, i) => docIndex[d.id] = i)
       results.forEach((p) => {
         const docId = getIDFromURL(p.document)
@@ -348,6 +390,7 @@ export default {
           if (document === undefined) {
             document = resultDocuments[docIndex[docId]]
           }
+          searcherDocs.push(document)
           docs[p.document] = docCount
           docCount += 1
           docsWithPages.push({
@@ -358,6 +401,7 @@ export default {
           docsWithPages[docs[p.document]].pages.push(docResult)
         }
       })
+      this.searcher.documents = searcherDocs
       this.searcher.results = docsWithPages
       Vue.set(this.searcher, 'docCount', docCount)
       this.searcher.done = true
