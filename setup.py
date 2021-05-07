@@ -42,6 +42,7 @@ setup(
         'Pillow',
         'django-filter',
         'django-json-widget',
+        'jsonschema',
         'django-taggit',
         'django-mptt',
         'djangorestframework'

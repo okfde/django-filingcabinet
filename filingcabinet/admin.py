@@ -7,7 +7,6 @@ from mptt.admin import MPTTModelAdmin
 from django_json_widget.widgets import JSONEditorWidget
 
 from .models import Page
-from .schema import SETTINGS_SCHEMA
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -18,7 +17,8 @@ class DocumentPortalAdmin(admin.ModelAdmin):
     list_filter = ('public',)
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(
-            options={'schema': SETTINGS_SCHEMA}
+            # TODO: JS does not work with CSP
+            # options={'schema': SETTINGS_SCHEMA}
         )},
     }
 
@@ -186,7 +186,8 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(
-            options={'schema': SETTINGS_SCHEMA}
+            # TODO: JS does not work with CSP
+            # options={'schema': SETTINGS_SCHEMA}
         )},
     }
     readonly_fields = (

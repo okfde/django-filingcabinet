@@ -20,6 +20,7 @@ from taggit.managers import TaggableManager
 from mptt.models import MPTTModel, TreeForeignKey
 
 from .storage import OverwriteStorage
+from .validators import validate_settings_schema
 from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL
@@ -34,7 +35,9 @@ class DocumentPortal(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     public = models.BooleanField(default=False)
 
-    settings = models.JSONField(blank=True, default=dict)
+    settings = models.JSONField(
+        blank=True, default=dict, validators=[validate_settings_schema]
+    )
 
     class Meta:
         verbose_name = _('document portal')
@@ -600,7 +603,9 @@ class AbstractDocumentCollection(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now, null=True)
     updated_at = models.DateTimeField(default=timezone.now, null=True)
-    settings = models.JSONField(blank=True, default=dict)
+    settings = models.JSONField(
+        blank=True, default=dict, validators=[validate_settings_schema]
+    )
 
     public = models.BooleanField(default=True)
     listed = models.BooleanField(default=True)
