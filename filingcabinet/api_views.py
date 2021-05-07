@@ -3,7 +3,7 @@ from django.db.models import (
 )
 
 from rest_framework import (
-    viewsets, mixins, permissions, filters, status
+    viewsets, mixins, permissions, status
 )
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -17,7 +17,7 @@ from .api_serializers import (
     DocumentCollectionSerializer
 )
 from .api_utils import make_oembed_response
-from .filters import DocumentFilter
+from .filters import DocumentFilter, PageDocumentFilterset
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -91,7 +91,7 @@ class DocumentViewSet(mixins.ListModelMixin,
 
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
-    filter_backends = [filters.SearchFilter]
+    filterset_class = PageDocumentFilterset
     search_fields = ['content']
 
     def get_queryset(self):
