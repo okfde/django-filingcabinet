@@ -41,6 +41,7 @@ setup(
         'pikepdf',
         'Pillow',
         'django-filter',
+        'django-json-widget',
         'django-taggit',
         'django-mptt',
         'djangorestframework'

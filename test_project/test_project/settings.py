@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'taggit',
+    'django_json_widget',
 
     'filingcabinet',
     'test_project.app'

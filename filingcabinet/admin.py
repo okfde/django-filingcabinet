@@ -1,11 +1,12 @@
 from django.contrib import admin
-from django.db.models import Q, Count
+from django.db.models import Q, Count, JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from mptt.admin import MPTTModelAdmin
+from django_json_widget.widgets import JSONEditorWidget
 
-from .models import Page, CollectionDocument
+from .models import Page
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -14,6 +15,9 @@ class DocumentPortalAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     list_display = ('title', 'created_at', 'public')
     list_filter = ('public',)
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
 
 
 class PageInline(admin.StackedInline):
@@ -34,6 +38,9 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     readonly_fields = ('uid', 'public', 'pending')
     prepopulated_fields = {'slug': ('title',)}
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
     actions = [
         'process_document', 'reprocess_document', 'fix_document_paths',
         'publish_documents', 'unpublish_documents',
@@ -180,6 +187,9 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
         'processed_documents_percentage'
     )
     prepopulated_fields = {'slug': ('title',)}
+    formfield_overrides = {
+        JSONField: {'widget': JSONEditorWidget},
+    }
     readonly_fields = (
         'uid', 'created_at'
     )
