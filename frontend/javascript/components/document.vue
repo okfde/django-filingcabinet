@@ -611,7 +611,7 @@ export default {
         results: []
       }
       this.preferences.showSearchResults = true
-      let searchUrl = `${this.config.urls.pageApiUrl}?document=${this.document.id}&q=${encodeURIComponent(term)}&${this.docAuth}`
+      let searchUrl = `${this.document.pages_uri}${this.document.pages_uri.includes('?') ? '&' : '?'}q=${encodeURIComponent(term)}&${this.docAuth}`
       getData(searchUrl).then((response) => {
         this.searcher.response = response
         this.searcher.done = true

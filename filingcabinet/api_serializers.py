@@ -46,6 +46,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
     page_template = serializers.CharField(
         source='get_page_template'
     )
+    pages_uri = serializers.SerializerMethodField()
 
     class Meta:
         model = Document
@@ -53,7 +54,13 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             'resource_uri', 'id', 'site_url', 'title', 'slug', 'description',
             'num_pages', 'public', 'listed', 'allow_annotation', 'pending',
             'file_url', 'file_size', 'cover_image', 'page_template',
-            'outline', 'properties', 'uid', 'data'
+            'outline', 'properties', 'uid', 'data', 'pages_uri'
+        )
+
+    def get_pages_uri(self, obj):
+        return '{}?document={}'.format(
+            reverse('api:page-list'),
+            obj.id
         )
 
 
