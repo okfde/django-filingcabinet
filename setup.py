@@ -39,6 +39,7 @@ setup(
         'wand',
         'pypdf2',
         'pikepdf',
+        'camelot-py[cv]',
         'Pillow',
         'django-filter',
         'django-json-widget',

@@ -15,7 +15,7 @@ from .models import (
     get_page_filename, get_page_annotation_filename
 )
 from .tasks import process_document_task
-from .pdf_utils import PDFProcessor, crop_image, draw_highlights
+from .pdf_utils import PDFProcessor, crop_image, draw_highlights, detect_tables
 from .utils import estimate_time
 
 
@@ -343,3 +343,13 @@ def remove_common_root_path(paths):
             PurePath(os.path.join(*p.parts[1:])) for p in paths
         ]
     return paths
+
+
+def detect_tables_on_doc(doc):
+    if not doc.get_file_path():
+        return
+    logger.info('Detecting tables for %s', doc.id)
+    with doc.get_local_file() as local_file_path:
+        tables = detect_tables(local_file_path)
+    doc.properties['_tables'] = tables
+    doc.save()

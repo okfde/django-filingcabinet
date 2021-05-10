@@ -59,3 +59,14 @@ def publish_document(doc_pk, public=True):
         doc._move_file()
         doc.save()
         files_moved_task.delay(doc.pk)
+
+
+@shared_task(acks_late=True, time_limit=5 * 60)
+def detect_tables_document_task(doc_pk):
+    from .services import detect_tables_on_doc
+
+    try:
+        doc = Document.objects.get(pk=doc_pk)
+    except Document.DoesNotExist:
+        return None
+    detect_tables_on_doc(doc)
