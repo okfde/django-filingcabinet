@@ -154,7 +154,7 @@ class PikePDFProcessor:
             outline = self._pdf.open_outline()
             outlines = outline.root
         for item in outlines:
-            if not item or not item.destination:
+            if not item or not item.destination or not item.destination[0]:
                 continue
             page_number = self.get_page_number_for_page(item.destination[0])
             title = fix_text(item.title)
