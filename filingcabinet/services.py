@@ -65,6 +65,8 @@ def process_document(doc):
     if not doc.outline:
         doc.outline = pdf.get_markdown_outline()
 
+    detect_tables_on_doc(doc, save=False)
+
     doc.save()
 
     queue_missing_pages(doc)
@@ -345,11 +347,12 @@ def remove_common_root_path(paths):
     return paths
 
 
-def detect_tables_on_doc(doc):
+def detect_tables_on_doc(doc, save=True):
     if not doc.get_file_path():
         return
     logger.info('Detecting tables for %s', doc.id)
     with doc.get_local_file() as local_file_path:
         tables = detect_tables(local_file_path)
     doc.properties['_tables'] = tables
-    doc.save()
+    if save:
+        doc.save()
