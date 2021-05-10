@@ -7,6 +7,7 @@ from mptt.admin import MPTTModelAdmin
 from django_json_widget.widgets import JSONEditorWidget
 
 from .models import Page
+from .admin_utils import NullFilter
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -28,6 +29,11 @@ class PageInline(admin.StackedInline):
     raw_id_fields = ('document',)
 
 
+class HasTablesFilter(NullFilter):
+    title = _('has detected tables')
+    parameter_name = 'properties___tables__0'
+
+
 class DocumentBaseAdmin(admin.ModelAdmin):
     inlines = [PageInline]
     save_on_top = True
@@ -37,7 +43,10 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         'title', 'created_at', 'public', 'listed', 'num_pages', 'pending',
         'processed_pages_percentage'
     )
-    list_filter = ('pending', 'public', 'allow_annotation', 'portal')
+    list_filter = (
+        'pending', 'public', 'allow_annotation', 'portal',
+        HasTablesFilter
+    )
     raw_id_fields = ('user',)
     readonly_fields = ('uid', 'public', 'pending')
     prepopulated_fields = {'slug': ('title',)}
@@ -47,7 +56,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     actions = [
         'process_document', 'reprocess_document', 'fix_document_paths',
         'publish_documents', 'unpublish_documents',
-        'mark_unlisted', 'mark_listed',
+        'mark_unlisted', 'mark_listed', 'detect_tables'
     ]
 
     def get_queryset(self, request):
@@ -132,6 +141,17 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     def mark_unlisted(self, request, queryset):
         queryset.update(listed=False)
     mark_unlisted.short_description = _("Mark as unlisted")
+
+    def detect_tables(self, request, queryset):
+        from .tasks import detect_tables_document_task
+
+        for doc in queryset:
+            detect_tables_document_task.delay(doc.pk)
+        self.message_user(
+            request,
+            _("Detecting tables tasks started...")
+        )
+    detect_tables.short_description = _("Detect tables")
 
 
 class PageAdmin(admin.ModelAdmin):
