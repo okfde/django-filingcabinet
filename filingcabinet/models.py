@@ -25,6 +25,7 @@ from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL
 )
+from .utils import get_local_file
 
 
 class DocumentPortal(models.Model):
@@ -229,6 +230,9 @@ class AbstractDocument(models.Model):
             return self.original.get_file_path()
         return ''
 
+    def get_local_file(self):
+        return get_local_file(self.get_file_path())
+
     def get_document_filename(self):
         return self.get_file_path().rsplit('/', 1)[1]
 
@@ -263,6 +267,7 @@ class AbstractDocument(models.Model):
             })
 
     def delete(self, **kwargs):
+        # FIXME: this should be storage system agnostic
         res = super().delete(**kwargs)
         dir_path = os.path.dirname(get_document_file_path(self, 'foo'))
         shutil.rmtree(dir_path, ignore_errors=True)
@@ -274,6 +279,7 @@ class AbstractDocument(models.Model):
         This uses direct filesystem operations for efficiency
         and not replicating/copying all thumbnails
         """
+        # FIXME: this should be storage system agnostic
         if not self.pending:
             return
         dummy_src_file_name = get_document_file_path(
