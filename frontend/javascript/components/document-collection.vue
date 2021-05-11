@@ -229,7 +229,7 @@ export default {
       }
     },
     collectionAuth () {
-      if (!this.collection.listed) {
+      if (!this.collection.listed && this.collection.uid) {
         return `uid=${this.collection.uid}`
       }
       return ''
