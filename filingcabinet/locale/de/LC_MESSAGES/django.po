@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-21 17:10+0000\n"
-"PO-Revision-Date: 2020-12-21 17:11+0000\n"
+"POT-Creation-Date: 2021-05-11 13:27+0100\n"
+"PO-Revision-Date: 2021-05-11 13:29+0100\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -18,111 +18,143 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.3\n"
 
-#: admin.py:54
+#: admin.py:33
+msgid "has detected tables"
+msgstr "Tabellen wurden erkannt"
+
+#: admin.py:74 admin.py:240
 msgid "Processed"
 msgstr "Verarbeitet"
 
-#: admin.py:71
+#: admin.py:91
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py:72
+#: admin.py:92
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py:77
+#: admin.py:97
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py:78
+#: admin.py:98
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
 
-#: admin.py:86
+#: admin.py:106
 msgid "Fixing document paths..."
 msgstr "Dokumentenpfade werden repariert..."
 
-#: admin.py:87
+#: admin.py:107
 msgid "Fix document paths"
 msgstr "Repariere Dokumentenpfade"
 
-#: admin.py:90
+#: admin.py:110
 msgid "Publishing {} documents..."
 msgstr "{} Dokumente werden veröffentlicht..."
 
-#: admin.py:106
+#: admin.py:126
 msgid "Please select only non-pending documents for publishing."
 msgstr "Bitte wählen Sie nur fertige Dokumente zur Veröffentlichung."
 
-#: admin.py:108
+#: admin.py:128
 msgid "Publish documents"
 msgstr "Dokumente veröffentlichen"
 
-#: admin.py:113
+#: admin.py:133
 msgid "Unpublishing {} documents..."
 msgstr "{} Dokumente werden depubliziert..."
 
-#: admin.py:115
+#: admin.py:135
 msgid "Unpublish documents"
 msgstr "Dokumente depublizieren"
 
-#: admin.py:136
+#: admin.py:139
+msgid "Mark as listed"
+msgstr "Als gelistet markieren"
+
+#: admin.py:143
+msgid "Mark as unlisted"
+msgstr "Als ungelistet markieren"
+
+#: admin.py:152
+msgid "Detecting tables tasks started..."
+msgstr "Tabellenerkennung wurde gestartet..."
+
+#: admin.py:154
+msgid "Detect tables"
+msgstr "Tabellen erkennen"
+
+#: admin.py:175
 msgid "Set to pending"
 msgstr "Auf unverarbeitet setzen"
+
+#: admin.py:231
+msgid "Documents"
+msgstr "Dokumente"
+
+#: admin_utils.py:17
+msgid "Has value"
+msgstr "Hat Wert"
+
+#: admin_utils.py:18
+msgid "None"
+msgstr "Kein Wert"
 
 #: apps.py:7
 msgid "Filing Cabinet"
 msgstr "Aktenschrank"
 
-#: models.py:37
+#: models.py:44
 msgid "document portal"
 msgstr "Dokumentenportal"
 
-#: models.py:38
+#: models.py:45
 msgid "document portals"
 msgstr "Dokumentenportale"
 
-#: models.py:84
+#: models.py:122
 msgid "Document Tag"
 msgstr "Dokumenten-Schlagwort"
 
-#: models.py:85
+#: models.py:123
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py:109 models.py:419 models.py:479 models.py:529
+#: models.py:147 models.py:491 models.py:551 models.py:607
 msgid "User"
 msgstr "Nutzer"
 
-#: models.py:138
+#: models.py:178
 msgid "document"
 msgstr "Dokument"
 
-#: models.py:139 views.py:69
+#: models.py:179 views.py:79
 msgid "documents"
 msgstr "Dokumente"
 
-#: models.py:469
+#: models.py:541
 msgid "created at"
 msgstr "erstellt am"
 
-#: models.py:486
+#: models.py:558
 msgid "Collection directory"
 msgstr "Sammlungsverzeichnis"
 
-#: models.py:487
+#: models.py:559
 msgid "Collection directories"
 msgstr "Sammlungsverzeichnisse"
 
-#: models.py:509
+#: models.py:581
 msgid "directory"
 msgstr "Verzeichnis"
 
-#: models.py:550
+#: models.py:634
 msgid "document collection"
 msgstr "Dokumentensammlung"
 
-#: models.py:551
+#: models.py:635
 msgid "document collections"
 msgstr "Dokumentensammlungen"
 
@@ -138,9 +170,17 @@ msgstr "Anmerkung schreiben"
 msgid "This document is still being processed..."
 msgstr "Dieses Dokument wird noch verarbeitet..."
 
-#: templates/filingcabinet/document_detail.html:14
+#: templates/filingcabinet/document_detail.html:18
+msgid "Document oEmbed Profile"
+msgstr "Dokument-oEmbed-Profil"
+
+#: templates/filingcabinet/document_detail.html:26
 msgid "private"
 msgstr "privat"
+
+#: templates/filingcabinet/documentcollection_detail.html:14
+msgid "Document Collection oEmbed Profile"
+msgstr "Dokumentensammlung oEmbed-Profil"
 
 #: urls.py:15
 msgctxt "url part"
@@ -157,69 +197,81 @@ msgctxt "url part"
 msgid "collection/<int:pk>-<slug:slug>/embed/"
 msgstr "sammlung/<int:pk>-<slug:slug>/embed/"
 
-#: views.py:53
+#: urls.py:33
+msgctxt "url part"
+msgid "collection/<int:pk>/embed/"
+msgstr "sammlung/<int:pk>/embed/"
+
+#: views.py:62
 msgid "Loading..."
 msgstr "Wird geladen..."
 
-#: views.py:54
+#: views.py:63
 msgid "page"
 msgstr "Seite"
 
-#: views.py:55
+#: views.py:64
 msgid "pages"
 msgstr "Seiten"
 
-#: views.py:56
+#: views.py:65
 msgid "one match"
 msgstr "ein Ergebnis"
 
-#: views.py:57
+#: views.py:66
 msgid "matches"
 msgstr "Ergebnisse"
 
-#: views.py:58
+#: views.py:67
 msgid "Search"
 msgstr "Suchen"
 
-#: views.py:59
+#: views.py:68
+msgid "Search term"
+msgstr "Suchbegriff"
+
+#: views.py:69
 msgid "Searching..."
 msgstr "Suche läuft..."
 
-#: views.py:60
+#: views.py:70
 msgid "Found on"
 msgstr "Gefunden auf"
 
-#: views.py:61
+#: views.py:71
 msgid "found"
 msgstr "gefunden"
 
-#: views.py:62
+#: views.py:72
 msgid "Show/hide Text"
 msgstr "Zeige/verstecke Text"
 
-#: views.py:63
+#: views.py:73
 msgid "Title"
 msgstr "Titel"
 
-#: views.py:64
+#: views.py:74
 msgid "Description"
 msgstr "Beschreibung"
 
-#: views.py:65
+#: views.py:75
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: views.py:66
+#: views.py:76
 msgid "Add annotation"
 msgstr "Annotation hinzufügen"
 
-#: views.py:67
+#: views.py:77
 msgid "Delete this annotation?"
 msgstr "Diese Annotation löschen?"
 
-#: views.py:68
-msgid "Back to collection"
-msgstr "Zurück zur Sammlung"
+#: views.py:78
+msgid "Back"
+msgstr "Zurück"
+
+#~ msgid "Back to collection"
+#~ msgstr "Zurück zur Sammlung"
 
 #~ msgid "Download PDF"
 #~ msgstr "PDF herunterladen"
