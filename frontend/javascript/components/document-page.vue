@@ -11,6 +11,7 @@
             v-show="imageLoaded"
             ref="image"
             :src="imageUrl"
+            :srcset="imageSrcSet"
             :alt="pageLabel"
             :style="{'width': page.zoomedWidth + 'px'}"
             class="page-image"
@@ -109,6 +110,12 @@ import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
 import {FilingcabinetLinkService} from '../lib/pdfjs-utils.js'
 
+const PAGE_SIZES = {
+  'small': 180,
+  'normal': 700,
+  'large': 1000,
+}
+
 
 export default {
   name: 'DocumentPage',
@@ -144,8 +151,23 @@ export default {
       }
       return 'original'
     },
+    imageSizeRetina () {
+      if (this.page.zoomedWidth <= 1400) {
+        return 'normal'
+      } else if (this.page.zoomedWidth <= 1000) {
+        return 'large'
+      }
+      return 'original'
+    },
     imageUrl () {
       return this.page.image_url.replace(/\{size\}/, this.imageSize)
+    },
+    imageSrcSet () {
+      let srcset = []
+      for (let size in PAGE_SIZES) {
+        srcset.push(`${this.page.image_url.replace(/\{size\}/, size)} ${PAGE_SIZES[size]}w`)
+      }
+      return srcset.join(', ')
     },
     pageId () {
       return `page-${this.page.number}`
