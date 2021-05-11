@@ -47,6 +47,34 @@ class DocumentPortal(models.Model):
     def __str__(self):
         return self.title
 
+    def get_serializer_class(self):
+        from .api_serializers import DocumentPortalSerializer
+
+        return DocumentPortalSerializer
+
+    @property
+    def documents(self):
+        from . import get_document_model
+
+        return get_document_model().objects.filter(portal=self)
+
+    @property
+    def ordered_documents(self):
+        from . import get_document_model
+
+        return get_document_model().objects.filter(portal=self)
+
+    def can_read_unlisted(self, request):
+        return True
+
+    def can_read(self, request):
+        if request.user.is_superuser:
+            return True
+        return self.public
+
+    def can_write(self, request):
+        return False
+
 
 class AuthQuerysetMixin:
     def get_authenticated_queryset(self, request):

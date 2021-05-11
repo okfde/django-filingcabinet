@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from . import get_document_model, get_documentcollection_model
-from .models import Page, PageAnnotation, CollectionDirectory
+from .models import Page, PageAnnotation, CollectionDirectory, DocumentPortal
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -283,3 +283,52 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
             user=validated_data['user'],
         )
         return annotation
+
+
+class DocumentPortalSerializer(serializers.HyperlinkedModelSerializer):
+    document_count = serializers.SerializerMethodField()
+    documents = serializers.SerializerMethodField()
+    document_directory_count = serializers.SerializerMethodField()
+    documents_uri = serializers.SerializerMethodField()
+    pages_uri = serializers.SerializerMethodField()
+    directories = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DocumentPortal
+        fields = (
+            'id', 'title', 'description',
+            'created_at',
+            'document_count', 'document_directory_count',
+            'directories', 'documents', 'documents_uri',
+            'pages_uri', 'settings'
+        )
+
+    def get_document_count(self, obj):
+        if hasattr(obj, 'document_count'):
+            return obj.document_count
+        return obj.documents.all().count()
+
+    def get_document_directory_count(self, obj):
+        return self.get_document_count(obj)
+
+    def get_documents(self, obj):
+        docs = obj.documents.all()[:MAX_COLLECTION_DOCS]
+        return Document.get_serializer_class()(
+            docs, many=True,
+            context=self.context
+        ).data
+
+    def get_documents_uri(self, obj):
+        return '{}?portal={}'.format(
+            reverse('api:document-list'),
+            obj.id
+        )
+
+    def get_pages_uri(self, obj):
+        return '{}?portal={}'.format(
+            reverse('api:page-list'),
+            obj.id
+        )
+
+    def get_directories(self, obj):
+        return []
