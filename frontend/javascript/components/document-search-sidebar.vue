@@ -1,11 +1,14 @@
 <template>
-  <div class="document-search-pages bg-secondary text-light" :style="{'height': height}">
+  <div
+    class="document-search-pages bg-secondary text-light"
+    :style="{'height': height}"
+  >
     <RecycleScroller
+      v-slot="{ item }"
       class="scroller"
       :items="pages"
       key-field="number"
       :item-size="116"
-      v-slot="{ item }"
     >
       <document-search-preview
         :key="item.number"
@@ -27,7 +30,7 @@ import { RecycleScroller } from 'vue-virtual-scroller'
 import DocumentSearchPreview from './document-search-preview.vue'
 
 export default {
-  name: 'document-search-sidebar',
+  name: 'DocumentSearchSidebar',
   components: {
     DocumentSearchPreview,
     RecycleScroller
