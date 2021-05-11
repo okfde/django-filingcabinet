@@ -59,7 +59,7 @@ export default {
       return this.preferences.showAnnotations
     },
     isPageMode () {
-      return this.preferences.maxHeight === null
+      return !this.preferences.maxHeight
     }
   },
   mounted () {
