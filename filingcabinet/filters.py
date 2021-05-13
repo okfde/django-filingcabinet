@@ -143,7 +143,7 @@ class PageDocumentFilterset(filters.FilterSet):
 
     def apply_data_filters(self, qs, filters):
         for filt in filters:
-            if not filt['key'].startswith('data__'):
+            if not filt['key'].startswith('data.'):
                 continue
             val = self.request.GET.get(filt['key'])
             if not val:
@@ -155,6 +155,6 @@ class PageDocumentFilterset(filters.FilterSet):
                         val = int(val)
                 except ValueError:
                     continue
-            filt_key = 'document__{}'.format(filt['key'])
+            filt_key = 'document__{}'.format(filt['key'].replace('.', '__'))
             qs = qs.filter(**{filt_key: val})
         return qs
