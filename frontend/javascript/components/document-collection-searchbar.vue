@@ -85,7 +85,7 @@
         <div
           v-for="facet in facetList"
           :key="facet.key"
-          class="col-3"
+          class="col-4"
         >
           <document-facet
             :values="facet.values"
