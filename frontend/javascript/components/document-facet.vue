@@ -21,10 +21,10 @@
           href="#"
           @click.prevent="$emit('select', facet.value)"
         >
-          {{ facet.label }} ({{ facet.count }})
+          {{ facet.label }} ({{ facet.count }} {{ i18n.pages }})
         </a>
         <span v-else>
-          {{ facet.label }} ({{ facet.count }})
+          {{ facet.label }} ({{ facet.count }} {{ i18n.pages }})
         </span>
       </li>
     </ul>
