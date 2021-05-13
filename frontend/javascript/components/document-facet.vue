@@ -11,7 +11,7 @@
         <i class="fa fa-close" />
       </button>
     </h5>
-    <ul>
+    <ul class="document-facet-list">
       <li
         v-for="facet in facetList"
         :key="facet.value"
@@ -83,17 +83,15 @@ export default {
 </script>
 
 <style scoped>
-.document-facet {
+.document-facet-list {
   max-height: 8rem;
   overflow-y: scroll;
-}
-
-.document-facet ul {
   list-style-type: none;
   padding-left: 0;
+  margin-bottom: 0;
 }
 
-.document-facet ul li a {
+.document-facet-list li a {
   color: inherit;
   text-decoration: underline;
 }
