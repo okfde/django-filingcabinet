@@ -65,6 +65,7 @@ def get_js_config(request, obj):
             'one_match': _('one match'),
             'matches': _('matches'),
             'search': _('Search'),
+            'clear': _('Clear'),
             'searchTerm': _('Search term'),
             'searching': _('Searching...'),
             'found_on': _('Found on'),

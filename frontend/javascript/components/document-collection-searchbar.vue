@@ -27,8 +27,8 @@
             v-for="filter in filters"
             :key="filter.id"
             :filter="filter"
-            :initial-value="filterValues[filter.id] || ''"
-            @change="updateFilter"
+            :value="filterValues.get(filter.key) || ''"
+            @input="updateFilter"
           />
         </div>
       </div>
@@ -78,6 +78,23 @@
           </button>
         </div>
       </div>
+      <div
+        v-if="hasFacets"
+        class="row d-flex mb-2"
+      >
+        <div
+          v-for="facet in facetList"
+          :key="facet.key"
+          class="col-3"
+        >
+          <document-facet
+            :values="facet.values"
+            :filter="facet.filter"
+            :value="facet.value"
+            @select="setFilter(facet.filter.key, $event)"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -85,13 +102,24 @@
 <script>
 
 import DocumentFilter from './document-filter.vue'
+import DocumentFacet from './document-facet.vue'
 
 export default {
   name: 'DocumentCollectionSearchbar',
   components: {
-    DocumentFilter
+    DocumentFilter,
+    DocumentFacet
   },
-  props: ['searcher', 'filters'],
+  props: {
+    searcher: {
+      type: Object,
+      default: null
+    },
+    filters: {
+      type: Array,
+      default: () => []
+    }
+  },
   data () {
     return {
       search: this.searcher?.term || '',
@@ -107,6 +135,29 @@ export default {
     },
     hasFilters () {
       return !!this.filters && this.filters.length > 0
+    },
+    hasFacets () {
+      return !!(this.searcher && this.searcher.response && this.searcher.response.facets)
+    },
+    facetList () {
+      let facets = [];
+      for (let field in this.searcher.response.facets.fields) {
+        let facetValues = this.searcher.response.facets.fields[field];
+        if (facetValues.length === 0) {
+          continue
+        }
+        let filter = this.filters.filter(f => f.key === field)[0]
+        if (filter === undefined) {
+          continue
+        }
+        facets.push({
+          key: filter.key,
+          filter: filter,
+          values: facetValues,
+          value: this.filterValues.get(filter.key) || ''
+        })
+      }
+      return facets
     },
     resultCount () {
       if (this.searcher !== null) {
@@ -124,6 +175,10 @@ export default {
         term: this.search,
         filters: this.filterValues
       })
+    },
+    setFilter(key, event) {
+      this.updateFilter({key, value: event})
+      this.runSearch()
     },
     updateFilter ({key, value}) {
       this.filterValues.set(key, value)

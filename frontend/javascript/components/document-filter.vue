@@ -10,9 +10,9 @@
       <div class="col-sm-10">
         <select
           :id="filter.id"
-          v-model="value"
+          :value="value"
           class="form-control"
-          @change="updateFilter"
+          @input="updateFilter($event.target.value)"
         >
           <option value="">
             ---
@@ -41,13 +41,8 @@ export default {
       required: true
     },
     // eslint-disable-next-line vue/require-prop-types
-    initialValue: {
+    value: {
       default: ''
-    }
-  },
-  data () {
-    return {
-      value: this.initialValue
     }
   },
   computed: {
@@ -59,8 +54,8 @@ export default {
     }
   },
   methods: {
-    updateFilter () {
-      this.$emit('change', {key: this.filter.key, value: this.value})
+    updateFilter (value) {
+      this.$emit('input', {key: this.filter.key, value})
     }
   }
 }
