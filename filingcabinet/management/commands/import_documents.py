@@ -52,7 +52,7 @@ class Command(BaseCommand):
             content_hash=metadata['content_hash'],
             defaults={
                 'title': metadata['title'],
-                'slug': slugify(metadata['title']),
+                'slug': slugify(metadata['title'][:250])[:250],
                 'description': metadata.get('description', ''),
                 'published_at': published_at,
                 'language': metadata.get('language', settings.LANGUAGE_CODE),
