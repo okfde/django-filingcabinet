@@ -33,7 +33,10 @@ class DocumentPortalAdmin(admin.ModelAdmin):
             document_count=Count('document'),
             ready_document_count=Count(
                 'document',
-                filter=Q(document__pending=False)
+                filter=Q(
+                    document__pending=False,
+                    document__num_pages__gt=0
+                )
             ),
         )
         return qs
