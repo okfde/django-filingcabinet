@@ -48,7 +48,10 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         HasTablesFilter
     )
     raw_id_fields = ('user',)
-    readonly_fields = ('uid', 'public', 'pending')
+    readonly_fields = (
+        'uid', 'public', 'pending',
+        'content_hash'
+    )
     prepopulated_fields = {'slug': ('title',)}
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget},
