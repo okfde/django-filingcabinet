@@ -168,7 +168,10 @@ class AbstractDocument(models.Model):
     file_size = models.BigIntegerField(null=True, blank=True)
     pending = models.BooleanField(default=False)
 
-    content_hash = models.CharField(null=True, blank=True, max_length=40, editable=False)
+    content_hash = models.CharField(
+        null=True, blank=True, max_length=40,
+        editable=False
+    )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
