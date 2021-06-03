@@ -177,6 +177,7 @@ class AbstractDocument(models.Model):
 
     created_at = models.DateTimeField(default=timezone.now, null=True)
     updated_at = models.DateTimeField(default=timezone.now, null=True)
+    published_at = models.DateTimeField(default=None, null=True, blank=True)
 
     num_pages = models.PositiveIntegerField(default=0)
 
