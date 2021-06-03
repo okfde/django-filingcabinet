@@ -168,8 +168,11 @@ class AbstractDocument(models.Model):
     file_size = models.BigIntegerField(null=True, blank=True)
     pending = models.BooleanField(default=False)
 
+    content_hash = models.CharField(null=True, blank=True, max_length=40, editable=False)
+
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True,
+        settings.AUTH_USER_MODEL,
+        null=True, blank=True,
         on_delete=models.SET_NULL,
         related_name='%(app_label)s_%(class)s',
         verbose_name=_("User")
@@ -207,6 +210,13 @@ class AbstractDocument(models.Model):
         verbose_name = _('document')
         verbose_name_plural = _('documents')
         abstract = True
+        indexes = [
+            models.Index(
+                fields=['content_hash'],
+                name='%(app_label)s_%(class)s_chash_idx',
+                condition=models.Q(content_hash__isnull=False)
+            )
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
