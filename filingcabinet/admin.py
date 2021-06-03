@@ -14,7 +14,11 @@ class DocumentPortalAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     search_fields = ('title',)
     date_hierarchy = 'created_at'
-    list_display = ('title', 'created_at', 'public')
+    list_display = (
+        'title', 'created_at', 'public',
+        'get_document_count',
+        'processed_documents_percentage'
+    )
     list_filter = ('public',)
     formfield_overrides = {
         JSONField: {'widget': JSONEditorWidget(
@@ -22,6 +26,31 @@ class DocumentPortalAdmin(admin.ModelAdmin):
             # options={'schema': SETTINGS_SCHEMA}
         )},
     }
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(
+            document_count=Count('document'),
+            ready_document_count=Count(
+                'document',
+                filter=Q(document__pending=False)
+            ),
+        )
+        return qs
+
+    def get_document_count(self, obj):
+        return obj.document_count
+    get_document_count.admin_order_field = 'document_count'
+    get_document_count.short_description = _('Documents')
+
+    def processed_documents_percentage(self, obj):
+        if not obj.document_count:
+            return '-'
+        return '{:.2f}%'.format(
+            obj.ready_document_count / obj.document_count * 100
+        )
+    processed_documents_percentage.admin_order_field = 'ready_document_count'
+    processed_documents_percentage.short_description = _('Processed')
 
 
 class PageInline(admin.StackedInline):
