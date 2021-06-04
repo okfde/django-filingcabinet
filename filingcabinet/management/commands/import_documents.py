@@ -57,6 +57,7 @@ class Command(BaseCommand):
                 'published_at': published_at,
                 'language': metadata.get('language', settings.LANGUAGE_CODE),
                 'public': True,
+                'pending': True,
                 'allow_annotation': metadata.get('allow_annotation', False),
                 'properties': metadata.get('properties', {}),
                 'data': metadata.get('data', {}),
