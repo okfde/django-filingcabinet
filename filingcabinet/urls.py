@@ -4,7 +4,9 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
     DocumentView, DocumentCollectionView,
-    DocumentEmbedView, DocumentCollectionEmbedView
+    DocumentPortalView,
+    DocumentEmbedView, DocumentCollectionEmbedView,
+    DocumentPortalEmbedView,
 )
 
 app_name = 'filingcabinet'
@@ -36,6 +38,20 @@ urlpatterns = [
             DocumentCollectionEmbedView.as_view()
         ),
         name="document-collection_embed_short"),
+
+    path(pgettext_lazy(
+            'url part',
+            'portal/<slug:slug>/'
+        ),
+        DocumentPortalView.as_view(), name='document-portal'),
+    path(pgettext_lazy(
+            'url part',
+            'portal/<slug:slug>/embed/',
+        ),
+        xframe_options_exempt(
+            DocumentPortalEmbedView.as_view()
+        ),
+        name="document-portal_embed"),
     path("<int:pk>-<slug:slug>/", DocumentView.as_view(),
          name="document-detail"),
     path("<int:pk>/", DocumentView.as_view(),

@@ -9,6 +9,7 @@ from django.templatetags.static import static
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
 from .forms import get_viewer_preferences
+from .models import DocumentPortal
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -166,3 +167,40 @@ class DocumentCollectionEmbedView(DocumentCollectionView):
     template_name = 'filingcabinet/documentcollection_detail_embed.html'
     redirect_url_name = 'filingcabinet:document-collection_embed'
     redirect_short_url_name = 'filingcabinet:document-collection_embed_short'
+
+
+def get_document_portal_context(portal, request):
+    context = {
+        'object': portal
+    }
+    context['documents'] = Document.objects.filter(portal=portal)
+    serializer_klass = portal.get_serializer_class()
+    api_ctx = {
+        'request': request
+    }
+    data = serializer_klass(portal, context=api_ctx).data
+    context['documentcollection_data'] = json.dumps(data)
+    config = get_js_config(request, portal)
+    context['config'] = json.dumps(config)
+    return context
+
+
+class DocumentPortalView(DetailView):
+    queryset = DocumentPortal.objects.filter(public=True)
+    template_name = 'filingcabinet/documentportal_detail.html'
+    redirect_url_name = 'filingcabinet:document-portal'
+    redirect_short_url_name = 'filingcabinet:document-portal_short'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(
+            get_document_portal_context(self.object, self.request)
+        )
+        return context
+
+
+class DocumentPortalEmbedView(DocumentPortalView):
+    template_name = 'filingcabinet/documentcollection_detail_embed.html'
+    redirect_url_name = 'filingcabinet:document-portal_embed'
+    redirect_short_url_name = 'filingcabinet:document-portal_embed_short'
