@@ -16,6 +16,19 @@ from ...tasks import process_document_task
 Document = get_document_model()
 
 
+def parse_date(date_str):
+    try:
+        date = datetime.fromisoformat(date_str)
+    except ValueError:
+        return None
+    tz = timezone.get_default_timezone()
+    if date.tzinfo is not None:
+        date = tz.normalize(date)
+    else:
+        date = tz.localize(date)
+    return date
+
+
 class Command(BaseCommand):
     help = "Load directory of PDFs with meta data JSON files"
 
@@ -37,13 +50,7 @@ class Command(BaseCommand):
 
         published_at = None
         if metadata.get('published_at'):
-            published_at = datetime.fromisoformat(metadata['published_at'])
-            tz = timezone.get_default_timezone()
-            if published_at.tzinfo is not None:
-                published_at = tz.normalize(published_at)
-            else:
-                published_at = tz.localize(published_at)
-
+            published_at = parse_date(metadata['published_at'])
         portal = None
         if metadata.get('portal'):
             portal = self.get_portal(metadata['portal'])
