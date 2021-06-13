@@ -47,6 +47,11 @@ class DocumentPortal(models.Model):
     def __str__(self):
         return self.title
 
+    def get_absolute_url(self):
+        return reverse('filingcabinet:document-portal', kwargs={
+            'slug': self.slug
+        })
+
     def get_serializer_class(self):
         from .api_serializers import DocumentPortalSerializer
 
