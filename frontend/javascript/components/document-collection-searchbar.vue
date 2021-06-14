@@ -41,22 +41,31 @@
           />
           <small v-if="searching">{{ i18n.searching }}</small>
           <small v-if="searcher && searcher.done">
-            <template v-if="pageCount == 1">
-              {{ pageCount }} {{ i18n.page }}
-            </template>
-            <template v-else>
-              {{ pageCount }} {{ i18n.pages }} {{ i18n.found }} 
-            </template>
-            –
-            <span :title="i18n.showingDocumentResults">
+            <template v-if="searcher.term">
+              <template v-if="pageCount == 1">
+                {{ pageCount }} {{ i18n.page }}
+              </template>
+              <template v-else>
+                {{ pageCount }} {{ i18n.pages }} {{ i18n.found }} 
+              </template>
+              –
               <template v-if="resultCount == 1">
                 {{ resultCount }} {{ i18n.document }}
               </template>
               <template v-else>
                 {{ resultCount }} {{ i18n.documents }}
               </template>
-            </span>
-            {{ i18n.areShown }}
+              {{ i18n.areShown }}
+            </template>
+            <template v-else>
+              <template v-if="pageCount == 1">
+                {{ pageCount }} {{ i18n.document }}
+              </template>
+              <template v-else>
+                {{ pageCount }} {{ i18n.documents }}
+              </template>
+              {{ i18n.found }} 
+            </template>
           </small>
         </div>
         <div class="col-auto ml-auto">
