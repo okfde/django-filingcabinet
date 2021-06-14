@@ -25,6 +25,11 @@ class DocumentFilter(filters.FilterSet):
         queryset=DocumentCollection.objects.all(),
         method='filter_collection',
     )
+    portal = filters.ModelChoiceFilter(
+        queryset=DocumentPortal.objects.filter(public=True),
+        to_field_name='pk',
+        method='filter_portal',
+    )
     ids = filters.CharFilter(
         method='filter_ids'
     )
@@ -63,11 +68,38 @@ class DocumentFilter(filters.FilterSet):
     def filter_collection(self, qs, name, collection):
         if not collection.can_read(self.request):
             return qs.none()
-        return qs.filter(
+
+        qs = qs.filter(
             filingcabinet_collectiondocument__collection=collection
         ).order_by(
             'filingcabinet_collectiondocument__order'
         )
+        data_filters = collection.settings.get('filters', [])
+        qs = self.apply_data_filters(qs, data_filters)
+        return qs
+
+    def filter_portal(self, qs, name, portal):
+        qs = qs.filter(portal=portal)
+        qs = self.apply_data_filters(qs, portal.settings.get('filters', []))
+        return qs
+
+    def apply_data_filters(self, qs, filters):
+        for filt in filters:
+            if not filt['key'].startswith('data.'):
+                continue
+            val = self.request.GET.get(filt['key'])
+            if not val:
+                continue
+            data_type = filt.get('datatype')
+            if data_type:
+                try:
+                    if data_type == 'int':
+                        val = int(val)
+                except ValueError:
+                    continue
+            filt_key = filt['key'].replace('.', '__')
+            qs = qs.filter(**{filt_key: val})
+        return qs
 
 
 class PageDocumentFilterset(filters.FilterSet):
@@ -137,7 +169,7 @@ class PageDocumentFilterset(filters.FilterSet):
         return qs
 
     def filter_portal(self, qs, name, portal):
-        qs = qs.filter(document__portal=portal.id)
+        qs = qs.filter(document__portal=portal)
         qs = self.apply_data_filters(qs, portal.settings.get('filters', []))
         return qs
 
