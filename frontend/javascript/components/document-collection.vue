@@ -286,10 +286,11 @@ export default {
     },
     getDocuments(offset) {
       if (this.abortController) {
+        this.documentOffsets.delete(this.lastOffset)
         this.abortController.abort()
       }
       this.abortController = new AbortController();
-
+      this.lastOffset = offset
       let url = [this.documentsUri]
       if (url[0].indexOf('?') === -1) {
         url.push('?')
