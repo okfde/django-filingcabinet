@@ -62,17 +62,6 @@ export default {
       return !this.preferences.maxHeight
     }
   },
-  mounted () {
-    this.initialNav = false
-  },
-  updated () {
-    if (!this.initialNav || !this.document.loaded) {
-      if (this.document.loaded) {
-        this.initialNav = true
-      }
-      this.$emit('initialized')
-    }
-  },
   methods: {
     updateCurrentPage (startIndex, endIndex) {
       this.$emit('currentpage', {start: startIndex, end: endIndex})

@@ -118,7 +118,6 @@
           :width="documentContainerWidth"
           :height="documentViewHeight"
           :can-annotate="canAnnotate"
-          @initialized="pagesInitialized"
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
@@ -405,6 +404,7 @@ export default {
       if (this.document.file_size <= MAX_PDF_SIZE || this.document.properties._force_load_pdf) {
         this.loadPDF()
       }
+      Vue.nextTick(() => this.pagesInitialized())
     })
     getData(`${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}&${this.docAuth}`).then((results) => {
       let annotations = {}
