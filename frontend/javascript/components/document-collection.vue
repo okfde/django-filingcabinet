@@ -106,6 +106,18 @@
           </div>
         </div>
       </template>
+      <div v-if="searcher.done && searcher.response.meta.next">
+        <div class="row bg-secondary justify-content-center">
+          <div class="col-auto px-0 pb-5">
+            <button
+              class="btn btn-secondary my-3"
+              @click="loadMoreSearchResults"
+            >
+              {{ i18n.loadMore }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <div
       v-show="!document && !searcher"
@@ -358,25 +370,26 @@ export default {
         documents: []
       }
       let searchUrl = `${this.collection.pages_uri}${this.collection.pages_uri.includes('?') ? '&' : '?'}${params.join('&')}`
-      getData(searchUrl).then((response) => {
-        this.searcher.response = response
-        let missingDocs = []
-        response.objects.forEach((p) => {
-          const docId = getIDFromURL(p.document)
-          let document = this.collection.documents[this.collectionIndex[docId]]
-          if (document === undefined) {
-            missingDocs.push(docId)
-          }
-        })
-        if (missingDocs.length > 0) {
-          let docsUrl = `${this.collection.documents_uri}${this.collection.documents_uri.includes('?') ? '&' : '?'}ids=${missingDocs.join(',')}`
-          getData(docsUrl).then((docsResponse) => {
-            this.setSearchResults(response.objects, docsResponse.objects)
-          })
-        } else {
-          this.setSearchResults(response.objects, [])
+      getData(searchUrl).then((response) => this.documentsReceived(response))
+    },
+    documentsReceived (response) {
+      this.searcher.response = response
+      let missingDocs = []
+      response.objects.forEach((p) => {
+        const docId = getIDFromURL(p.document)
+        let document = this.collection.documents[this.collectionIndex[docId]]
+        if (document === undefined) {
+          missingDocs.push(docId)
         }
       })
+      if (missingDocs.length > 0) {
+        let docsUrl = `${this.collection.documents_uri}${this.collection.documents_uri.includes('?') ? '&' : '?'}ids=${missingDocs.join(',')}`
+        getData(docsUrl).then((docsResponse) => {
+          this.setSearchResults(response.objects, docsResponse.objects)
+        })
+      } else {
+        this.setSearchResults(response.objects, [])
+      }
     },
     setSearchResults (results, resultDocuments) {
       const docsWithPages = []
@@ -412,6 +425,12 @@ export default {
       this.searcher.results = docsWithPages
       Vue.set(this.searcher, 'docCount', docCount)
       this.searcher.done = true
+    },
+    loadMoreSearchResults () {
+      this.searcher.done = false
+      getData(this.searcher.response.meta.next).then(
+        (response) => this.documentsReceived(response)
+      )
     },
     selectDirectory (directory) {
       if (directory) {

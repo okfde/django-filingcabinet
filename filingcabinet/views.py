@@ -58,6 +58,7 @@ def get_js_config(request, obj=None):
         },
         'i18n': {
             'loading': _('Loading...'),
+            'loadMore': _('Load more'),
             'page': _('page'),
             'pages': _('pages'),
             'one_match': _('one match'),
@@ -76,6 +77,7 @@ def get_js_config(request, obj=None):
             'deleteAnnotation': _('Delete this annotation?'),
             'backToCollection': _('Back'),
             'documents': _('documents'),
+            'areShown': _('are shown')
         }
     }
 

@@ -41,12 +41,22 @@
           />
           <small v-if="searching">{{ i18n.searching }}</small>
           <small v-if="searcher && searcher.done">
-            <template v-if="resultCount == 1">
-              {{ resultCount }} {{ i18n.document }} {{ i18n.found }} 
+            <template v-if="pageCount == 1">
+              {{ pageCount }} {{ i18n.page }}
             </template>
             <template v-else>
-              {{ resultCount }} {{ i18n.documents }} {{ i18n.found }} 
+              {{ pageCount }} {{ i18n.pages }} {{ i18n.found }} 
             </template>
+            –
+            <span :title="i18n.showingDocumentResults">
+              <template v-if="resultCount == 1">
+                {{ resultCount }} {{ i18n.document }}
+              </template>
+              <template v-else>
+                {{ resultCount }} {{ i18n.documents }}
+              </template>
+            </span>
+            {{ i18n.areShown }}
           </small>
         </div>
         <div class="col-auto ml-auto">
@@ -158,6 +168,12 @@ export default {
         })
       }
       return facets
+    },
+    pageCount () {
+      if (this.searcher !== null) {
+        return this.searcher.response.meta.total_count
+      }
+      return 0
     },
     resultCount () {
       if (this.searcher !== null) {
