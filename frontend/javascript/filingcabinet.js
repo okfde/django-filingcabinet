@@ -37,8 +37,7 @@ Array.from(document.querySelectorAll('[data-fcdocument]')).forEach(el => {
 
 Array.from(document.querySelectorAll('[data-fcdocumentcollection]')).forEach(el => {
   createDocumentCollectionViewer(el, {
-    documentCollectionUrl: el.dataset.fcdocumentcollectionurl,
-    documentCollectionPreview: JSON.parse(el.dataset.fcdocumentcollection),
+    documentCollection: JSON.parse(el.dataset.fcdocumentcollection),
     config: JSON.parse(el.dataset.fcconfig)
   })
 })

@@ -170,11 +170,7 @@ export default {
     DocumentCollectionSearchResults,
   },
   props: {
-    documentCollectionUrl: {
-      type: String,
-      required: true
-    },
-    documentCollectionPreview: {
+    documentCollection: {
       type: Object,
       default: () => ({
         documents: [], directories: []
@@ -191,8 +187,8 @@ export default {
     let collection = {
       documents, directories
     }
-    if (this.documentCollectionPreview) {
-      collection = this.documentCollectionPreview
+    if (this.documentCollection) {
+      collection = this.documentCollection
     }
     return {
       document: null,
@@ -236,15 +232,18 @@ export default {
     }
   },
   created () {
-    if (!this.documentCollectionPreview || !this.collection.id) {
+    if (!this.documentCollection.id && this.documentCollection.resource_uri) {
       this.getCollectionData()
     }
   },
   mounted () {
+    if (this.documents.length >= 0 && this.documents[0] === null && this.documentsUri) {
+      this.loadMoreDocuments(0)
+    }
   },
   methods: {
     getCollectionData () {
-      let url = [this.documentCollectionUrl]
+      let url = [this.documentCollection.resource_uri]
       if (url[0].indexOf('?') === -1) {
         url.push('?')
       } else {
@@ -263,9 +262,6 @@ export default {
       })
     },
     makeOffsets (collection) {
-      if (!collection.id) {
-        return null
-      }
       let offsetSteps = collection.documents.length / DOCUMENTS_API_LIMIT
       let documentOffsets = new Set()
       for (var i = 0; i < offsetSteps; i += 1) {
@@ -274,12 +270,10 @@ export default {
       return documentOffsets
     },
     makeDocuments(collection) {
-      if (!collection.id) {
-        return []
-      }
+      let colDocs = collection.documents || []
       return [
-        ...collection.documents,
-        ...new Array(collection.document_directory_count - collection.documents.length).fill(null)
+        ...colDocs,
+        ...new Array(collection.document_directory_count - colDocs.length).fill(null)
       ]
     },
     loadMoreDocuments (offset) {
@@ -297,10 +291,16 @@ export default {
       this.abortController = new AbortController();
 
       let url = [this.documentsUri]
+      if (url[0].indexOf('?') === -1) {
+        url.push('?')
+      }
       url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : '-'}`)
       url.push(`&offset=${offset}&limit=${DOCUMENTS_API_LIMIT}`)
       this.documentOffset = offset + DOCUMENTS_API_LIMIT
       getData(url.join(''), {}, this.abortController.signal).then(result => {
+        if (!result) {
+          return
+        }
         this.abortController = null
         this.documents = [
           ...this.documents.slice(0, offset),
