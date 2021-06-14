@@ -49,6 +49,7 @@ def process_document(doc):
     logger.info('Processing document %s', doc.id)
     pdf = get_pdf_processor(doc)
     doc.num_pages = pdf.num_pages
+    # TODO: make storage agnostic
     doc.file_size = os.path.getsize(doc.get_file_path())
 
     meta = pdf.get_meta()
