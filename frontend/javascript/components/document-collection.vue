@@ -291,11 +291,17 @@ export default {
       }
     },
     getDocuments(offset) {
+      if (this.abortController) {
+        this.abortController.abort()
+      }
+      this.abortController = new AbortController();
+
       let url = [this.documentsUri]
       url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : '-'}`)
       url.push(`&offset=${offset}&limit=${DOCUMENTS_API_LIMIT}`)
       this.documentOffset = offset + DOCUMENTS_API_LIMIT
-      getData(url.join('')).then(result => {
+      getData(url.join(''), {}, this.abortController.signal).then(result => {
+        this.abortController = null
         this.documents = [
           ...this.documents.slice(0, offset),
           ...result.objects,

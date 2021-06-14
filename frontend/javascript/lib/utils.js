@@ -1,8 +1,9 @@
-function getData (url = '', headers = {}) {
+function getData (url = '', headers = {}, signal = undefined) {
   headers = headers || {}
   return window.fetch(url, {
     method: 'GET',
     cache: 'no-cache',
+    signal: signal,
     credentials: 'same-origin',
     headers: {
       'Accept': 'application/json',
@@ -10,6 +11,9 @@ function getData (url = '', headers = {}) {
       ...headers
     }
   }).then(response => response.json())
+  .catch((e) => {
+    console.warn(e)
+  })
 }
 
 function postData (url = '', data = {}, csrfToken, method = 'POST') {
