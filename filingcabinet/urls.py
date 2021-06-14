@@ -3,6 +3,7 @@ from django.utils.translation import pgettext_lazy
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
+    DocumentListView, DocumentListEmbedView,
     DocumentView, DocumentCollectionView,
     DocumentPortalView,
     DocumentEmbedView, DocumentCollectionEmbedView,
@@ -12,6 +13,14 @@ from .views import (
 app_name = 'filingcabinet'
 
 urlpatterns = [
+    path('', DocumentListView.as_view(), name='document-list'),
+    path(pgettext_lazy(
+            'url part',
+            'embed/'
+        ),
+        xframe_options_exempt(
+            DocumentListEmbedView.as_view()
+        ), name='document-list_embed'),
     path(pgettext_lazy(
             'url part',
             'collection/<int:pk>-<slug:slug>/'

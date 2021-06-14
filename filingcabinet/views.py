@@ -2,7 +2,7 @@ import json
 
 from django.shortcuts import redirect, Http404
 from django.urls import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 from django.utils.translation import gettext as _
 from django.templatetags.static import static
 
@@ -48,11 +48,8 @@ class AuthMixin:
         return self.model.objects.get_authenticated_queryset(self.request)
 
 
-def get_js_config(request, obj):
-    return {
-        'settings': {
-            'canWrite': obj.can_write(request)
-        },
+def get_js_config(request, obj=None):
+    context = {
         'resources': {
             'pdfjsWorker': static('js/pdf.worker.min.js')
         },
@@ -81,6 +78,14 @@ def get_js_config(request, obj):
             'documents': _('documents'),
         }
     }
+
+    if obj is not None:
+        context.update({
+            'settings': {
+                'canWrite': obj.can_write(request)
+            }
+        })
+    return context
 
 
 def get_document_viewer_context(doc, request, page_number=1, defaults=None):
@@ -173,7 +178,9 @@ def get_document_portal_context(portal, request):
     context = {
         'object': portal
     }
-    context['documents'] = Document.objects.filter(portal=portal)
+    context['documents'] = Document.objects.filter(
+        portal=portal, pending=False
+    )
     serializer_klass = portal.get_serializer_class()
     api_ctx = {
         'request': request
@@ -204,3 +211,42 @@ class DocumentPortalEmbedView(DocumentPortalView):
     template_name = 'filingcabinet/documentcollection_detail_embed.html'
     redirect_url_name = 'filingcabinet:document-portal_embed'
     redirect_short_url_name = 'filingcabinet:document-portal_embed_short'
+
+
+def get_document_list_context(request):
+    context = {
+        'object': {
+            'title': _('All documents'),
+        }
+    }
+    objs = Document.objects.filter(
+        pending=False
+    )
+    context['documents'] = objs
+    context['documentcollection_data'] = json.dumps({
+        "documents": [],
+        "document_directory_count": objs.count(),
+        "document_count": objs.count(),
+        "documents_uri": reverse('api:document-list'),
+        "pages_uri": reverse('api:page-list'),
+        "directories": []
+    })
+    config = get_js_config(request)
+    context['config'] = json.dumps(config)
+    return context
+
+
+class DocumentListView(TemplateView):
+    template_name = 'filingcabinet/document_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(
+            get_document_list_context(self.request)
+        )
+        return context
+
+
+class DocumentListEmbedView(DocumentListView):
+    template_name = 'filingcabinet/documentcollection_detail_embed.html'
