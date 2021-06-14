@@ -346,6 +346,7 @@ export default {
         this.collectionAuth,
       ]
       let hasSearch = false
+      let baseUrl = this.collection.pages_uri
       if (term) {
         params.push(`q=${encodeURIComponent(term)}`)
         hasSearch = true
@@ -369,7 +370,7 @@ export default {
         results: [],
         documents: []
       }
-      let searchUrl = `${this.collection.pages_uri}${this.collection.pages_uri.includes('?') ? '&' : '?'}${params.join('&')}`
+      let searchUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${params.join('&')}`
       getData(searchUrl).then((response) => this.documentsReceived(response))
     },
     documentsReceived (response) {
