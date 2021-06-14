@@ -82,6 +82,8 @@ class DocumentViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         qs = self.get_base_queryset()
+        if self.action == 'list':
+            qs = qs.filter(pending=False)
         return qs
 
     @action(detail=False, methods=['get'])
