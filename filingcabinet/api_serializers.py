@@ -117,8 +117,7 @@ class CollectionDirectorySerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-MAX_COLLECTION_DOCS = 100
-MAX_PORTAL_DOCS = 10
+MAX_COLLECTION_DOCS = 50
 
 
 class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
@@ -313,7 +312,7 @@ class DocumentPortalSerializer(serializers.HyperlinkedModelSerializer):
         return self.get_document_count(obj)
 
     def get_documents(self, obj):
-        docs = obj.documents.all()[:MAX_PORTAL_DOCS]
+        docs = obj.documents.all()[:MAX_COLLECTION_DOCS]
         return Document.get_serializer_class()(
             docs, many=True,
             context=self.context
