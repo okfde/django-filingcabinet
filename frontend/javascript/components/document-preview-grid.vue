@@ -76,7 +76,7 @@ export default {
       for (let i = 0; i < this.documents.length; i += this.colCount) {
         let rowDocs = this.documents.slice(i, i + this.colCount)
         rows.push({
-          rowId: i,
+          rowId: `${this.documents[0].id}_${i}`,
           loaded: rowDocs.every(d => d !== null),
           documents: rowDocs
         })

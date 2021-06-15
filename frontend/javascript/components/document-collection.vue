@@ -150,6 +150,17 @@
             @navigate="navigate"
             @loadmore="loadMoreDocuments"
           />
+          <div
+            v-if="shouldPaginate && canPaginate"
+            class="col-auto px-0 pb-5 text-center"
+          >
+            <button
+              class="btn btn-secondary my-3"
+              @click.prevent="() => loadMoreDocuments()"
+            >
+              {{ i18n.loadMore }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -167,6 +178,7 @@ import Document from './document.vue'
 import {getData} from '../lib/utils.js'
 
 const DOCUMENTS_API_LIMIT = 50
+const MAX_SCROLL_DOCS = DOCUMENTS_API_LIMIT * 100
 
 function getIDFromURL (s) {
   const parts = s.split('/')
@@ -214,6 +226,7 @@ export default {
       documents: this.makeDocuments(collection),
       directories: collection.directories,
       documentOffsets: this.makeOffsets(collection),
+      lastOffset: 0,
       documentsUri: collection.documents_uri || null,
     }
   },
@@ -241,6 +254,12 @@ export default {
         return `uid=${this.collection.uid}`
       }
       return ''
+    },
+    shouldPaginate () {
+      return this.collection.document_directory_count > MAX_SCROLL_DOCS
+    },
+    canPaginate () {
+      return this.collection.document_directory_count > this.lastOffset + DOCUMENTS_API_LIMIT
     }
   },
   created () {
@@ -282,6 +301,9 @@ export default {
       return documentOffsets
     },
     makeDocuments(collection) {
+      if (this.shouldPaginate) {
+        return collection.documents
+      }
       let colDocs = collection.documents || []
       return [
         ...colDocs,
@@ -289,7 +311,19 @@ export default {
       ]
     },
     loadMoreDocuments (offset) {
+      if (offset === undefined) {
+        offset = this.lastOffset + DOCUMENTS_API_LIMIT
+      }
       offset = offset - (offset % DOCUMENTS_API_LIMIT)
+      if (this.shouldPaginate) {
+        if (offset === this.lastOffset) {
+          return
+        }
+        this.documents = []
+        this.lastOffset = offset
+        Vue.nextTick(() => this.goTop())
+        return this.getDocuments(offset)
+      }
       let offsetStep = offset / DOCUMENTS_API_LIMIT
       if (!this.documentOffsets.has(offsetStep)) {
         this.documentOffsets.add(offsetStep)
@@ -315,20 +349,27 @@ export default {
           return
         }
         this.abortController = null
-        this.documents = [
-          ...this.documents.slice(0, offset),
-          ...result.objects,
-          ...this.documents.slice(offset + result.objects.length),
-        ]
+        if (this.shouldPaginate) {
+          this.documents = result.objects
+        } else {
+          this.documents = [
+            ...this.documents.slice(0, offset),
+            ...result.objects,
+            ...this.documents.slice(offset + result.objects.length),
+          ]
+        }
       })
     },
     navigate ({document, page}) {
       this.document = document
       this.documentPage = page || 1
-      window.scrollTo(0, this.$refs.toolbar.offsetTop)
+      this.goTop()
     },
     clearDocument () {
       this.document = null
+      this.goTop()
+    },
+    goTop () {
       window.scrollTo(0, this.$refs.toolbar.offsetTop)
     },
     enableSearch () {
