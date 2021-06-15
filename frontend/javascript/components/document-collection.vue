@@ -214,6 +214,7 @@ export default {
     if (this.documentCollection) {
       collection = this.documentCollection
     }
+    let shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
     return {
       document: null,
       collection: collection,
@@ -223,9 +224,10 @@ export default {
       documentPage: 1,
       currentDirectory: null,
       directoryStack: [],
-      documents: this.makeDocuments(collection),
+      shouldPaginate,
+      documents: this.makeDocuments(collection, shouldPaginate),
       directories: collection.directories,
-      documentOffsets: this.makeOffsets(collection),
+      documentOffsets: this.makeOffsets(collection, shouldPaginate),
       lastOffset: 0,
       documentsUri: collection.documents_uri || null,
     }
@@ -254,9 +256,6 @@ export default {
         return `uid=${this.collection.uid}`
       }
       return ''
-    },
-    shouldPaginate () {
-      return this.collection.document_directory_count > MAX_SCROLL_DOCS
     },
     canPaginate () {
       return this.collection.document_directory_count > this.lastOffset + DOCUMENTS_API_LIMIT
@@ -300,8 +299,8 @@ export default {
       }
       return documentOffsets
     },
-    makeDocuments(collection) {
-      if (this.shouldPaginate) {
+    makeDocuments(collection, shouldPaginate = true) {
+      if (this.shouldPaginate || shouldPaginate) {
         return collection.documents
       }
       let colDocs = collection.documents || []
