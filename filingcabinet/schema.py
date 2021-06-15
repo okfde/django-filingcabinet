@@ -20,7 +20,7 @@ SETTINGS_SCHEMA = {
                     "id": {"type": "string"},
                     "type": {
                         "type": "string",
-                        "pattern": "choice"
+                        "pattern": "choice|daterange"
                     },
                     "key": {"type": "string"},
                     "facet": {"type": "boolean"},

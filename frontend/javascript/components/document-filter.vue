@@ -27,14 +27,28 @@
         </select>
       </div>
     </template>
+    <template v-if="filter.type == 'daterange'">
+      <div class="col-sm-10">
+        <document-date-range-filter
+          :value="value || {}"
+          :filter="filter"
+          @input="updateFilter"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
 const DEFAULT_LANG = 'en'
 
+import DocumentDateRangeFilter from './document-daterangefilter.vue'
+
 export default {
   name: 'DocumentFilter',
+  components: {
+    DocumentDateRangeFilter
+  },
   props: {
     filter: {
       type: Object,

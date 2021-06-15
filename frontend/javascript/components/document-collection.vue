@@ -395,7 +395,15 @@ export default {
       }
       for (let [key, value] of filters.entries()) {
         if (value) {
-          params.push(`${key}=${encodeURIComponent(value)}`)
+          if (typeof value === 'object') {
+            for (let urlKey in value) {
+              if (value[urlKey]) {
+                params.push(`${urlKey}=${encodeURIComponent(value[urlKey])}`)
+              }
+            }
+          } else {
+            params.push(`${key}=${encodeURIComponent(value)}`)
+          }
           hasSearch = true
         }
       }
