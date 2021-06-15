@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from taggit.models import Tag
 from django_filters import rest_framework as filters
 
@@ -32,6 +34,9 @@ class DocumentFilter(filters.FilterSet):
     )
     ids = filters.CharFilter(
         method='filter_ids'
+    )
+    created_at = filters.DateFromToRangeFilter(
+        method='filter_created_at',
     )
 
     def __init__(self, *args, **kwargs):
@@ -100,6 +105,25 @@ class DocumentFilter(filters.FilterSet):
             filt_key = filt['key'].replace('.', '__')
             qs = qs.filter(**{filt_key: val})
         return qs
+
+    def filter_created_at(self, qs, name, value):
+        range_kwargs = {}
+        if value.start is not None:
+            range_kwargs['gte'] = value.start
+        if value.stop is not None:
+            range_kwargs['lte'] = value.stop
+
+        for comp, val in range_kwargs.items():
+            qs.filter(
+                Q(**{
+                    'published_at__isnull': False,
+                    'published_at__{}'.format(comp): val
+                }) |
+                Q(**{
+                    'published_at__isnull': True,
+                    'created_at__{}'.format(comp): val
+                })
+            )
 
 
 class PageDocumentFilterset(filters.FilterSet):
@@ -190,3 +214,22 @@ class PageDocumentFilterset(filters.FilterSet):
             filt_key = 'document__{}'.format(filt['key'].replace('.', '__'))
             qs = qs.filter(**{filt_key: val})
         return qs
+
+    def filter_created_at(self, qs, name, value):
+        range_kwargs = {}
+        if value.start is not None:
+            range_kwargs['gte'] = value.start
+        if value.stop is not None:
+            range_kwargs['lte'] = value.stop
+
+        for comp, val in range_kwargs.items():
+            qs.filter(
+                Q(**{
+                    'document__published_at__isnull': False,
+                    'document__published_at__{}'.format(comp): val
+                }) |
+                Q(**{
+                    'document__published_at__isnull': True,
+                    'document__created_at__{}'.format(comp): val
+                })
+            )
