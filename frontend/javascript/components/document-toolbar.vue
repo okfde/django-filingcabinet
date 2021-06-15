@@ -61,6 +61,13 @@
         role="group"
       >
         <button
+          class="btn btn-sm btn-secondary"
+          @click="showInfo"
+        >
+          <i class="fa fa-info-circle" />
+          <span class="sr-only">{{ i18n.info }}</span>
+        </button>
+        <button
           type="button"
           class="btn btn-sm btn-secondary"
           :class="{'btn-light': preferences.showText}"
@@ -74,6 +81,7 @@
           @click="download"
         >
           <i class="fa fa-download" />
+          <span class="sr-only">{{ i18n.downloadPDF }}</span>
         </button>
       </div>
     </div>
@@ -240,6 +248,9 @@ export default {
     },
     downloadByUrl (filename) {
       triggerDownload(this.document.file_url, filename)
+    },
+    showInfo () {
+      this.$emit('showinfo')
     }
   }
 }

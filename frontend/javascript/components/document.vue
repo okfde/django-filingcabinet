@@ -24,6 +24,7 @@
           @clearsearch="clearSearch"
           @zoomin="zoomIn"
           @zoomout="zoomOut"
+          @showinfo="showInfoModal = !showInfoModal"
         />
         <document-searchbar
           v-if="preferences.showSearchbar"
@@ -63,6 +64,40 @@
       </transition>
     </div>
     <div class="row main-row">
+      <document-modal
+        v-if="showInfoModal"
+        @close="showInfoModal = false"
+      >
+        <h5 slot="header">
+          {{ i18n.documentProperties }}
+        </h5>
+        <div slot="body">
+          <dl>
+            <dt>{{ i18n.title }}</dt>
+            <dd>{{ document.properties.title || document.title }}</dd>
+            <template v-if="document.properties.author">
+              <dt>{{ i18n.author }}</dt>
+              <dd>{{ document.properties.author }}</dd>
+            </template>
+            <template v-if="document.properties.creator">
+              <dt>{{ i18n.creator }}</dt>
+              <dd>{{ document.properties.creator }}</dd>
+            </template>
+            <template v-if="document.properties.producer">
+              <dt>{{ i18n.producer }}</dt>
+              <dd>{{ document.properties.producer }}</dd>
+            </template>
+            <template v-if="document.properties.url">
+              <dt>{{ i18n.url }}</dt>
+              <dd>
+                <a :href="document.properties.url" target="_blank" rel="noopener">
+                  {{ document.properties.url.slice(0, 20) }}&hellip;
+                </a>
+              </dd>
+            </template>
+          </dl>
+        </div>
+      </document-modal>
       <div
         v-if="!isSmallScreen && sidebarVisible"
         ref="sidebarContainer"
@@ -137,6 +172,7 @@ import DocumentOutlineSidebar from './document-outline-sidebar.vue'
 import DocumentSearchSidebar from './document-search-sidebar.vue'
 import DocumentToolbar from './document-toolbar.vue'
 import DocumentSearchbar from './document-searchbar.vue'
+import DocumentModal from './document-modal.vue'
 
 import {getData, postData, findPageByOffset} from '../lib/utils.js'
 
@@ -185,6 +221,7 @@ export default {
     DocumentPreviewSidebar,
     DocumentSearchSidebar,
     DocumentOutlineSidebar,
+    DocumentModal
   },
   props: {
     documentUrl: {
@@ -274,6 +311,7 @@ export default {
       toolbarHeight: null,
       isSmallScreen: true,
       isMediumScreen: true,
+      showInfoModal: false,
     }
   },
   computed: {
@@ -783,6 +821,9 @@ export default {
   padding: 0 15px;
   margin: 0 -15px;
   overflow: hidden;
+}
+.main-row {
+  position: relative;
 }
 
 .sidebar {

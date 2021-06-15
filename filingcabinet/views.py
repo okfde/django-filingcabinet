@@ -77,7 +77,13 @@ def get_js_config(request, obj=None):
             'deleteAnnotation': _('Delete this annotation?'),
             'backToCollection': _('Back'),
             'documents': _('documents'),
-            'areShown': _('are shown')
+            'areShown': _('are shown'),
+            'downloadPDF': _('Download PDF'),
+            'info': _('Document Info'),
+            'author': _('Author'),
+            'creator': _('Creator'),
+            'producer': _('producer'),
+            'url': _('URL'),
         }
     }
 
