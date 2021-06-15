@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-14 12:41+0200\n"
-"PO-Revision-Date: 2021-06-14 12:41+0200\n"
+"POT-Creation-Date: 2021-06-15 14:14+0200\n"
+"PO-Revision-Date: 2021-06-15 14:15+0200\n"
 "Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -297,7 +297,31 @@ msgstr "Zurück"
 msgid "are shown"
 msgstr "angezeigt"
 
-#: views.py:221
+#: views.py:81
+msgid "Download PDF"
+msgstr "PDF herunterladen"
+
+#: views.py:82
+msgid "Document Info"
+msgstr "Dokumentendetails"
+
+#: views.py:83
+msgid "Author"
+msgstr "Autor:in"
+
+#: views.py:84
+msgid "Creator"
+msgstr "Ersteller:in"
+
+#: views.py:85
+msgid "producer"
+msgstr "Produzent:in"
+
+#: views.py:86
+msgid "URL"
+msgstr "URL"
+
+#: views.py:227
 msgid "All documents"
 msgstr "Alle Dokumente"
 
@@ -326,9 +350,6 @@ msgstr "Alle Dokumente"
 
 #~ msgid "Back to collection"
 #~ msgstr "Zurück zur Sammlung"
-
-#~ msgid "Download PDF"
-#~ msgstr "PDF herunterladen"
 
 #~ msgid "Found in"
 #~ msgstr "Gefunden in"
