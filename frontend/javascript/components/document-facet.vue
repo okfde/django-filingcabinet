@@ -19,7 +19,7 @@
         <a
           v-if="!facet.selected"
           href="#"
-          @click.prevent="$emit('select', facet.value)"
+          @click.prevent="selectFacetValue(facet.value)"
         >
           {{ facet.label }} ({{ facet.count }} {{ i18n.pages }})
         </a>
@@ -34,6 +34,19 @@
 <script>
 
 const DEFAULT_LANG = 'en'
+
+const equal = (a, b) => {
+  // Really simple edge-case ignoring equality
+  if (typeof a === 'object') {
+    for (let k of Object.keys(a)) {
+      if (a[k] !== b[k]) {
+        return false
+      }
+    }
+    return true
+  }
+  return a === b
+}
 
 export default {
   name: 'DocumentFacet',
@@ -63,20 +76,52 @@ export default {
     },
     filterChoiceLabelMap () {
       let labelMap = new Map()
-      this.filter.choices.forEach((choice) => {
-        labelMap.set(choice.value, (choice.label && choice.label[this.lang]) || choice.value)
-      })
+      if (this.filter.choices) {
+        this.filter.choices.forEach((choice) => {
+          labelMap.set(choice.value, (choice.label && choice.label[this.lang]) || choice.value)
+        })
+      }
       return labelMap
     },
     facetList () {
       return this.values.map(([facetValue, facetCount]) => {
         return {
-          selected: facetValue === this.value,
+          selected: this.checkSelected(facetValue),
           value: facetValue,
           count: facetCount,
-          label: this.filterChoiceLabelMap.get(facetValue) || facetValue
+          label: this.getFacetLabel(facetValue)
         }
       })
+    }
+  },
+  methods: {
+    checkSelected (facetValue) {
+      let val = this.getFacetValue(facetValue)
+      return equal(val, this.value)
+    },
+    getFacetLabel (value) {
+      if (this.filter.choices) {
+        return this.filterChoiceLabelMap.get(value) || value
+      }
+      if (this.filter.facet_config?.type === 'date_histogram') {
+        let date = new Date(value)
+        return date.getFullYear()
+      }
+    },
+    getFacetValue (value) {
+      if (this.filter.facet_config?.type === 'date_histogram') {
+        let date = new Date(value)
+        let before = `${date.getFullYear()}-12-31`
+        return {
+          [`${this.filter.key}_after`]: date.toISOString().split('T')[0],
+          [`${this.filter.key}_before`]: before
+        }
+      } else {
+        return value
+      }
+    },
+    selectFacetValue (value) {
+      this.$emit('select', this.getFacetValue(value))
     }
   }
 }

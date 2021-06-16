@@ -24,6 +24,14 @@ SETTINGS_SCHEMA = {
                     },
                     "key": {"type": "string"},
                     "facet": {"type": "boolean"},
+                    "facet_config": {
+                        "type": "object",
+                        "properties": {
+                            "type": {"type": "string"},
+                            "interval": {"type": "string"},
+                            "format": {"type": "string"}
+                        }
+                    },
                     "label": {
                         "type": "object",
                         "minProperties": 1,

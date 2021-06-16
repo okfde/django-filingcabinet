@@ -206,7 +206,7 @@ export default {
       this.runSearch()
     },
     updateFilter ({key, value}) {
-      this.filterValues.set(key, value)
+      this.filerValues = new Map(this.filterValues.set(key, value))
     }
   }
 }

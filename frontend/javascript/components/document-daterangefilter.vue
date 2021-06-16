@@ -1,20 +1,20 @@
 <template>
   <div class="input-group">
     <input
-      v-model="min"
+      :value="min"
       type="date"
       class="form-control"
-      @input="updateValue"
+      @input="updateValue($event.target.value)"
     >
     <div class="input-group-prepend">
       <span class="input-group-text">-</span>
     </div>
   
     <input
-      v-model="max"
+      :value="max"
       type="date"
       class="form-control"
-      @input="updateValue"
+      @input="updateValue(undefined, $event.target.value)"
     >
   </div>
 </template>
@@ -32,17 +32,21 @@ export default {
       required: true
     },
   },
-  data () {
-    return {
-      min: this.value[`${this.filter.key}_after`],
-      max: this.value[`${this.filter.key}_before`]
+  computed: {
+    min () {
+      return this.value[`${this.filter.key}_after`]
+    },
+    max () {
+      return this.value[`${this.filter.key}_before`]
     }
   },
   methods: {
-    updateValue() {
+    updateValue(min, max) {
+      min = min || this.min
+      max = max || this.max
       this.$emit('input', {
-        [`${this.filter.key}_after`]: this.min,
-        [`${this.filter.key}_before`]: this.max,
+        [`${this.filter.key}_after`]: min,
+        [`${this.filter.key}_before`]: max,
       })
     }
   }
