@@ -479,7 +479,7 @@ export default {
   height: 100%;
   margin: 0 auto;
 }
-.text-layer > div {
+.text-layer > div, .text-layer > span, .textLayer > br {
   color: transparent;
   position: absolute;
   white-space: pre;
