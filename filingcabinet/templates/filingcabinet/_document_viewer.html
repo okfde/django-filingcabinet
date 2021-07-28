@@ -1,6 +1,8 @@
 {% load static %}
 {% load i18n %}
 
+{% load filingcabinet %}
+
 {% if object.pending %}
   <div class="container">
     <p>
@@ -35,6 +37,6 @@
   </div>
 {% else %}
   <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
-    <iframe src="{% static 'filingcabinet/viewer/web/viewer.html' %}?file={{ object.get_authorized_file_url | urlencode }}{% if page_number %}#page={{ page_number }}{% endif %}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+    <iframe src="{% get_pdf_viewer object.get_authorized_file_url page_number %}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
   </div>
 {% endif %}
