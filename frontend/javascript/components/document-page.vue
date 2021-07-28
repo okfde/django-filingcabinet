@@ -337,14 +337,19 @@ export default {
     },
     renderText (pdfPage, pdfTextContent, pdfAnnotations) {
       if (this.destroyed) { return }
-      let viewport = pdfPage.getViewport(
-        this.page.zoomedWidth / pdfPage.view[2]
-      )
+      let viewport = pdfPage.getViewport({
+        scale: this.page.zoomedWidth / pdfPage.view[2]
+      })
       // Rendering text layer as HTML.
       this.$refs.textLayer.innerHTML = ""
       console.log('Rendering content', pdfTextContent)
+      const readableStream = pdfPage.streamTextContent({
+        normalizeWhitespace: true,
+        includeMarkedContent: true
+      });
       this.$root.PDFJS.renderTextLayer({
         textContent: pdfTextContent,
+        textContentStream: readableStream,
         container: this.$refs.textLayer,
         viewport,
         enhanceTextSelection: true
