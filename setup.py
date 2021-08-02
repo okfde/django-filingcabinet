@@ -39,7 +39,6 @@ setup(
         'wand',
         'pypdf2',
         'pikepdf',
-        'camelot-py[cv]',
         'Pillow',
         'django-filter',
         'django-json-widget',
@@ -48,6 +47,9 @@ setup(
         'django-mptt',
         'djangorestframework'
     ],
+    extras_require={
+        'tabledetection': ['camelot-py[cv]']
+    },
     test_requires=[
         'factory_boy'
     ],

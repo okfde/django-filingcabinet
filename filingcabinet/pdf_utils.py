@@ -7,8 +7,6 @@ import shutil
 import subprocess
 import tempfile
 
-import camelot
-
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
@@ -619,6 +617,11 @@ def get_continuous_pages(pages):
 
 
 def detect_tables(filename):
+    try:
+        import camelot
+    except ImportError:
+        return None
+
     tables = camelot.read_pdf(filename)
     return [
         table.parsing_report for table in tables
