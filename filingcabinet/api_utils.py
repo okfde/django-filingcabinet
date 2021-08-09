@@ -6,7 +6,7 @@ from rest_framework import status
 
 def make_oembed_response(request, model):
     format = request.GET.get('format')
-    if format != 'json':
+    if format is not None and format != 'json':
         return Response({}, status=status.HTTP_501_NOT_IMPLEMENTED)
     url = request.GET.get('url')
     obj = model.objects.get_public_via_url(url)
