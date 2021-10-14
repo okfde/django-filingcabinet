@@ -27,12 +27,17 @@
       {% for page in pages %}
         <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
           <pre class="sr-only">{{ page.content }}</pre>
-          <div class="ml-auto mr-auto mt-5">
+          <div class="mx-auto text-center mt-5">
             <div class="spinner-grow" role="status">
             </div>
           </div>
         </div>
       {% endfor %}
+      {% if next_page %}
+        <a href="./?page={{ next_page }}">
+          {% translate "Go to next pages" %}
+        </a>
+      {% endif %}
     </div>
   </div>
 {% else %}
