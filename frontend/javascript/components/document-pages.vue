@@ -63,7 +63,13 @@ export default {
       return !this.preferences.maxHeight
     },
     buffer () {
-      return Math.round(parseInt(this.height.replace('px', '')) * 1.5)
+      if (this.height) {
+        return Math.round(parseInt(this.height.replace('px', '')) * 1.5)
+      }
+      if (this.pages.length > 0) {
+        return Math.round(this.pages[0].height * 1.5)
+      }
+      return 200
     }
   },
   methods: {
