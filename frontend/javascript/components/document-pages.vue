@@ -11,6 +11,7 @@
       key-field="number"
       size-field="normalSize"
       :emit-update="true"
+      :buffer="buffer"
       @update="updateCurrentPage"
     >
       <document-page
@@ -60,6 +61,9 @@ export default {
     },
     isPageMode () {
       return !this.preferences.maxHeight
+    },
+    buffer () {
+      return Math.round(parseInt(this.height.replace('px', '')) * 1.5)
     }
   },
   methods: {
