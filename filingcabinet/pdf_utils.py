@@ -621,8 +621,11 @@ def detect_tables(filename):
         import camelot
     except ImportError:
         return None
-
-    tables = camelot.read_pdf(filename)
-    return [
-        table.parsing_report for table in tables
-    ]
+    try:
+        tables = camelot.read_pdf(filename)
+        return [
+            table.parsing_report for table in tables
+        ]
+    except Exception:
+        # Camelot may fail on bad pdfs, just ignore
+        return []
