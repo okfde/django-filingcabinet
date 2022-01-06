@@ -62,6 +62,7 @@
       >
         <button
           class="btn btn-sm btn-secondary"
+          :class="{'btn-light': preferences.showDocumentProperties}"
           @click="showInfo"
         >
           <i class="fa fa-info-circle" />
@@ -263,6 +264,7 @@ export default {
 }
 .page-number-input {
   max-width: 70px;
+  text-align: right;
 }
 .badge-annotation-count {
   position: absolute !important;
