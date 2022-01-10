@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.db.models import Q, Count, JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -66,6 +67,14 @@ class HasTablesFilter(NullFilter):
     parameter_name = 'properties___tables__0'
 
 
+class DocumentChangeList(ChangeList):
+    def get_results(self, *args, **kwargs):
+        super().get_results(*args, **kwargs)
+        self.result_list = self.result_list.annotate(
+            ready_page_count=Count('pages', filter=Q(pages__pending=False)),
+        )
+
+
 class DocumentBaseAdmin(admin.ModelAdmin):
     inlines = [PageInline]
     save_on_top = True
@@ -94,12 +103,8 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         'mark_unlisted', 'mark_listed', 'detect_tables'
     ]
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        qs = qs.annotate(
-            ready_page_count=Count('pages', filter=Q(pages__pending=False)),
-        )
-        return qs
+    def get_changelist(self, request):
+        return DocumentChangeList
 
     def processed_pages_percentage(self, obj):
         if not obj.num_pages:
