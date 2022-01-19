@@ -64,10 +64,10 @@ export default {
     },
     buffer () {
       if (this.height) {
-        return Math.round(parseInt(this.height.replace('px', '')) * 1.5)
+        return Math.round(parseInt(this.height.replace('px', '')) * 0.7)
       }
       if (this.pages.length > 0) {
-        return Math.round(this.pages[0].height * 1.5)
+        return Math.round(this.pages[0].normalSize * 0.7)
       }
       return 200
     }
