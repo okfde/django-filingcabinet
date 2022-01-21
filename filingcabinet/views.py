@@ -97,6 +97,8 @@ def get_js_config(request, obj=None):
 
 
 def get_document_viewer_context(doc, request, page_number=1, defaults=None):
+    if defaults is None:
+        defaults = {}
     pages = doc.pages.all()
     pages = pages.filter(number__gte=page_number)[:PREVIEW_PAGE_COUNT]
     has_more = page_number + PREVIEW_PAGE_COUNT - 1 < doc.num_pages
@@ -105,8 +107,9 @@ def get_document_viewer_context(doc, request, page_number=1, defaults=None):
         'pages': pages,
         'next_page': page_number + PREVIEW_PAGE_COUNT if has_more else None,
         'page_number': page_number,
-        'defaults': json.dumps(defaults or {}),
-        'config': json.dumps(get_js_config(request, doc))
+        'defaults': json.dumps(defaults),
+        'config': json.dumps(get_js_config(request, doc)),
+        'maxHeight': defaults.get('maxHeight')
     }
     serializer_klass = doc.get_serializer_class()
     api_ctx = {

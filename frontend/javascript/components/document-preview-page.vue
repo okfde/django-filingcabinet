@@ -1,7 +1,23 @@
 <template>
-  <a :href="pageAnchor" class="preview-page" @click.prevent="navigate">
-    <img v-if="page.image_url" v-show="imageLoaded" ref="image" @load="onImageLoad" :src="imageUrl" alt="" class="img-fluid page-image"/>
-    <div v-if="!imageLoaded" class="spinner-grow" role="status">
+  <a
+    :href="pageAnchor"
+    class="document-preview-page"
+    @click.prevent="navigate"
+  >
+    <img
+      v-if="page.image_url"
+      v-show="imageLoaded"
+      ref="image"
+      :src="imageUrl"
+      alt=""
+      class="img-fluid page-image"
+      @load="onImageLoad"
+    >
+    <div
+      v-if="!imageLoaded"
+      class="spinner-grow"
+      role="status"
+    >
       <span class="sr-only">{{ i18n.loading }}</span>
     </div>
     <p>
@@ -13,17 +29,16 @@
 <script>
 
 export default {
-  name: 'document-preview-page',
-  props: ['page'],
+  name: 'DocumentPreviewPage',
+  props: {
+    page: {
+      type: Object,
+      required: true
+    }
+  },
   data () {
     return {
       imageLoaded: false
-    }
-  },
-  beforeDestroy () {
-    if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
-      // Cancel image download on destroy
-      this.$refs.image.setAttribute('src', "")
     }
   },
   computed: {
@@ -37,6 +52,12 @@ export default {
       return `#page-${this.page.number}`
     }
   },
+  beforeDestroy () {
+    if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
+      // Cancel image download on destroy
+      this.$refs.image.setAttribute('src', "")
+    }
+  },
   methods: {
     onImageLoad () {
       this.imageLoaded = true
@@ -48,17 +69,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.preview-page {
+<style lang="scss">
+.document-preview-page {
   display: block;
   text-align: center;
   padding: 0 0.5rem;
 }
-.preview-page .page-image {
+.document-preview-page .page-image {
   border: 1px solid #aaa;
   margin: 0 auto;
 }
-.preview-page p, .preview-page p:hover {
+.document-preview-page p, .document-preview-page p:hover {
   text-align: center;
   color: #fff;
   text-decoration: none;

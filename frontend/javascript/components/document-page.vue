@@ -5,7 +5,13 @@
         <div
           :id="pageId"
           class="page"
-        >
+        > 
+          <div
+            v-if="page.image_url"
+            v-show="!imageLoaded"
+            :style="placeholderImageStyle"
+            class="page-image-placeholder"
+          />
           <img
             v-if="page.image_url"
             v-show="imageLoaded"
@@ -42,13 +48,6 @@
             <pre :style="imageOverlayStyle">
               {{ page.content }}
             </pre>
-          </div>
-          <div
-            v-if="!imageLoaded"
-            class="spinner-grow"
-            role="status"
-          >
-            <span class="sr-only">{{ i18n.loading }}</span>
           </div>
           <div
             v-if="showAnnotationForm"
@@ -162,12 +161,24 @@ export default {
     imageUrl () {
       return this.page.image_url.replace(/\{size\}/, this.imageSize)
     },
+    previewImageUrl () {
+      return this.page.image_url.replace(/\{size\}/, "small")
+    },
     imageSrcSet () {
       let srcset = []
       for (let size in PAGE_SIZES) {
         srcset.push(`${this.page.image_url.replace(/\{size\}/, size)} ${PAGE_SIZES[size]}w`)
       }
       return srcset.join(', ')
+    },
+    placeholderImageStyle () {
+      return {
+        width: this.page.zoomedWidth + 'px',
+        height: (this.page.height / this.page.width * this.page.zoomedWidth) + 'px',
+        "background-image": `url(${this.previewImageUrl})`,
+        "background-size": `cover`,
+        "background-repeat": "none"
+      }
     },
     pageId () {
       return `page-${this.page.number}`
@@ -193,13 +204,13 @@ export default {
     imageDimensions () {
       return {
         width: this.page.zoomedWidth,
-        height: Math.round(this.page.zoomedWidth / this.page.width * this.page.height)
+        height: Math.floor(this.page.zoomedWidth / this.page.width * this.page.height)
       }
     },
     imageOverlayStyle () {
       return {
         width: this.imageDimensions.width + 'px',
-        height: this.imageDimensions.height + 'px',
+        height: (this.imageDimensions.height - 1) + 'px',
       }
     },
     imageInfo () {
@@ -406,7 +417,6 @@ export default {
 }
 .page-image {
   border: 1px solid #aaa;
-  margin-bottom: 0.25rem;
   pointer-events: none;
 }
 .annotation-form {

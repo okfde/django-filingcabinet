@@ -506,6 +506,21 @@ class Page(models.Model):
             page=self.number, size=size
         )
 
+    def get_preview_image_url(self):
+        return self.document.get_page_template(
+            page=self.number, size='small'
+        )
+
+    def get_normal_image_url(self):
+        return self.document.get_page_template(
+            page=self.number, size='normal'
+        )
+
+    def get_large_image_url(self):
+        return self.document.get_page_template(
+            page=self.number, size='large'
+        )
+
     def dim_ratio_percent(self):
         if self.width and self.height:
             return str(self.height / self.width * 100)

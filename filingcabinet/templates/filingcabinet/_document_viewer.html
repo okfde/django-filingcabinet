@@ -23,22 +23,108 @@
       data-fcdocument="{{ document_data }}"
       data-fcpage="{{ page_number }}"
       data-fcconfig="{{ config }}"
-      data-fcdefaults="{{ defaults }}">
-      {% for page in pages %}
-        <div  class="aspect-ratio" style="padding-bottom:{{ page.dim_ratio_percent }}%; background: url({{ page.image_normal.url }}) no-repeat; background-size: cover">
-          <pre class="sr-only">{{ page.content }}</pre>
-          <div class="mx-auto text-center mt-5">
-            <div class="spinner-grow" role="status">
+      data-fcdefaults="{{ defaults }}"
+      {% if maxHeight %}style="overflow: auto;padding:0 15px;height:{{ maxHeight }}"{% endif %}>
+      <div class="toolbar">
+        <div>
+          <div class="row py-2 bg-dark toolbar-row">
+            <div class="col-auto px-1 px-sm-2">
+              <div role="group" class="btn-group">
+                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-toggle-left"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col col-md-auto pr-0 pl-1 px-sm-2">
+              <div class="input-group input-group-sm">
+                <input type="number" class="page-number-input form-control bg-light form-control-sm" disabled value="{{ page_number }}" style="width: 70px!important">
+                <div class="input-group-append">
+                  <span class="d-none d-sm-inline input-group-text">/ {{ object.num_pages }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="col col-md-auto pl-0 pr-1 px-sm-2">
+              <div role="group" class="btn-group">
+                <button class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-info-circle"></i>
+                  <span class="sr-only">Dokumentendetails</span>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-file-text"></i>
+                  <span class="sr-only">Zeige/verstecke Text</span>
+                </button>
+                <a href="#" class="btn btn-sm btn-secondary">
+                  <i class="fa fa-download"></i>
+                  <span class="sr-only">PDF herunterladen</span>
+                </a>
+              </div>
+            </div>
+            <div class="col col-md-auto px-1 px-sm-2">
+              <div role="group" class="btn-group">
+                <button type="button" disabled="disabled" class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-search-minus"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                  <i class="fa fa-search-plus"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col col-sm-auto px-1 px-sm-2 ml-auto text-right">
+              <button type="button" class="btn btn-sm btn-secondary" disabled>
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+            <!---->
+        </div>
+          <!---->
+      </div>
+      <div class="row main-row">
+        <div class="sidebar-container d-none d-md-block col-md-3 col-sm-2 px-0 bg-dark">
+          <div class="sidebar preview" style="top: 47px;">
+            <div class="sidebar-content" style="height: calc(100vh - 47px)">
+              <div class="document-preview-pages">
+                {% for page in pages %}
+                  <div>
+                    <a href="#page-{{ page.number }}" class="document-preview-page px-2 text-center d-block">
+                      <img src="{{ page.get_preview_image_url }}" loading="lazy" alt="" class="img-fluid page-image">
+                      <!---->
+                      <p class="text-white">{{ page.number }}</p>
+                    </a>
+                  </div>
+                {% endfor %}
+              </div>
             </div>
           </div>
         </div>
-      {% endfor %}
-      {% if next_page %}
-        <a href="./?page={{ next_page }}">
-          {% translate "Go to next pages" %}
-        </a>
-      {% endif %}
+          <!---->
+
+        <div class="col document-pages-container bg-light annotations-hidden">
+          <div class="document-pages">
+
+            {% for page in pages %}
+              <div class="row justify-content-center">
+                <div class="col">
+                  <div class="page-wrapper">
+                    <div id="page-{{ page.number }}" class="page" style="width:100%;padding-bottom:{{ page.dim_ratio_percent }}%;">
+                      <pre class="sr-only">{{ page.content }}</pre>
+                      <img src="{{ page.get_normal_image_url }}" loading="lazy" srcset="{{ page.get_preview_image_url }} 180w, {{ page.get_normal_image_url }} 700w, {{ page.get_large_image_url }} 1000w" alt="{{ page.number }}" draggable="false" class="page-image img-fluid"/>
+                    </div>
+                  </div>
+                  <p class="page-number">{{ page.numnber }}</p>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
     </div>
+  
+    {% if next_page %}
+      <a href="./?page={{ next_page }}">
+        {% translate "Go to next pages" %}
+      </a>
+    {% endif %}
   </div>
 {% else %}
   <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
