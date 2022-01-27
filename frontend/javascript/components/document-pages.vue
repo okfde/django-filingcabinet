@@ -23,8 +23,8 @@
         :show-annotations="showAnnotations"
         :current-annotation="currentAnnotation"
         :annotation-form="activeAnnotationForm"
-        :width="width"
         :can-annotate="canAnnotate"
+        :supported-formats="supportedFormats"
         @currentannotation="$emit('currentannotation', $event)"
         @activateannotationform="$emit('activateannotationform', $event)"
         @deleteannotation="$emit('deleteannotation', $event)"
@@ -48,10 +48,44 @@ export default {
     RecycleScroller,
     DocumentPage
   },
-  props: [
-    'document', 'pages', 'preferences', 'annotations', 'currentAnnotation',
-    'activeAnnotationForm', 'width', 'height', 'canAnnotate', 'pdfDocument'
-  ],
+  props: {
+    document: {
+      type: Object,
+      required: true,
+    },
+    pages: {
+      type: Array,
+      required: true,
+    },
+    preferences: {
+      type: Object,
+      required: true,
+    },
+    annotations: {
+      type: Object,
+      required: true,
+    },
+    currentAnnotation: {
+      type: Object,
+      default: null,
+    },
+    activeAnnotationForm: {
+      type: Object,
+      default: null,
+    },
+    height: {
+      type: String,
+      default: null,
+    },
+    canAnnotate: {
+      type: Boolean,
+      default: false,
+    },
+    pdfDocument: {
+      type: Object,
+      default: null,
+    },
+  },
   computed: {
     showText () {
       return this.preferences.showText
@@ -61,6 +95,12 @@ export default {
     },
     isPageMode () {
       return !this.preferences.maxHeight
+    },
+    supportedFormats () {
+      if (this.document.properties && this.document.properties._format_webp) {
+        return ["webp"]
+      }
+      return []
     },
     buffer () {
       if (this.height) {

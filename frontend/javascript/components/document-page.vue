@@ -6,25 +6,45 @@
           :id="pageId"
           class="page"
         > 
-          <div
+          <picture
             v-if="page.image_url"
             v-show="!imageLoaded"
-            :style="placeholderImageStyle"
-            class="page-image-placeholder"
-          />
-          <img
-            v-if="page.image_url"
-            v-show="imageLoaded"
-            ref="image"
-            :src="imageUrl"
-            :srcset="imageSrcSet"
-            :alt="pageLabel"
-            :style="{'width': page.zoomedWidth + 'px'}"
-            class="page-image"
-            draggable="false"
-            :class="{'annotation-form': showAnnotationForm}"
-            @load="onImageLoad"
           >
+            <source
+              v-for="format in supportedFormats"
+              :key="format"
+              :srcset="previewImageUrl + '.' + format"
+              :type="'image/' + format"
+            >
+            <img
+              :src="previewImageUrl"
+              :alt="pageLabel"
+              :style="{'width': page.zoomedWidth + 'px', height: imageHeight + 'px'}"
+              class="page-image-placeholder"
+              draggable="false"
+            >
+          </picture>
+          <picture>
+            <source
+              v-for="pic in imageSources"
+              :key="pic.type"
+              :srcset="pic.srcset"
+              :type="pic.type"
+            >
+            <img
+              v-if="page.image_url"
+              v-show="imageLoaded"
+              ref="image"
+              :src="imageUrl"
+              :srcset="imageSrcSet"
+              :alt="pageLabel"
+              :style="{'width': page.zoomedWidth + 'px'}"
+              class="page-image"
+              draggable="false"
+              :class="{'annotation-form': showAnnotationForm}"
+              @load="onImageLoad"
+            >
+          </picture>
           <div
             class="pdf-layer"
             :style="imageOverlayStyle"
@@ -122,11 +142,44 @@ export default {
     PageAnnotationOverlay,
     PageAnnotations
   },
-  props: [
-    'page', 'annotations', 'showText', 'showAnnotations',
-    'currentAnnotation', 'annotationForm', 'width',
-    'canAnnotate', 'pdfDocument'
-  ],
+  props: {
+    page: {
+      type: Object,
+      required: true
+    },
+    annotations: {
+      type: Array,
+      required: true
+    },
+    showText: {
+      type: Boolean,
+      required: true
+    },
+    showAnnotations: {
+      type: Boolean,
+      required: true
+    },
+    currentAnnotation: {
+      type: Object,
+      default: null
+    },
+    annotationForm: {
+      type: Object,
+      default: null
+    },
+    canAnnotate: {
+      type: Boolean,
+      default: false
+    },
+    pdfDocument: {
+      type: Object,
+      default: null
+    },
+    supportedFormats: {
+      type: Array,
+      default: () => []
+    }
+  },
   data () {
     return {
       imageLoaded: false,
@@ -164,21 +217,22 @@ export default {
     previewImageUrl () {
       return this.page.image_url.replace(/\{size\}/, "small")
     },
+    imageSources () {
+      return this.supportedFormats.map(format => {
+        let srcset = this.imageSrcSet
+        srcset = srcset.replace(/\.png/g, `.png.${format}`)
+        return {
+          srcset: srcset,
+          type: `image/${format}`
+        }
+      })
+    },
     imageSrcSet () {
       let srcset = []
       for (let size in PAGE_SIZES) {
         srcset.push(`${this.page.image_url.replace(/\{size\}/, size)} ${PAGE_SIZES[size]}w`)
       }
       return srcset.join(', ')
-    },
-    placeholderImageStyle () {
-      return {
-        width: this.page.zoomedWidth + 'px',
-        height: (this.page.height / this.page.width * this.page.zoomedWidth) + 'px',
-        "background-image": `url(${this.previewImageUrl})`,
-        "background-size": `cover`,
-        "background-repeat": "none"
-      }
     },
     pageId () {
       return `page-${this.page.number}`
@@ -201,10 +255,13 @@ export default {
         height: this.annotationRect.height + 'px',
       }
     },
+    imageHeight () {
+      return Math.floor(this.page.height / this.page.width * this.page.zoomedWidth)
+    },
     imageDimensions () {
       return {
         width: this.page.zoomedWidth,
-        height: Math.floor(this.page.zoomedWidth / this.page.width * this.page.height)
+        height: this.imageHeight
       }
     },
     imageOverlayStyle () {
@@ -414,6 +471,9 @@ export default {
   overflow: auto;
   left: 50%;
   transform: translateX(-50%)
+}
+.page-image-placeholder {
+  filter: blur(5px);
 }
 .page-image {
   border: 1px solid #aaa;

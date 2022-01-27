@@ -105,6 +105,7 @@
             <document-preview-sidebar
               v-else
               :pages="document.pages"
+              :image-formats="supportedImageFormats"
               :height="sidebarContentHeight"
               @navigate="navigate"
               @navigatesidebar="navigateSidebar(currentPage)"
@@ -125,7 +126,6 @@
           :current-annotation="currentAnnotation"
           :preferences="preferences"
           :active-annotation-form="activeAnnotationForm"
-          :width="documentContainerWidth"
           :height="documentViewHeight"
           :can-annotate="canAnnotate"
           @currentpage="updateCurrentPage"
@@ -389,6 +389,12 @@ export default {
       } else {
         return window.innerHeight - this.toolbarHeight
       }
+    },
+    supportedImageFormats () {
+      if (this.document.properties && this.document.properties._format_webp) {
+        return ["webp"]
+      }
+      return []
     }
   },
   created () {

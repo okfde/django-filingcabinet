@@ -14,6 +14,7 @@
       <document-preview-page
         :key="item.number"
         :page="item"
+        :image-formats="imageFormats"
         @navigate="navigate"
       />
     </RecycleScroller>
@@ -34,7 +35,20 @@ export default {
     RecycleScroller,
     DocumentPreviewPage
   },
-  props: ['pages', 'height'],
+  props: {
+    pages: {
+      type: Array,
+      required: true,
+    },
+    imageFormats: {
+      type: Array,
+      default: () => []
+    },
+    height: {
+      type: String,
+      required: true,
+    }
+  },
   computed: {
     i18n () {
       return this.config.i18n

@@ -4,15 +4,23 @@
     class="document-preview-page"
     @click.prevent="navigate"
   >
-    <img
-      v-if="page.image_url"
-      v-show="imageLoaded"
-      ref="image"
-      :src="imageUrl"
-      alt=""
-      class="img-fluid page-image"
-      @load="onImageLoad"
-    >
+    <picture>
+      <source
+        v-for="format in imageFormats"
+        :key="format"
+        :srcset="imageUrl + '.' + format"
+        :type="'image/' + format"
+      >
+      <img
+        v-if="page.image_url"
+        v-show="imageLoaded"
+        ref="image"
+        :src="imageUrl"
+        alt=""
+        class="img-fluid page-image"
+        @load="onImageLoad"
+      >
+    </picture>
     <div
       v-if="!imageLoaded"
       class="spinner-grow"
@@ -34,6 +42,10 @@ export default {
     page: {
       type: Object,
       required: true
+    },
+    imageFormats: {
+      type: Array,
+      default: () => []
     }
   },
   data () {
@@ -50,7 +62,17 @@ export default {
     },
     pageAnchor () {
       return `#page-${this.page.number}`
-    }
+    },
+    imageSources () {
+      return this.supportedFormats.map(format => {
+        let srcset = this.imageSrcSet
+        srcset = srcset.replace(/\.png/g, `.png.${format}`)
+        return {
+          srcset: srcset,
+          type: `image/${format}`
+        }
+      })
+    },
   },
   beforeDestroy () {
     if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
