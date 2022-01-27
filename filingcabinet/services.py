@@ -9,6 +9,9 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.utils.text import slugify
 
+import webp
+from PIL import Image as PILImage
+
 from . import get_document_model
 from .models import (
     Page, PageAnnotation, CollectionDocument, CollectionDirectory,
@@ -357,3 +360,40 @@ def detect_tables_on_doc(doc, save=True):
     doc.properties['_tables'] = tables
     if save:
         doc.save()
+
+
+def convert_images_to_webp(doc):
+    logger.info("Converting page images to webp for Doc %s", doc.id)
+
+    for page in doc.pages.all():
+        convert_page_to_webp(page)
+
+    logger.info("Done converting page images to webp for Doc %s", doc.id)
+
+
+def convert_page_to_webp(page):
+    webp_config = get_webp_default_config()
+
+    if page.image:
+        pil_image = PILImage.open(page.image).convert('RGB')
+        buf = encode_to_webp(pil_image, config=webp_config)
+        page.image.storage.save("{}.webp".format(page.image.name), ContentFile(buf))
+
+    for size_name, width in Page.SIZES:
+        field_file = getattr(page, 'image_%s' % size_name)
+        if not field_file:
+            continue
+        pil_image = PILImage.open(field_file).convert('RGB')
+        buf = encode_to_webp(pil_image, config=webp_config)
+        field_file.storage.save("{}.webp".format(field_file.name), ContentFile(buf))
+
+
+def get_webp_default_config():
+    return webp.WebPConfig.new(preset=webp.WebPPreset.TEXT, quality=80)
+
+
+def encode_to_webp(pil_image, config=None):
+    if config is None:
+        config = get_webp_default_config()
+    pic = webp.WebPPicture.from_pil(pil_image)
+    return pic.encode(config).buffer()

@@ -70,3 +70,25 @@ def detect_tables_document_task(doc_pk):
     except Document.DoesNotExist:
         return None
     detect_tables_on_doc(doc)
+
+
+@shared_task
+def convert_images_to_webp(doc_pk):
+    from .services import convert_images_to_webp
+
+    try:
+        doc = Document.objects.get(pk=doc_pk)
+    except Document.DoesNotExist:
+        return None
+
+    webp_marker = Document.FORMAT_KEY.format("webp")
+    if doc.properties.get(webp_marker) is not None:
+        return
+    # Set marker to False, preventing double task execution
+    doc.properties[webp_marker] = False
+    doc.save(update_fields=["properties"])
+
+    convert_images_to_webp(doc)
+
+    doc.properties[webp_marker] = True
+    doc.save(update_fields=["properties"])

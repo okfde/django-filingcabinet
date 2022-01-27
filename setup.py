@@ -45,7 +45,8 @@ setup(
         'jsonschema',
         'django-taggit',
         'django-mptt',
-        'djangorestframework'
+        'djangorestframework',
+        'webp'
     ],
     extras_require={
         'tabledetection': ['camelot-py[cv]']

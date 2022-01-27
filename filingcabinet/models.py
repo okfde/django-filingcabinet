@@ -214,6 +214,8 @@ class AbstractDocument(models.Model):
 
     objects = DocumentManager()
 
+    FORMAT_KEY = "_format_{}"
+
     class Meta:
         verbose_name = _('document')
         verbose_name_plural = _('documents')
@@ -430,6 +432,13 @@ class AbstractDocument(models.Model):
 
         process_document_task.delay(self.id)
 
+    def has_format(self, format):
+        format_marker = self.FORMAT_KEY.format(format)
+        return self.properties.get(format_marker) is True
+
+    def has_format_webp(self):
+        return self.has_format("webp")
+
 
 class Document(AbstractDocument):
     class Meta(AbstractDocument.Meta):
@@ -525,6 +534,17 @@ class Page(models.Model):
         if self.width and self.height:
             return str(self.height / self.width * 100)
         return str(70)
+
+    def get_image_srcset(self, ext=""):
+        return "{preview}{ext} 180w, {normal}{ext} 700w, {large}{ext} 1000w".format(
+            preview=self.get_preview_image_url(),
+            normal=self.get_normal_image_url(),
+            large=self.get_large_image_url(),
+            ext=ext
+        )
+
+    def get_image_srcset_webp(self):
+        return self.get_image_srcset(ext=".webp")
 
 
 def get_page_annotation_filename(instance, filename):
