@@ -87,7 +87,15 @@
                 {% for page in pages %}
                   <div>
                     <a href="#page-{{ page.number }}" class="document-preview-page px-2 text-center d-block">
-                      <img src="{{ page.get_preview_image_url }}" loading="lazy" alt="" class="img-fluid page-image">
+                      <picture>
+                        {% if object.has_format_webp %}
+                          <source
+                            srcset="{{ page.get_preview_image_url }}.webp"
+                            type="image/webp"
+                          >
+                        {% endif %}
+                        <img src="{{ page.get_preview_image_url }}" loading="lazy" alt="" class="img-fluid page-image">
+                      </picture>
                       <!---->
                       <p class="text-white">{{ page.number }}</p>
                     </a>
@@ -108,7 +116,15 @@
                   <div class="page-wrapper">
                     <div id="page-{{ page.number }}" class="page" style="width:100%;padding-bottom:{{ page.dim_ratio_percent }}%;">
                       <pre class="sr-only">{{ page.content }}</pre>
-                      <img src="{{ page.get_normal_image_url }}" loading="lazy" srcset="{{ page.get_preview_image_url }} 180w, {{ page.get_normal_image_url }} 700w, {{ page.get_large_image_url }} 1000w" alt="{{ page.number }}" draggable="false" class="page-image img-fluid"/>
+                      <picture>
+                        {% if object.has_format_webp %}
+                          <source
+                            srcset="{{ page.get_image_srcset_webp }}"
+                            type="image/webp"
+                          >
+                        {% endif %}
+                        <img src="{{ page.get_normal_image_url }}" loading="lazy" srcset="{{ page.get_image_srcset }}" alt="{{ page.number }}" draggable="false" class="page-image img-fluid"/>
+                      </picture>
                     </div>
                   </div>
                   <p class="page-number">{{ page.numnber }}</p>
