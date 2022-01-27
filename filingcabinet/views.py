@@ -100,7 +100,7 @@ def get_document_viewer_context(doc, request, page_number=1, defaults=None):
     if defaults is None:
         defaults = {}
 
-    if not doc.has_format_webp():
+    if not doc.has_format_webp() and not doc.pending:
         from .tasks import convert_images_to_webp
         convert_images_to_webp.delay(doc.pk)
 
