@@ -99,6 +99,11 @@ def get_js_config(request, obj=None):
 def get_document_viewer_context(doc, request, page_number=1, defaults=None):
     if defaults is None:
         defaults = {}
+
+    if not doc.has_format_webp():
+        from .tasks import convert_images_to_webp
+        convert_images_to_webp.delay(doc.pk)
+
     pages = doc.pages.all()
     pages = pages.filter(number__gte=page_number)[:PREVIEW_PAGE_COUNT]
     has_more = page_number + PREVIEW_PAGE_COUNT - 1 < doc.num_pages
