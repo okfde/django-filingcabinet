@@ -22,6 +22,7 @@
               :style="{'width': page.zoomedWidth + 'px', height: imageHeight + 'px'}"
               class="page-image-placeholder"
               draggable="false"
+              loading="lazy"
             >
           </picture>
           <picture>
@@ -41,6 +42,7 @@
               :style="{'width': page.zoomedWidth + 'px'}"
               class="page-image"
               draggable="false"
+              loading="lazy"
               :class="{'annotation-form': showAnnotationForm}"
               @load="onImageLoad"
             >

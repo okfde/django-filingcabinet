@@ -18,6 +18,7 @@
         :src="imageUrl"
         alt=""
         class="img-fluid page-image"
+        loading="lazy"
         @load="onImageLoad"
       >
     </picture>
