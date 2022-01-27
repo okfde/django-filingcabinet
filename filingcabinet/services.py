@@ -17,7 +17,7 @@ from .models import (
     Page, PageAnnotation, CollectionDocument, CollectionDirectory,
     get_page_filename, get_page_annotation_filename
 )
-from .tasks import process_document_task
+from .tasks import process_document_task, convert_images_to_webp
 from .pdf_utils import PDFProcessor, crop_image, draw_highlights, detect_tables
 from .utils import estimate_time
 
@@ -140,6 +140,7 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
         logger.info('Processing pages of doc %s complete', doc.id)
         doc.pending = False
         doc.save()
+        convert_images_to_webp.delay(doc.pk)
     else:
         queue_missing_pages(doc)
 
