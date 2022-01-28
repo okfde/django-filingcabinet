@@ -42,7 +42,6 @@
               :style="{'width': page.zoomedWidth + 'px'}"
               class="page-image"
               draggable="false"
-              loading="lazy"
               :class="{'annotation-form': showAnnotationForm}"
               @load="onImageLoad"
             >
@@ -258,7 +257,7 @@ export default {
       }
     },
     imageHeight () {
-      return Math.floor(this.page.height / this.page.width * this.page.zoomedWidth)
+      return this.page.height / this.page.width * this.page.zoomedWidth
     },
     imageDimensions () {
       return {
