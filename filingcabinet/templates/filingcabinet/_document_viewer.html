@@ -134,13 +134,12 @@
           </div>
         </div>
       </div>
+      {% if next_page %}
+        <a href="./?page={{ next_page }}">
+          {% translate "Go to next pages" %}
+        </a>
+      {% endif %}
     </div>
-  
-    {% if next_page %}
-      <a href="./?page={{ next_page }}">
-        {% translate "Go to next pages" %}
-      </a>
-    {% endif %}
   </div>
 {% else %}
   <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
