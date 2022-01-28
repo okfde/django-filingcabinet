@@ -73,7 +73,7 @@ def detect_tables_document_task(doc_pk):
 
 
 @shared_task
-def convert_images_to_webp(doc_pk):
+def convert_images_to_webp_task(doc_pk):
     from .services import convert_images_to_webp
 
     try:
