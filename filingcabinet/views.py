@@ -101,8 +101,8 @@ def get_document_viewer_context(doc, request, page_number=1, defaults=None):
         defaults = {}
 
     if not doc.has_format_webp() and not doc.pending:
-        from .tasks import convert_images_to_webp
-        convert_images_to_webp.delay(doc.pk)
+        from .tasks import convert_images_to_webp_task
+        convert_images_to_webp_task.delay(doc.pk)
 
     pages = doc.pages.all()
     pages = pages.filter(number__gte=page_number)[:PREVIEW_PAGE_COUNT]
