@@ -131,7 +131,7 @@ def get_document_file_path(instance, filename, public=None):
 
 def get_document_path(instance, filename):
     name, ext = os.path.splitext(filename)
-    slug = slugify(name)
+    slug = slugify(name)[:80]
     return get_document_file_path(instance, slug + ext)
 
 
