@@ -46,6 +46,7 @@ setup(
         'django-taggit',
         'django-mptt',
         'djangorestframework',
+        'reportlab',
         'webp'
     ],
     extras_require={
