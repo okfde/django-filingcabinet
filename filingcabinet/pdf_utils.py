@@ -246,7 +246,7 @@ class PDFProcessor(object):
         if pages is None:
             pages = range(self.num_pages)
         for page_no in pages:
-            yield self.get_for_page(page_no)
+            yield self.get_text_for_page(page_no)
 
     def run_ocr_on_image(self, image, timeout=30):
         if pytesseract is None:
