@@ -223,7 +223,7 @@ class AbstractDocument(models.Model):
         indexes = [
             models.Index(
                 fields=['content_hash'],
-                name='%(app_label)s_%(class)s_chash_idx',
+                name='chash_idx',
                 condition=models.Q(content_hash__isnull=False)
             )
         ]
