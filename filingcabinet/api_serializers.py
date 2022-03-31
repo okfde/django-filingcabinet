@@ -65,6 +65,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PagesMixin(object):
+
     def get_pages(self, obj):
         pages = obj.pages.all()
         serializer = PageSerializer(
@@ -76,6 +77,8 @@ class PagesMixin(object):
 
 
 class DocumentDetailSerializer(PagesMixin, DocumentSerializer):
+    pages = serializers.SerializerMethodField(source="get_pages")
+
     class Meta(DocumentSerializer.Meta):
         fields = DocumentSerializer.Meta.fields + (
             'pages',
