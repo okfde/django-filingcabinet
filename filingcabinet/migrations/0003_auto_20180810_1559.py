@@ -22,11 +22,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
             ],
         ),
-        migrations.AlterField(
-            model_name='documentcollection',
-            name='documents',
-            field=models.ManyToManyField(blank=True, related_name='filingcabinet_documentcollection', through='filingcabinet.CollectionDocument', to=settings.FILINGCABINET_DOCUMENT_MODEL),
-        ),
         migrations.AddField(
             model_name='collectiondocument',
             name='collection',
