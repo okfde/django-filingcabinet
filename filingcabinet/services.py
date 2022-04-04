@@ -207,7 +207,7 @@ def fix_file_paths(doc):
 
 def fix_file_paths_for_page(page):
     changed = False
-    for size_name, width in (("original", -1),) + Page.SIZES:
+    for size_name, _ in (("original", -1),) + Page.SIZES:
         if size_name == "original":
             field_file = page.image
         else:
@@ -354,7 +354,7 @@ def convert_page_to_webp(page):
         buf = encode_to_webp(pil_image, config=webp_config)
         page.image.storage.save("{}.webp".format(page.image.name), ContentFile(buf))
 
-    for size_name, width in Page.SIZES:
+    for size_name, _ in Page.SIZES:
         field_file = getattr(page, "image_%s" % size_name)
         if not field_file:
             continue

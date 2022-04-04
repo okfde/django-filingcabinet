@@ -154,10 +154,11 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
     fix_document_paths.short_description = _("Fix document paths")
 
-    def publish_documents(
-        self, request, queryset, public=True, message=_("Publishing {} documents...")
-    ):
+    def publish_documents(self, request, queryset, public=True, message=None):
         from .tasks import publish_document
+
+        if message is None:
+            message = _("Publishing {} documents...")
 
         count = 0
         for instance in queryset:

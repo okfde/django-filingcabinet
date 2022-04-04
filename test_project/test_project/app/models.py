@@ -1,7 +1,4 @@
-from filingcabinet.models import (
-    AbstractDocument,
-    AbstractDocumentCollection,
-)
+from filingcabinet.models import AbstractDocument, AbstractDocumentCollection
 
 
 class Document(AbstractDocument):
