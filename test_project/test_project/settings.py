@@ -1,12 +1,14 @@
-import os
 import random
 
-test_dir = os.path.dirname(__file__)
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(test_dir, 'db.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -49,7 +51,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
-        'DIRS': [os.path.join(test_dir, 'templates')],
+        'DIRS': [BASE_DIR / 'test_project' / 'templates'],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
