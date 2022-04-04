@@ -22,7 +22,6 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(blank=True, max_length=255)),
                 ('description', models.TextField(blank=True)),
                 ('public', models.BooleanField(default=True)),
-                ('documents', models.ManyToManyField(blank=True, through='filingcabinet.CollectionDocument', related_name='filingcabinet_documentcollection', to=settings.FILINGCABINET_DOCUMENT_MODEL)),
             ],
             options={
                 'abstract': False,

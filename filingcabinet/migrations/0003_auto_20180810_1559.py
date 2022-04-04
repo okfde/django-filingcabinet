@@ -23,6 +23,11 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AddField(
+            model_name='documentcollection',
+            name='documents',
+            field=models.ManyToManyField(blank=True, related_name='filingcabinet_documentcollection', through='filingcabinet.CollectionDocument', to=settings.FILINGCABINET_DOCUMENT_MODEL),
+        ),
+        migrations.AddField(
             model_name='collectiondocument',
             name='collection',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='filingcabinet_collectiondocument', to=settings.FILINGCABINET_DOCUMENTCOLLECTION_MODEL),
