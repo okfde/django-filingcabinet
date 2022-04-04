@@ -9,7 +9,10 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.text import slugify
 
-import webp
+try:
+    import webp
+except ImportError:
+    webp = None
 from PIL import Image as PILImage
 
 from . import get_document_model
@@ -137,7 +140,8 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
         logger.info("Processing pages of doc %s complete", doc.id)
         doc.pending = False
         doc.save()
-        convert_images_to_webp_task.delay(doc.pk)
+        if webp is not None:
+            convert_images_to_webp_task.delay(doc.pk)
     else:
         queue_missing_pages(doc)
 
@@ -207,7 +211,7 @@ def fix_file_paths(doc):
 
 def fix_file_paths_for_page(page):
     changed = False
-    for size_name, width in (("original", -1),) + Page.SIZES:
+    for size_name, _ in (("original", -1),) + Page.SIZES:
         if size_name == "original":
             field_file = page.image
         else:
@@ -354,7 +358,7 @@ def convert_page_to_webp(page):
         buf = encode_to_webp(pil_image, config=webp_config)
         page.image.storage.save("{}.webp".format(page.image.name), ContentFile(buf))
 
-    for size_name, width in Page.SIZES:
+    for size_name, _ in Page.SIZES:
         field_file = getattr(page, "image_%s" % size_name)
         if not field_file:
             continue
@@ -364,10 +368,14 @@ def convert_page_to_webp(page):
 
 
 def get_webp_default_config():
+    if webp is None:
+        raise RuntimeError("The 'webp' python package is not installed")
     return webp.WebPConfig.new(preset=webp.WebPPreset.TEXT, quality=80)
 
 
 def encode_to_webp(pil_image, config=None):
+    if webp is None:
+        raise RuntimeError("The 'webp' python package is not installed")
     if config is None:
         config = get_webp_default_config()
     pic = webp.WebPPicture.from_pil(pil_image)

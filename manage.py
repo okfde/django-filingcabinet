@@ -6,10 +6,10 @@ import sys
 
 def main():
     # Add directory to Python module import paht
-    app_dir = os.path.join(os.path.dirname(__file__), '..')
+    app_dir = os.path.join(os.path.dirname(__file__), "..")
     sys.path.insert(0, app_dir)
 
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'fc_project.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fc_project.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -21,5 +21,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
