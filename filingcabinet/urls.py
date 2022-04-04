@@ -1,9 +1,10 @@
-from django.urls import path
+from django.conf import settings
+from django.urls import path, re_path
 from django.utils.translation import pgettext_lazy
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
-    DocumentListView, DocumentListEmbedView,
+    DocumentFileDetailView, DocumentListView, DocumentListEmbedView,
     DocumentView, DocumentCollectionView,
     DocumentPortalView,
     DocumentEmbedView, DocumentCollectionEmbedView,
@@ -12,7 +13,7 @@ from .views import (
 
 app_name = 'filingcabinet'
 
-urlpatterns = [
+fc_urlpatterns = [
     path('', DocumentListView.as_view(), name='document-list'),
     path(pgettext_lazy(
             'url part',
@@ -74,4 +75,22 @@ urlpatterns = [
             DocumentEmbedView.as_view()
         ),
         name="document-detail_embed_short"),
+]
+
+
+MEDIA_PATH = settings.MEDIA_URL
+# Split off domain and leading slash
+if MEDIA_PATH.startswith("http"):
+    MEDIA_PATH = MEDIA_PATH.split("/", 3)[-1]
+else:
+    MEDIA_PATH = MEDIA_PATH[1:]
+
+
+urlpatterns = fc_urlpatterns + [
+    re_path(
+        r"^%s%s/(?P<u1>[a-z0-9]{2})/(?P<u2>[a-z0-9]{2})/(?P<u3>[a-z0-9]{2})/(?P<uuid>[a-z0-9]{32})/(?P<filename>.+)"
+        % (MEDIA_PATH, settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX),
+        DocumentFileDetailView.as_view(),
+        name="filingcabinet-auth_document",
+    )
 ]

@@ -1,6 +1,6 @@
 import json
 
-from django.shortcuts import redirect, Http404
+from django.shortcuts import get_object_or_404, redirect, Http404
 from django.urls import reverse
 from django.views.generic import DetailView, TemplateView
 from django.utils.translation import gettext as _
@@ -267,3 +267,20 @@ class DocumentListView(TemplateView):
 
 class DocumentListEmbedView(DocumentListView):
     template_name = 'filingcabinet/documentcollection_detail_embed.html'
+
+
+class DocumentFileDetailView(DetailView):
+    def get_object(self):
+        uid = self.kwargs["uuid"]
+        if (
+            uid[0:2] != self.kwargs["u1"]
+            or uid[2:4] != self.kwargs["u2"]
+            or uid[4:6] != self.kwargs["u3"]
+        ):
+            raise Http404
+        return get_object_or_404(Document, uid=uid)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        url = self.object.get_file_name(filename=self.kwargs["filename"])
+        return redirect(url)
