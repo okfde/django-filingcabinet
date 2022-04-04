@@ -225,10 +225,14 @@ class PDFProcessor(object):
             with Image(filename=image_filename, background=white) as img:
                 yield page_number, img
 
-    def get_text_for_page(self, page_no, image=None):
+    def get_text_for_page(self, page_no, image=None, use_ocr=False):
         text = self._get_text_for_page(page_no)
-        if not text.strip() and image is not None:
-            text = self.run_ocr_on_image(image)
+        if not text.strip():
+            if use_ocr and image is None:
+                for image in self.get_images([page_no]):
+                    text = self.run_ocr_on_image(image)
+            elif image is not None:
+                text = self.run_ocr_on_image(image)
         return text.strip()
 
     def _get_text_for_page(self, page_no):
@@ -242,11 +246,11 @@ class PDFProcessor(object):
         page = self.pdf_reader.getPage(page_no - 1)
         return page.extractText()
 
-    def get_text(self, pages=None):
+    def get_text(self, pages=None, use_ocr=False):
         if pages is None:
             pages = range(self.num_pages)
         for page_no in pages:
-            yield self.get_text_for_page(page_no)
+            yield self.get_text_for_page(page_no, use_ocr=use_ocr)
 
     def run_ocr_on_image(self, image, timeout=30):
         if pytesseract is None:
