@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0019_auto_20210323_1404'),
+        ("filingcabinet", "0019_auto_20210323_1404"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='data',
+            model_name="document",
+            name="data",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='documentcollection',
-            name='settings',
+            model_name="documentcollection",
+            name="settings",
             field=models.JSONField(blank=True, default=dict),
         ),
         migrations.AddField(
-            model_name='documentportal',
-            name='settings',
+            model_name="documentportal",
+            name="settings",
             field=models.JSONField(blank=True, default=dict),
         ),
     ]

@@ -6,26 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0013_auto_20191001_1644'),
+        ("filingcabinet", "0013_auto_20191001_1644"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='collectiondocument',
-            options={'ordering': ['order', 'document__title']},
+            name="collectiondocument",
+            options={"ordering": ["order", "document__title"]},
         ),
         migrations.AlterModelOptions(
-            name='documentcollection',
-            options={'verbose_name': 'document collection', 'verbose_name_plural': 'document collections'},
+            name="documentcollection",
+            options={
+                "verbose_name": "document collection",
+                "verbose_name_plural": "document collections",
+            },
         ),
         migrations.AddField(
-            model_name='collectiondocument',
-            name='order',
+            model_name="collectiondocument",
+            name="order",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='document',
-            name='file_size',
+            model_name="document",
+            name="file_size",
             field=models.BigIntegerField(blank=True, null=True),
         ),
     ]

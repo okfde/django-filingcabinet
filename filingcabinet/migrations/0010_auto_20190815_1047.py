@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0009_document_file_size'),
+        ("filingcabinet", "0009_document_file_size"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='document',
-            name='pending',
+            model_name="document",
+            name="pending",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='page',
-            name='pending',
+            model_name="page",
+            name="pending",
             field=models.BooleanField(default=False),
         ),
     ]

@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.FILINGCABINET_DOCUMENT_MODEL),
-        ('filingcabinet', '0010_auto_20190815_1047'),
+        ("filingcabinet", "0010_auto_20190815_1047"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='page',
-            unique_together={('document', 'number')},
+            name="page",
+            unique_together={("document", "number")},
         ),
     ]

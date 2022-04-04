@@ -1,106 +1,110 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
-from django.db.models import Q, Count, JSONField
+from django.db.models import Count, JSONField, Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from mptt.admin import MPTTModelAdmin
 from django_json_widget.widgets import JSONEditorWidget
+from mptt.admin import MPTTModelAdmin
 
-from .models import Page
 from .admin_utils import NullFilter
+from .models import Page
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ('title',)}
-    search_fields = ('title',)
-    date_hierarchy = 'created_at'
+    prepopulated_fields = {"slug": ("title",)}
+    search_fields = ("title",)
+    date_hierarchy = "created_at"
     list_display = (
-        'title', 'created_at', 'public',
-        'get_document_count',
-        'processed_documents_percentage'
+        "title",
+        "created_at",
+        "public",
+        "get_document_count",
+        "processed_documents_percentage",
     )
-    list_filter = ('public',)
+    list_filter = ("public",)
     formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget(
-            # TODO: JS does not work with CSP
-            # options={'schema': SETTINGS_SCHEMA}
-        )},
+        JSONField: {
+            "widget": JSONEditorWidget(
+                # TODO: JS does not work with CSP
+                # options={'schema': SETTINGS_SCHEMA}
+            )
+        },
     }
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(
-            document_count=Count('document'),
+            document_count=Count("document"),
             ready_document_count=Count(
-                'document',
-                filter=Q(
-                    document__pending=False,
-                    document__num_pages__gt=0
-                )
+                "document", filter=Q(document__pending=False, document__num_pages__gt=0)
             ),
         )
         return qs
 
     def get_document_count(self, obj):
         return obj.document_count
-    get_document_count.admin_order_field = 'document_count'
-    get_document_count.short_description = _('Documents')
+
+    get_document_count.admin_order_field = "document_count"
+    get_document_count.short_description = _("Documents")
 
     def processed_documents_percentage(self, obj):
         if not obj.document_count:
-            return '-'
-        return '{:.2f}%'.format(
-            obj.ready_document_count / obj.document_count * 100
-        )
-    processed_documents_percentage.admin_order_field = 'ready_document_count'
-    processed_documents_percentage.short_description = _('Processed')
+            return "-"
+        return "{:.2f}%".format(obj.ready_document_count / obj.document_count * 100)
+
+    processed_documents_percentage.admin_order_field = "ready_document_count"
+    processed_documents_percentage.short_description = _("Processed")
 
 
 class PageInline(admin.StackedInline):
     model = Page
-    raw_id_fields = ('document',)
+    raw_id_fields = ("document",)
 
 
 class HasTablesFilter(NullFilter):
-    title = _('has detected tables')
-    parameter_name = 'properties___tables__0'
+    title = _("has detected tables")
+    parameter_name = "properties___tables__0"
 
 
 class DocumentChangeList(ChangeList):
     def get_results(self, *args, **kwargs):
         super().get_results(*args, **kwargs)
         self.result_list = self.result_list.annotate(
-            ready_page_count=Count('pages', filter=Q(pages__pending=False)),
+            ready_page_count=Count("pages", filter=Q(pages__pending=False)),
         )
 
 
 class DocumentBaseAdmin(admin.ModelAdmin):
     inlines = [PageInline]
     save_on_top = True
-    search_fields = ('title',)
-    date_hierarchy = 'created_at'
+    search_fields = ("title",)
+    date_hierarchy = "created_at"
     list_display = (
-        'title', 'created_at', 'public', 'listed', 'num_pages', 'pending',
-        'processed_pages_percentage'
+        "title",
+        "created_at",
+        "public",
+        "listed",
+        "num_pages",
+        "pending",
+        "processed_pages_percentage",
     )
-    list_filter = (
-        'pending', 'public', 'allow_annotation', 'portal',
-        HasTablesFilter
-    )
-    raw_id_fields = ('user',)
-    readonly_fields = (
-        'uid', 'public', 'pending',
-        'content_hash'
-    )
-    prepopulated_fields = {'slug': ('title',)}
+    list_filter = ("pending", "public", "allow_annotation", "portal", HasTablesFilter)
+    raw_id_fields = ("user",)
+    readonly_fields = ("uid", "public", "pending", "content_hash")
+    prepopulated_fields = {"slug": ("title",)}
     formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget},
+        JSONField: {"widget": JSONEditorWidget},
     }
     actions = [
-        'process_document', 'reprocess_document', 'fix_document_paths',
-        'publish_documents', 'unpublish_documents',
-        'mark_unlisted', 'mark_listed', 'detect_tables'
+        "process_document",
+        "reprocess_document",
+        "fix_document_paths",
+        "publish_documents",
+        "unpublish_documents",
+        "mark_unlisted",
+        "mark_listed",
+        "detect_tables",
     ]
 
     def get_changelist(self, request):
@@ -108,13 +112,14 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
     def processed_pages_percentage(self, obj):
         if not obj.num_pages:
-            return '-'
-        return '{:.2f}%'.format(obj.ready_page_count / obj.num_pages * 100)
-    processed_pages_percentage.admin_order_field = 'ready_page_count'
-    processed_pages_percentage.short_description = _('Processed')
+            return "-"
+        return "{:.2f}%".format(obj.ready_page_count / obj.num_pages * 100)
+
+    processed_pages_percentage.admin_order_field = "ready_page_count"
+    processed_pages_percentage.short_description = _("Processed")
 
     def get_inline_instances(self, request, obj=None):
-        ''' Only show inline for docs with fewer than 31 pages'''
+        """Only show inline for docs with fewer than 31 pages"""
         if obj is not None and obj.num_pages and obj.num_pages <= 30:
             return super().get_inline_instances(request, obj=obj)
         return []
@@ -129,12 +134,14 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         for instance in queryset:
             instance.process_document(reprocess=False)
         self.message_user(request, _("Started processing documents."))
+
     process_document.short_description = _("Process documents")
 
     def reprocess_document(self, request, queryset):
         for instance in queryset:
             instance.process_document(reprocess=True)
         self.message_user(request, _("Started reprocessing documents."))
+
     reprocess_document.short_description = _("Reprocess documents")
 
     def fix_document_paths(self, request, queryset):
@@ -144,10 +151,12 @@ class DocumentBaseAdmin(admin.ModelAdmin):
             files_moved_task.delay(instance.id)
 
         self.message_user(request, _("Fixing document paths..."))
+
     fix_document_paths.short_description = _("Fix document paths")
 
-    def publish_documents(self, request, queryset, public=True,
-                          message=_("Publishing {} documents...")):
+    def publish_documents(
+        self, request, queryset, public=True, message=_("Publishing {} documents...")
+    ):
         from .tasks import publish_document
 
         count = 0
@@ -156,30 +165,29 @@ class DocumentBaseAdmin(admin.ModelAdmin):
                 publish_document.delay(instance.pk, public=public)
                 count += 1
         if count:
-            self.message_user(
-                request,
-                message.format(count)
-            )
+            self.message_user(request, message.format(count))
         else:
             self.message_user(
-                request,
-                _("Please select only non-pending documents for publishing.")
+                request, _("Please select only non-pending documents for publishing.")
             )
+
     publish_documents.short_description = _("Publish documents")
 
     def unpublish_documents(self, request, queryset):
         return self.publish_documents(
-            request, queryset, public=False,
-            message=_("Unpublishing {} documents...")
+            request, queryset, public=False, message=_("Unpublishing {} documents...")
         )
+
     unpublish_documents.short_description = _("Unpublish documents")
 
     def mark_listed(self, request, queryset):
         queryset.update(listed=True)
+
     mark_listed.short_description = _("Mark as listed")
 
     def mark_unlisted(self, request, queryset):
         queryset.update(listed=False)
+
     mark_unlisted.short_description = _("Mark as unlisted")
 
     def detect_tables(self, request, queryset):
@@ -187,24 +195,26 @@ class DocumentBaseAdmin(admin.ModelAdmin):
 
         for doc in queryset:
             detect_tables_document_task.delay(doc.pk)
-        self.message_user(
-            request,
-            _("Detecting tables tasks started...")
-        )
+        self.message_user(request, _("Detecting tables tasks started..."))
+
     detect_tables.short_description = _("Detect tables")
 
 
 class PageAdmin(admin.ModelAdmin):
-    raw_id_fields = ('document',)
-    search_fields = ('document__title',)
-    list_filter = ('pending', 'corrected', 'number',)
-    list_display = ('show_title', 'number', 'pending', 'corrected')
+    raw_id_fields = ("document",)
+    search_fields = ("document__title",)
+    list_filter = (
+        "pending",
+        "corrected",
+        "number",
+    )
+    list_display = ("show_title", "number", "pending", "corrected")
 
-    actions = ['set_pending']
+    actions = ["set_pending"]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        qs = qs.select_related('document')
+        qs = qs.select_related("document")
         return qs
 
     def show_title(self, obj):
@@ -212,75 +222,83 @@ class PageAdmin(admin.ModelAdmin):
 
     def set_pending(self, request, queryset):
         queryset.update(pending=True)
-    set_pending.short_description = _('Set to pending')
+
+    set_pending.short_description = _("Set to pending")
 
 
 class PageAnnotationAdmin(admin.ModelAdmin):
-    raw_id_fields = ('user', 'page',)
-    date_hierarchy = 'timestamp'
-    list_display = ('page', 'user', 'title', 'timestamp')
-    list_filter = ['page__number']
+    raw_id_fields = (
+        "user",
+        "page",
+    )
+    date_hierarchy = "timestamp"
+    list_display = ("page", "user", "title", "timestamp")
+    list_filter = ["page__number"]
     save_on_top = True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        qs = qs.select_related('user', 'page', 'page__document')
+        qs = qs.select_related("user", "page", "page__document")
         return qs
 
 
 class CollectionDirectoryAdmin(MPTTModelAdmin):
-    raw_id_fields = ('user', 'collection', 'parent')
-    list_display = ('name', 'collection', 'created_at', 'updated_at')
+    raw_id_fields = ("user", "collection", "parent")
+    list_display = ("name", "collection", "created_at", "updated_at")
 
 
 class DocumentCollectionBaseAdmin(admin.ModelAdmin):
-    raw_id_fields = ('user', 'documents',)
+    raw_id_fields = (
+        "user",
+        "documents",
+    )
     save_on_top = True
-    search_fields = ('title',)
-    date_hierarchy = 'created_at'
+    search_fields = ("title",)
+    date_hierarchy = "created_at"
     list_display = (
-        'title', 'created_at', 'public', 'listed', 'user',
-        'get_document_count',
-        'processed_documents_percentage'
+        "title",
+        "created_at",
+        "public",
+        "listed",
+        "user",
+        "get_document_count",
+        "processed_documents_percentage",
     )
-    prepopulated_fields = {'slug': ('title',)}
+    prepopulated_fields = {"slug": ("title",)}
     formfield_overrides = {
-        JSONField: {'widget': JSONEditorWidget(
-            # TODO: JS does not work with CSP
-            # options={'schema': SETTINGS_SCHEMA}
-        )},
+        JSONField: {
+            "widget": JSONEditorWidget(
+                # TODO: JS does not work with CSP
+                # options={'schema': SETTINGS_SCHEMA}
+            )
+        },
     }
-    readonly_fields = (
-        'uid', 'created_at'
-    )
+    readonly_fields = ("uid", "created_at")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         qs = qs.annotate(
-            document_count=Count('documents'),
-            ready_document_count=Count(
-                'documents',
-                filter=Q(documents__pending=False)
-            ),
+            document_count=Count("documents"),
+            ready_document_count=Count("documents", filter=Q(documents__pending=False)),
         )
         return qs
 
     def get_document_count(self, obj):
         return obj.document_count
-    get_document_count.admin_order_field = 'document_count'
-    get_document_count.short_description = _('Documents')
+
+    get_document_count.admin_order_field = "document_count"
+    get_document_count.short_description = _("Documents")
 
     def processed_documents_percentage(self, obj):
         if not obj.document_count:
-            return '-'
-        return '{:.2f}%'.format(
-            obj.ready_document_count / obj.document_count * 100
-        )
-    processed_documents_percentage.admin_order_field = 'ready_document_count'
-    processed_documents_percentage.short_description = _('Processed')
+            return "-"
+        return "{:.2f}%".format(obj.ready_document_count / obj.document_count * 100)
+
+    processed_documents_percentage.admin_order_field = "ready_document_count"
+    processed_documents_percentage.short_description = _("Processed")
 
     def get_inline_instances(self, request, obj=None):
-        ''' Only show inline for docs with fewer than 31 pages'''
+        """Only show inline for docs with fewer than 31 pages"""
         if obj is not None:
             doc_count = obj.documents.count()
             if doc_count < 31:
@@ -289,12 +307,12 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
 
 
 class CollectionDocumentBaseAdmin(admin.ModelAdmin):
-    list_display = ('document', 'collection', 'order')
-    raw_id_fields = ('document', 'collection', 'directory')
+    list_display = ("document", "collection", "order")
+    raw_id_fields = ("document", "collection", "directory")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        qs = qs.select_related('document', 'collection')
+        qs = qs.select_related("document", "collection")
         return qs
 
 

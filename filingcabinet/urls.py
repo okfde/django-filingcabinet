@@ -4,77 +4,77 @@ from django.utils.translation import pgettext_lazy
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
-    DocumentFileDetailView, DocumentListView, DocumentListEmbedView,
-    DocumentView, DocumentCollectionView,
-    DocumentPortalView,
-    DocumentEmbedView, DocumentCollectionEmbedView,
+    DocumentCollectionEmbedView,
+    DocumentCollectionView,
+    DocumentEmbedView,
+    DocumentFileDetailView,
+    DocumentListEmbedView,
+    DocumentListView,
     DocumentPortalEmbedView,
+    DocumentPortalView,
+    DocumentView,
 )
 
-app_name = 'filingcabinet'
+app_name = "filingcabinet"
 
 fc_urlpatterns = [
-    path('', DocumentListView.as_view(), name='document-list'),
-    path(pgettext_lazy(
-            'url part',
-            'embed/'
+    path("", DocumentListView.as_view(), name="document-list"),
+    path(
+        pgettext_lazy("url part", "embed/"),
+        xframe_options_exempt(DocumentListEmbedView.as_view()),
+        name="document-list_embed",
+    ),
+    path(
+        pgettext_lazy("url part", "collection/<int:pk>-<slug:slug>/"),
+        DocumentCollectionView.as_view(),
+        name="document-collection",
+    ),
+    path(
+        pgettext_lazy("url part", "collection/<int:pk>/"),
+        DocumentCollectionView.as_view(),
+        name="document-collection_short",
+    ),
+    path(
+        pgettext_lazy(
+            "url part",
+            "collection/<int:pk>-<slug:slug>/embed/",
         ),
-        xframe_options_exempt(
-            DocumentListEmbedView.as_view()
-        ), name='document-list_embed'),
-    path(pgettext_lazy(
-            'url part',
-            'collection/<int:pk>-<slug:slug>/'
+        xframe_options_exempt(DocumentCollectionEmbedView.as_view()),
+        name="document-collection_embed",
+    ),
+    path(
+        pgettext_lazy(
+            "url part",
+            "collection/<int:pk>/embed/",
         ),
-        DocumentCollectionView.as_view(), name='document-collection'),
-    path(pgettext_lazy(
-            'url part',
-            'collection/<int:pk>/'
+        xframe_options_exempt(DocumentCollectionEmbedView.as_view()),
+        name="document-collection_embed_short",
+    ),
+    path(
+        pgettext_lazy("url part", "portal/<slug:slug>/"),
+        DocumentPortalView.as_view(),
+        name="document-portal",
+    ),
+    path(
+        pgettext_lazy(
+            "url part",
+            "portal/<slug:slug>/embed/",
         ),
-        DocumentCollectionView.as_view(), name='document-collection_short'),
-    path(pgettext_lazy(
-            'url part',
-            'collection/<int:pk>-<slug:slug>/embed/',
-        ),
-        xframe_options_exempt(
-            DocumentCollectionEmbedView.as_view()
-        ),
-        name="document-collection_embed"),
-    path(pgettext_lazy(
-            'url part',
-            'collection/<int:pk>/embed/',
-        ),
-        xframe_options_exempt(
-            DocumentCollectionEmbedView.as_view()
-        ),
-        name="document-collection_embed_short"),
-
-    path(pgettext_lazy(
-            'url part',
-            'portal/<slug:slug>/'
-        ),
-        DocumentPortalView.as_view(), name='document-portal'),
-    path(pgettext_lazy(
-            'url part',
-            'portal/<slug:slug>/embed/',
-        ),
-        xframe_options_exempt(
-            DocumentPortalEmbedView.as_view()
-        ),
-        name="document-portal_embed"),
-    path("<int:pk>-<slug:slug>/", DocumentView.as_view(),
-         name="document-detail"),
-    path("<int:pk>/", DocumentView.as_view(),
-         name="document-detail_short"),
-    path("<int:pk>-<slug:slug>/embed/",
-         xframe_options_exempt(
-            DocumentEmbedView.as_view()
-         ),
-         name="document-detail_embed"),
-    path("<int:pk>/embed/", xframe_options_exempt(
-            DocumentEmbedView.as_view()
-        ),
-        name="document-detail_embed_short"),
+        xframe_options_exempt(DocumentPortalEmbedView.as_view()),
+        name="document-portal_embed",
+    ),
+    path("<int:pk>-<slug:slug>/", DocumentView.as_view(), name="document-detail"),
+    path("<int:pk>/", DocumentView.as_view(), name="document-detail_short"),
+    path(
+        "<int:pk>-<slug:slug>/embed/",
+        xframe_options_exempt(DocumentEmbedView.as_view()),
+        name="document-detail_embed",
+    ),
+    path(
+        "<int:pk>/embed/",
+        xframe_options_exempt(DocumentEmbedView.as_view()),
+        name="document-detail_embed_short",
+    ),
 ]
 
 

@@ -1,23 +1,22 @@
-from django.db.models import (
-    Q, Value, BooleanField, Case, When, Count
-)
+from django.db.models import BooleanField, Case, Count, Q, Value, When
 
-from rest_framework import (
-    viewsets, mixins, permissions, status
-)
-from rest_framework.response import Response
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from . import get_document_model, get_documentcollection_model
-from .models import Page, PageAnnotation, CollectionDirectory
 from .api_serializers import (
-    DocumentSerializer, DocumentDetailSerializer, UpdateDocumentSerializer,
+    CreatePageAnnotationSerializer,
+    DocumentCollectionSerializer,
+    DocumentDetailSerializer,
+    DocumentSerializer,
+    PageAnnotationSerializer,
     PageSerializer,
-    PageAnnotationSerializer, CreatePageAnnotationSerializer,
-    DocumentCollectionSerializer
+    UpdateDocumentSerializer,
 )
 from .api_utils import make_oembed_response
 from .filters import DocumentFilter, PageDocumentFilterset
+from .models import CollectionDirectory, Page, PageAnnotation
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -53,14 +52,16 @@ class CanReadWritePermission(permissions.BasePermission):
         return obj.can_write(request)
 
 
-class DocumentViewSet(mixins.ListModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      viewsets.GenericViewSet):
+class DocumentViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_action_classes = {
-        'list': DocumentSerializer,
-        'retrieve': DocumentDetailSerializer,
-        'update': UpdateDocumentSerializer
+        "list": DocumentSerializer,
+        "retrieve": DocumentDetailSerializer,
+        "update": UpdateDocumentSerializer,
     }
     permission_classes = (CanReadWritePermission,)
     filterset_class = DocumentFilter
@@ -72,7 +73,7 @@ class DocumentViewSet(mixins.ListModelMixin,
             return DocumentSerializer
 
     def get_base_queryset(self):
-        if self.action == 'list':
+        if self.action == "list":
             cond = Q(public=True, listed=True)
         else:
             cond = Q(public=True)
@@ -82,11 +83,11 @@ class DocumentViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         qs = self.get_base_queryset()
-        if self.action == 'list':
+        if self.action == "list":
             qs = qs.filter(pending=False)
         return qs
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def oembed(self, request):
         return make_oembed_response(request, Document)
 
@@ -94,11 +95,11 @@ class DocumentViewSet(mixins.ListModelMixin,
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
     filterset_class = PageDocumentFilterset
-    search_fields = ['content']
+    search_fields = ["content"]
 
     def get_queryset(self):
-        document_id = self.request.query_params.get('document', '')
-        collection_id = self.request.query_params.get('collection', '')
+        document_id = self.request.query_params.get("document", "")
+        collection_id = self.request.query_params.get("collection", "")
 
         pages = Page.objects.all()
         try:
@@ -109,23 +110,20 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
         try:
-            collection = DocumentCollection.objects.get(
-                pk=collection_id
-            )
+            collection = DocumentCollection.objects.get(pk=collection_id)
             if not collection.can_read(self.request):
                 return Page.objects.none()
             pages = pages.filter(document__in=collection.documents.all())
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
-        return pages.prefetch_related('document')
+        return pages.prefetch_related("document")
 
 
 class DocumentCollectionViewSet(
-        mixins.ListModelMixin,
-        mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet):
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+):
     serializer_action_classes = {
-        'list': DocumentCollectionSerializer,
+        "list": DocumentCollectionSerializer,
     }
     permission_classes = (CanReadWritePermission,)
 
@@ -136,19 +134,19 @@ class DocumentCollectionViewSet(
             return DocumentCollectionSerializer
 
     def get_queryset(self):
-        if self.action == 'list':
+        if self.action == "list":
             cond = Q(public=True, listed=True)
         else:
             cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
         qs = DocumentCollection.objects.filter(cond)
-        qs = qs.annotate(document_count=Count('documents'))
+        qs = qs.annotate(document_count=Count("documents"))
         # TODO: annotate doc count for directory for performance
         # qs = qs.annotate(document_directory_count=Count(
         #     'documents', filter=Q(filingcabinet)
         # ))
-        qs = qs.prefetch_related('documents')
+        qs = qs.prefetch_related("documents")
         return qs
 
     def get_serializer_context(self):
@@ -156,37 +154,36 @@ class DocumentCollectionViewSet(
         Extra context provided to the serializer class.
         """
         ctx = super().get_serializer_context()
-        if self.action != 'retrieve':
+        if self.action != "retrieve":
             return ctx
 
         # FIXME: check if directory is part of this collection
         try:
-            dir_id = int(self.request.GET.get('directory', ''))
-            parent_directory = CollectionDirectory.objects.get(
-                id=dir_id
-            )
+            dir_id = int(self.request.GET.get("directory", ""))
+            parent_directory = CollectionDirectory.objects.get(id=dir_id)
         except (ValueError, CollectionDirectory.DoesNotExist):
             parent_directory = None
 
-        ctx.update({
-            'parent_directory': parent_directory
-        })
+        ctx.update({"parent_directory": parent_directory})
         return ctx
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def oembed(self, request):
         return make_oembed_response(request, DocumentCollection)
 
 
 class PageAnnotationViewSet(
-        mixins.CreateModelMixin, mixins.DestroyModelMixin,
-        mixins.ListModelMixin, mixins.RetrieveModelMixin,
-        viewsets.GenericViewSet):
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = PageAnnotationSerializer
     permission_classes = (IsUserOrReadOnly,)
 
     def get_serializer_class(self):
-        if self.action == 'create':
+        if self.action == "create":
             return CreatePageAnnotationSerializer
         return self.serializer_class
 
@@ -206,9 +203,7 @@ class PageAnnotationViewSet(
         user = self.request.user
 
         if user.is_superuser:
-            qs = qs.annotate(can_delete=Value(
-                True, output_field=BooleanField())
-            )
+            qs = qs.annotate(can_delete=Value(True, output_field=BooleanField()))
         else:
             whens = []
             if user.is_authenticated:
@@ -216,19 +211,17 @@ class PageAnnotationViewSet(
 
             qs = qs.annotate(
                 can_delete=Case(
-                    *whens,
-                    default=Value(False),
-                    output_field=BooleanField()
+                    *whens, default=Value(False), output_field=BooleanField()
                 )
             )
         return qs
 
     def get_queryset(self):
-        document_id = self.request.query_params.get('document', '')
+        document_id = self.request.query_params.get("document", "")
 
         qs = self.get_base_queryset(document_id)
 
-        number = self.request.query_params.get('number')
+        number = self.request.query_params.get("number")
         if number is not None:
             try:
                 qs.filter(page__number=int(number))
@@ -237,15 +230,15 @@ class PageAnnotationViewSet(
 
         qs = self.annotate_permissions(qs)
 
-        return qs.order_by('timestamp')
+        return qs.order_by("timestamp")
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = self.perform_create(serializer)
         data = {
-            'status': 'success',
-            'annotation': PageAnnotationSerializer(instance).data
+            "status": "success",
+            "annotation": PageAnnotationSerializer(instance).data,
         }
         return Response(data, status=status.HTTP_201_CREATED)
 

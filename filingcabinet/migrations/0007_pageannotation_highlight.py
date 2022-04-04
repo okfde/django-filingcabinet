@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0006_auto_20190109_1339'),
+        ("filingcabinet", "0006_auto_20190109_1339"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='pageannotation',
-            name='highlight',
+            model_name="pageannotation",
+            name="highlight",
             field=models.TextField(blank=True),
         ),
     ]

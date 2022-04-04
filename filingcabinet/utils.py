@@ -1,20 +1,20 @@
-from contextlib import contextmanager
 import os
 import tempfile
+from contextlib import contextmanager
 
 from django.core.files.storage import default_storage
 
 
 def chunks(li, n):
     n = max(1, n)
-    return (li[i:i+n] for i in range(0, len(li), n))
+    return (li[i : i + n] for i in range(0, len(li), n))
 
 
 def estimate_time(filesize, page_count=None):
-    '''
+    """
     Estimate processing time as
     one minute + 5 seconds per megabyte timeout
-    '''
+    """
     return int(60 + 5 * filesize / (1024 * 1024))
 
 
@@ -23,7 +23,7 @@ def get_local_file(path, storage=default_storage):
     _, extension = os.path.splitext(path)
     try:
         local_file = tempfile.NamedTemporaryFile(
-            mode='wb', delete=False, suffix=extension
+            mode="wb", delete=False, suffix=extension
         )
 
         local_file.write(storage.open(path).read())

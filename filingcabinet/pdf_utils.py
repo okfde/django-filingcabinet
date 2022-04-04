@@ -7,19 +7,16 @@ import shutil
 import subprocess
 import tempfile
 
+import pikepdf
+import wand
+from PIL import Image as PILImage
+from PyPDF2 import PdfFileReader
+from PyPDF2.utils import PdfReadError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
-
-import wand
-from wand.image import Image
 from wand.color import Color
-
-from PyPDF2 import PdfFileReader
-from PyPDF2.utils import PdfReadError
-from PIL import Image as PILImage
-
-import pikepdf
+from wand.image import Image
 
 try:
     import pytesseract
@@ -36,27 +33,24 @@ logger = logging.getLogger(__name__)
 
 
 OFFICE_FILETYPES = (
-    'application/msexcel',
-    'application/vnd.ms-excel',
-    'application/msword',
-    'application/vnd.msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'text/rtf',
-    'application/rtf',
+    "application/msexcel",
+    "application/vnd.ms-excel",
+    "application/msword",
+    "application/vnd.msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/rtf",
+    "application/rtf",
 )
 OFFICE_EXTENSIONS = (
-    '.doc',
-    '.docx',
-    '.docm',
-    '.odt',
-    '.rtf',
+    ".doc",
+    ".docx",
+    ".docm",
+    ".odt",
+    ".rtf",
 )
 
 
-TESSERACT_LANGUAGE = {
-    'en': 'eng',
-    'de': 'deu'
-}
+TESSERACT_LANGUAGE = {"en": "eng", "de": "deu"}
 
 
 class PDFException(Exception):
@@ -69,22 +63,22 @@ def try_reading_pdf(pdf_file, password=None):
     try:
         pdf_reader = PdfFileReader(pdf_file, strict=False)
     except (PdfReadError, ValueError, OSError) as e:
-        raise PDFException(e, 'rewrite')
+        raise PDFException(e, "rewrite")
 
     if pdf_reader.isEncrypted:
-        raise PDFException(None, 'decrypt')
+        raise PDFException(None, "decrypt")
 
     try:
         # Try reading number of pages
         pdf_reader.getNumPages()
     except KeyError as e:  # catch KeyError '/Pages'
-        raise PDFException(e, 'rewrite')
+        raise PDFException(e, "rewrite")
     except ValueError as e:  # catch invalid literal for int() with base 10
-        raise PDFException(e, 'rewrite')
+        raise PDFException(e, "rewrite")
     except RecursionError as e:  # catch RecursionError in PyPDF2
-        raise PDFException(e, 'rewrite')
+        raise PDFException(e, "rewrite")
     except PdfReadError as e:
-        raise PDFException(e, 'decrypt')
+        raise PDFException(e, "decrypt")
     return pdf_reader
 
 
@@ -101,24 +95,21 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
                 pdf_file = copy_func(pdf_file)
             tries += 1
             if tries > 2:
-                raise Exception('PDF Redaction Error')
-            if e.reason == 'rewrite':
+                raise Exception("PDF Redaction Error")
+            if e.reason == "rewrite":
                 next_pdf_file = rewrite_pdf_in_place(
-                    pdf_file, password=password,
-                    timeout=timeout
+                    pdf_file, password=password, timeout=timeout
                 )
                 if next_pdf_file is None:
                     next_pdf_file = rewrite_hard_pdf_in_place(
-                        pdf_file, password=password,
-                        timeout=timeout
+                        pdf_file, password=password, timeout=timeout
                     )
-            elif e.reason == 'decrypt':
+            elif e.reason == "decrypt":
                 next_pdf_file = decrypt_pdf_in_place(
-                    pdf_file, password=password,
-                    timeout=timeout
+                    pdf_file, password=password, timeout=timeout
                 )
             if next_pdf_file is None:
-                raise Exception('PDF Rewrite Error')
+                raise Exception("PDF Rewrite Error")
             pdf_file = next_pdf_file
 
 
@@ -162,18 +153,18 @@ class PikePDFProcessor:
     def iter_markdown_outline(self):
         outline_generator = self.get_outline()
         for depth, title, page_number in outline_generator:
-            yield '{indent}- [{title}](#page-{page_number})\n'.format(
-                indent='  ' * depth, title=title, page_number=page_number
+            yield "{indent}- [{title}](#page-{page_number})\n".format(
+                indent="  " * depth, title=title, page_number=page_number
             )
 
     def get_markdown_outline(self):
-        return ''.join(self.iter_markdown_outline())
+        return "".join(self.iter_markdown_outline())
 
 
 def fix_text(text):
     if text is None:
         return None
-    return text.replace('\u0000', '')
+    return text.replace("\u0000", "")
 
 
 class PDFProcessor(object):
@@ -189,7 +180,7 @@ class PDFProcessor(object):
         try:
             return PdfFileReader(filename)
         except (PdfReadError, ValueError, OSError):
-            logger.error('Could not read PDF %s', filename)
+            logger.error("Could not read PDF %s", filename)
             pass
         pdf_file_name = rewrite_pdf_in_place(filename)
         return PdfFileReader(pdf_file_name)
@@ -199,29 +190,26 @@ class PDFProcessor(object):
         if doc_info is None:
             return {}
         return {
-            'title': fix_text(doc_info.title),
-            'author': fix_text(doc_info.author),
-            'creator': fix_text(doc_info.creator),
-            'producer': fix_text(doc_info.producer),
-            'subject': fix_text(doc_info.subject),
+            "title": fix_text(doc_info.title),
+            "author": fix_text(doc_info.author),
+            "creator": fix_text(doc_info.creator),
+            "producer": fix_text(doc_info.producer),
+            "subject": fix_text(doc_info.subject),
         }
 
     def get_markdown_outline(self):
         with PikePDFProcessor(self.filename) as pike_pdf:
             return pike_pdf.get_markdown_outline()
 
-    def get_images(self, pages=None, resolution=300, chunk_size=20,
-                   timeout=5 * 60):
-        white = wand.color.Color('#fff')
+    def get_images(self, pages=None, resolution=300, chunk_size=20, timeout=5 * 60):
+        white = wand.color.Color("#fff")
         if pages is None:
             pages = list(range(1, self.num_pages + 1))
         images = get_images_from_pdf_chunked(
-            self.filename, pages,
-            chunk_size, dpi=resolution,
-            timeout=timeout
+            self.filename, pages, chunk_size, dpi=resolution, timeout=timeout
         )
         for page_number, image_filename in images:
-            logger.info('Generated page %s: %s', page_number, image_filename)
+            logger.info("Generated page %s: %s", page_number, image_filename)
             with Image(filename=image_filename, background=white) as img:
                 yield page_number, img
 
@@ -236,13 +224,13 @@ class PDFProcessor(object):
         return text.strip()
 
     def _get_text_for_page(self, page_no):
-        if not hasattr(self, 'pdflib_pages'):
+        if not hasattr(self, "pdflib_pages"):
             if pdflib is not None:
                 pdflib_doc = pdflib.Document(self.filename)
                 self.pdflib_pages = list(pdflib_doc)
-        if hasattr(self, 'pdflib_pages'):
+        if hasattr(self, "pdflib_pages"):
             page = self.pdflib_pages[page_no - 1]
-            return ' '.join(page.lines).strip()
+            return " ".join(page.lines).strip()
         page = self.pdf_reader.getPage(page_no - 1)
         return page.extractText()
 
@@ -254,13 +242,13 @@ class PDFProcessor(object):
 
     def run_ocr_on_image(self, image, timeout=30):
         if pytesseract is None:
-            return ''
-        img_blob = image.make_blob('RGB')
-        pil_image = PILImage.frombytes('RGB', image.size, img_blob)
+            return ""
+        img_blob = image.make_blob("RGB")
+        pil_image = PILImage.frombytes("RGB", image.size, img_blob)
 
         lang = TESSERACT_LANGUAGE[self.language]
-        config = ''
-        path = self.config.get('TESSERACT_DATA_PATH', '')
+        config = ""
+        path = self.config.get("TESSERACT_DATA_PATH", "")
         if path:
             config = '--tessdata-dir "{}"'.format(path)
 
@@ -269,26 +257,25 @@ class PDFProcessor(object):
                 pil_image, lang=lang, config=config, timeout=timeout
             )
         except RuntimeError:
-            logger.warning('Timeout on OCR')
-            return ''
+            logger.warning("Timeout on OCR")
+            return ""
 
 
 def draw_highlights(highlights):
     def apply_highlights(img):
-        img.colorspace = 'rgb'
+        img.colorspace = "rgb"
         for highlight in highlights:
             crop = img[
-                highlight['left']:highlight['left'] + highlight['width'],
-                highlight['top']:highlight['top'] + highlight['height']
+                highlight["left"] : highlight["left"] + highlight["width"],
+                highlight["top"] : highlight["top"] + highlight["height"],
             ]
             crop.opaque_paint(
-                target=Color('white'),
-                fill=Color(highlight['color']),
+                target=Color("white"),
+                fill=Color(highlight["color"]),
                 fuzz=crop.quantum_range * 0.3,
             )
-            img.composite(
-                crop, left=highlight['left'], top=highlight['top']
-            )
+            img.composite(crop, left=highlight["left"], top=highlight["top"])
+
     return apply_highlights
 
 
@@ -298,46 +285,43 @@ def crop_image(image_path, left, top, width, height, transform_func=None):
         img.crop(left, top, left + width, top + height)
         if transform_func is not None:
             transform_func(img)
-        return img.make_blob('gif')
+        return img.make_blob("gif")
 
 
 def can_convert_to_pdf(filetype, name=None):
     return filetype.lower() in OFFICE_FILETYPES or (
-        name is not None and name.lower().endswith(OFFICE_EXTENSIONS))
+        name is not None and name.lower().endswith(OFFICE_EXTENSIONS)
+    )
 
 
-def convert_to_pdf(filepath, binary_name=None, construct_call=None,
-                   timeout=120):
+def convert_to_pdf(filepath, binary_name=None, construct_call=None, timeout=120):
     if binary_name is None and construct_call is None:
         return
     outpath = tempfile.mkdtemp()
     path, filename = os.path.split(filepath)
-    parts = filename.rsplit('.', 1)
+    parts = filename.rsplit(".", 1)
     name = parts[0]
-    output_file = os.path.join(outpath, '%s.pdf' % name)
+    output_file = os.path.join(outpath, "%s.pdf" % name)
     arguments = [
         binary_name,
-        '--headless',
-        '--nodefault',
-        '--nofirststartwizard',
-        '--nolockcheck',
-        '--nologo',
-        '--norestore',
-        '--invisible',
-        '--convert-to',
-        'pdf',
-        '--outdir',
+        "--headless",
+        "--nodefault",
+        "--nofirststartwizard",
+        "--nolockcheck",
+        "--nologo",
+        "--norestore",
+        "--invisible",
+        "--convert-to",
+        "pdf",
+        "--outdir",
         outpath,
-        filepath
+        filepath,
     ]
     if construct_call is not None:
         arguments, output_file = construct_call(filepath, outpath)
 
     try:
-        output_bytes = shell_call(
-            arguments, outpath, output_file,
-            timeout=timeout
-        )
+        output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
         return output_bytes
     except Exception as err:
         logger.error("Error during Doc to PDF conversion: %s", err)
@@ -347,13 +331,13 @@ def convert_to_pdf(filepath, binary_name=None, construct_call=None,
     return None
 
 
-def convert_images_to_ocred_pdf(filenames, language='en', instructions=None):
+def convert_images_to_ocred_pdf(filenames, language="en", instructions=None):
     try:
         temp_dir = tempfile.mkdtemp()
-        output_file = os.path.join(temp_dir, 'out.pdf')
+        output_file = os.path.join(temp_dir, "out.pdf")
         pdf_bytes = convert_images_to_pdf(filenames, instructions=instructions)
 
-        with open(output_file, 'wb') as f:
+        with open(output_file, "wb") as f:
             f.write(pdf_bytes)
 
         return run_ocr(output_file, language=language, timeout=180)
@@ -367,27 +351,24 @@ def convert_images_to_ocred_pdf(filenames, language='en', instructions=None):
         shutil.rmtree(temp_dir)
 
 
-def run_ocr(filename, language=None, binary_name='ocrmypdf', timeout=50):
+def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
     if binary_name is None:
         return
     outpath = tempfile.mkdtemp()
     lang = TESSERACT_LANGUAGE[language]
-    output_file = os.path.join(outpath, 'out.pdf')
+    output_file = os.path.join(outpath, "out.pdf")
     arguments = [
         binary_name,
-        '-l',
+        "-l",
         lang,
-        '--deskew',
-        '--skip-text',
+        "--deskew",
+        "--skip-text",
         # '--title', title
         filename,
-        output_file
+        output_file,
     ]
     try:
-        output_bytes = shell_call(
-            arguments, outpath, output_file,
-            timeout=timeout
-        )
+        output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
         return output_bytes
     except Exception as err:
         logger.error("Error during PDF OCR: %s", err)
@@ -399,17 +380,14 @@ def run_ocr(filename, language=None, binary_name='ocrmypdf', timeout=50):
 
 def shell_call(arguments, outpath, output_file=None, timeout=50):
     env = dict(os.environ)
-    env.update({'HOME': outpath})
+    env.update({"HOME": outpath})
 
     logger.info("Running: %s", arguments)
-    out, err = '', ''
+    out, err = "", ""
     p = None
     try:
         p = subprocess.Popen(
-            arguments,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=env
+            arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
         )
 
         out, err = p.communicate(timeout=timeout)
@@ -423,7 +401,7 @@ def shell_call(arguments, outpath, output_file=None, timeout=50):
             out, err = p.communicate()
     if p is not None and p.returncode == 0:
         if output_file is not None and os.path.exists(output_file):
-            with open(output_file, 'rb') as f:
+            with open(output_file, "rb") as f:
                 return f.read()
     if output_file is not None:
         raise Exception(err)
@@ -432,13 +410,11 @@ def shell_call(arguments, outpath, output_file=None, timeout=50):
 def run_command_overwrite(filename, argument_func, timeout=50):
     try:
         temp_dir = tempfile.mkdtemp()
-        temp_out = os.path.join(temp_dir, 'gs_pdf_out.pdf')
+        temp_out = os.path.join(temp_dir, "gs_pdf_out.pdf")
         arguments, temp_out = argument_func(filename, temp_dir)
-        output_bytes = shell_call(
-            arguments, temp_dir, temp_out, timeout=timeout
-        )
+        output_bytes = shell_call(arguments, temp_dir, temp_out, timeout=timeout)
 
-        with open(filename, 'wb') as f:
+        with open(filename, "wb") as f:
             f.write(output_bytes)
         return filename
     except Exception as err:
@@ -452,13 +428,11 @@ def run_command_overwrite(filename, argument_func, timeout=50):
 
 def decrypt_pdf_in_place(filename, password=None, timeout=50):
     def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, 'qpdf_out.pdf')
-        arguments = ['qpdf', '--decrypt']
+        temp_out = os.path.join(temp_dir, "qpdf_out.pdf")
+        arguments = ["qpdf", "--decrypt"]
 
         if password is not None:
-            arguments.extend([
-                '--password=%s' % password
-            ])
+            arguments.extend(["--password=%s" % password])
 
         arguments.extend([filename, temp_out])
         return arguments, temp_out
@@ -468,19 +442,15 @@ def decrypt_pdf_in_place(filename, password=None, timeout=50):
 
 def rewrite_pdf_in_place(filename, password=None, timeout=50):
     def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, 'gs_pdf_out.pdf')
+        temp_out = os.path.join(temp_dir, "gs_pdf_out.pdf")
         arguments = [
-            'gs', '-o', temp_out,
+            "gs",
+            "-o",
+            temp_out,
         ]
         if password is not None:
-            arguments.extend([
-                '-sPDFPassword=%s' % password
-            ])
-        arguments.extend([
-            '-sDEVICE=pdfwrite',
-            '-dPDFSETTINGS=/prepress',
-            filename
-        ])
+            arguments.extend(["-sPDFPassword=%s" % password])
+        arguments.extend(["-sDEVICE=pdfwrite", "-dPDFSETTINGS=/prepress", filename])
         return arguments, temp_out
 
     return run_command_overwrite(filename, argument_func, timeout=timeout)
@@ -488,19 +458,14 @@ def rewrite_pdf_in_place(filename, password=None, timeout=50):
 
 def rewrite_hard_pdf_in_place(filename, password=None, timeout=50):
     def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, 'pdfcairo_out.pdf')
+        temp_out = os.path.join(temp_dir, "pdfcairo_out.pdf")
         arguments = [
-            'pdftocairo',
-            '-pdf',
+            "pdftocairo",
+            "-pdf",
         ]
         if password is not None:
-            arguments.extend([
-                '-upw', password
-            ])
-        arguments.extend([
-            filename,
-            temp_out
-        ])
+            arguments.extend(["-upw", password])
+        arguments.extend([filename, temp_out])
         return arguments, temp_out
 
     return run_command_overwrite(filename, argument_func, timeout=timeout)
@@ -517,11 +482,11 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     pdf = canvas.Canvas(writer, pagesize=A4)
     for filename, instruction in zip(filenames, instructions):
         with Image(filename=filename, resolution=dpi) as image:
-            image.background_color = Color('white')
-            image.format = 'jpg'
-            image.alpha_channel = 'remove'
+            image.background_color = Color("white")
+            image.format = "jpg"
+            image.alpha_channel = "remove"
             try:
-                degree = instruction.get('rotate', 0)
+                degree = instruction.get("rotate", 0)
                 if degree and degree % 90 == 0:
                     image.rotate(degree)
             except ValueError:
@@ -532,10 +497,7 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
             else:
                 ratio = MAX_HEIGHT_A4 / image.height
             if ratio < 1:
-                image.resize(
-                    round(ratio * image.width),
-                    round(ratio * image.height)
-                )
+                image.resize(round(ratio * image.width), round(ratio * image.height))
 
             width = image.width * 72 / dpi
             height = image.height * 72 / dpi
@@ -547,11 +509,11 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     return writer.getvalue()
 
 
-def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300,
-                                timeout=5 * 60):
+def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300, timeout=5 * 60):
     for pages in chunks(pages, chunk_size):
         with get_images_from_pdf(
-                filename, pages=pages, dpi=dpi, timeout=timeout) as images:
+            filename, pages=pages, dpi=dpi, timeout=timeout
+        ) as images:
             yield from images
 
 
@@ -569,10 +531,13 @@ def get_images_from_pdf(filename, pages=None, dpi=300, timeout=5 * 60):
 
 
 def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
-    temp_out = os.path.join(temp_dir, 'image')
+    temp_out = os.path.join(temp_dir, "image")
 
     base_arguments = [
-        'pdftoppm', '-png', '-r', str(dpi),
+        "pdftoppm",
+        "-png",
+        "-r",
+        str(dpi),
     ]
 
     if pages is not None:
@@ -585,22 +550,18 @@ def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
     for first, last in page_iterator:
         arguments = list(base_arguments)
         if first is not None:
-            arguments.extend(['-f', str(first), '-l', str(last)])
+            arguments.extend(["-f", str(first), "-l", str(last)])
 
         arguments.extend([filename, temp_out])
-        shell_call(
-            arguments, temp_dir, output_file=None, timeout=timeout
-        )
+        shell_call(arguments, temp_dir, output_file=None, timeout=timeout)
 
-    images = glob.glob(temp_out + '-*.png')
+    images = glob.glob(temp_out + "-*.png")
     images.sort()
-    return [
-        (get_page_number(filename), filename) for filename in images
-    ]
+    return [(get_page_number(filename), filename) for filename in images]
 
 
 def get_page_number(filename):
-    return int(filename.rsplit('-', 1)[1].split('.')[0])
+    return int(filename.rsplit("-", 1)[1].split(".")[0])
 
 
 def get_continuous_pages(pages):
@@ -627,9 +588,7 @@ def detect_tables(filename):
         return None
     try:
         tables = camelot.read_pdf(filename)
-        return [
-            table.parsing_report for table in tables
-        ]
+        return [table.parsing_report for table in tables]
     except Exception:
         # Camelot may fail on bad pdfs, just ignore
         return []

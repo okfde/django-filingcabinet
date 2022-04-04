@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0007_pageannotation_highlight'),
+        ("filingcabinet", "0007_pageannotation_highlight"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='page',
-            name='height',
+            model_name="page",
+            name="height",
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(
-            model_name='page',
-            name='width',
+            model_name="page",
+            name="width",
             field=models.IntegerField(null=True),
         ),
     ]

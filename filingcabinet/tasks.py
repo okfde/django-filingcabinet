@@ -24,11 +24,7 @@ def process_pages_task(doc_pk, page_numbers=None, task_page_limit=None):
         doc = Document.objects.get(pk=doc_pk)
     except Document.DoesNotExist:
         return None
-    process_pages(
-        doc,
-        page_numbers=page_numbers,
-        task_page_limit=task_page_limit
-    )
+    process_pages(doc, page_numbers=page_numbers, task_page_limit=task_page_limit)
 
 
 @shared_task(acks_late=True, time_limit=5 * 60)

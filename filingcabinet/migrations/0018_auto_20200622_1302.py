@@ -6,22 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0017_auto_20200514_1329'),
+        ("filingcabinet", "0017_auto_20200514_1329"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='collectiondirectory',
-            options={'verbose_name': 'Collection directory', 'verbose_name_plural': 'Collection directories'},
+            name="collectiondirectory",
+            options={
+                "verbose_name": "Collection directory",
+                "verbose_name_plural": "Collection directories",
+            },
         ),
         migrations.AddField(
-            model_name='document',
-            name='outline',
+            model_name="document",
+            name="outline",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='document',
-            name='properties',
+            model_name="document",
+            name="properties",
             field=models.JSONField(blank=True, default=dict),
         ),
     ]

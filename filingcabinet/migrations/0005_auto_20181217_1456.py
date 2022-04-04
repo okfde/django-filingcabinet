@@ -8,13 +8,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0004_auto_20180810_1642'),
+        ("filingcabinet", "0004_auto_20180810_1642"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='document',
-            name='language',
-            field=models.CharField(blank=True, choices=[('de', 'German'), ('en', 'English')], default='de', max_length=10),
+            model_name="document",
+            name="language",
+            field=models.CharField(
+                blank=True,
+                choices=[("de", "German"), ("en", "English")],
+                default="de",
+                max_length=10,
+            ),
         ),
     ]

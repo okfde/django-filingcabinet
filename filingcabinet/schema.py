@@ -18,10 +18,7 @@ SETTINGS_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "id": {"type": "string"},
-                    "type": {
-                        "type": "string",
-                        "pattern": "choice|daterange"
-                    },
+                    "type": {"type": "string", "pattern": "choice|daterange"},
                     "key": {"type": "string"},
                     "facet": {"type": "boolean"},
                     "facet_config": {
@@ -29,18 +26,14 @@ SETTINGS_SCHEMA = {
                         "properties": {
                             "type": {"type": "string"},
                             "interval": {"type": "string"},
-                            "format": {"type": "string"}
-                        }
+                            "format": {"type": "string"},
+                        },
                     },
                     "label": {
                         "type": "object",
                         "minProperties": 1,
-                        "propertyNames": {
-                            "pattern": "^[a-z]{2}$"
-                        },
-                        "patternProperties": {
-                            "^[a-z]{2}$": {"type": "string"}
-                        }
+                        "propertyNames": {"pattern": "^[a-z]{2}$"},
+                        "patternProperties": {"^[a-z]{2}$": {"type": "string"}},
                     },
                     "datatype": {"type": "string"},
                     "choices": {
@@ -52,22 +45,18 @@ SETTINGS_SCHEMA = {
                                 "label": {
                                     "type": "object",
                                     "minProperties": 1,
-                                    "propertyNames": {
-                                        "pattern": "^[a-z]{2}$"
-                                    },
+                                    "propertyNames": {"pattern": "^[a-z]{2}$"},
                                     "patternProperties": {
                                         "^[a-z]{2}$": {"type": "string"}
-                                    }
-                                }
+                                    },
+                                },
                             },
-                            "required": ["value"]
-                        }
-                    }
+                            "required": ["value"],
+                        },
+                    },
                 },
-                "required": [
-                    "id", "key", "type", "label"
-                ]
-            }
+                "required": ["id", "key", "type", "label"],
+            },
         }
-    }
+    },
 }

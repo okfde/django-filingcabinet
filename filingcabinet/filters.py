@@ -1,56 +1,48 @@
 from django.db.models import Q
 
-from taggit.models import Tag
 from django_filters import rest_framework as filters
+from taggit.models import Tag
 
 from . import get_document_model, get_documentcollection_model
 from .models import CollectionDirectory, DocumentPortal, Page
 
-
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
 
-NULL_VALUE = '-'
+NULL_VALUE = "-"
 
 
 class DocumentFilter(filters.FilterSet):
     directory = filters.ModelChoiceFilter(
-        queryset=(
-            CollectionDirectory.objects.all()
-            .select_related('collection')
-        ),
-        null_label='',
+        queryset=(CollectionDirectory.objects.all().select_related("collection")),
+        null_label="",
         null_value=NULL_VALUE,
-        method='filter_directory',
+        method="filter_directory",
     )
     collection = filters.ModelChoiceFilter(
         queryset=DocumentCollection.objects.all(),
-        method='filter_collection',
+        method="filter_collection",
     )
     portal = filters.ModelChoiceFilter(
         queryset=DocumentPortal.objects.filter(public=True),
-        to_field_name='pk',
-        method='filter_portal',
+        to_field_name="pk",
+        method="filter_portal",
     )
-    ids = filters.CharFilter(
-        method='filter_ids'
-    )
+    ids = filters.CharFilter(method="filter_ids")
     created_at = filters.DateFromToRangeFilter(
-        method='filter_created_at',
+        method="filter_created_at",
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        request = kwargs.get('request')
+        request = kwargs.get("request")
         if request is None:
             request = self.view.request
         self.request = request
 
     def filter_ids(self, qs, name, value):
         try:
-            ids = [
-                int(x) for x in value.split(',') if x
-            ]
+            ids = [int(x) for x in value.split(",") if x]
         except ValueError:
             ids = None
         if ids:
@@ -59,16 +51,12 @@ class DocumentFilter(filters.FilterSet):
 
     def filter_directory(self, qs, name, directory):
         if NULL_VALUE == directory:
-            return qs.filter(
-                filingcabinet_collectiondocument__directory__isnull=True
-            )
+            return qs.filter(filingcabinet_collectiondocument__directory__isnull=True)
         if not directory.collection.can_read(self.request):
             return qs.none()
         return qs.filter(
             filingcabinet_collectiondocument__directory=directory
-        ).order_by(
-            'filingcabinet_collectiondocument__order'
-        )
+        ).order_by("filingcabinet_collectiondocument__order")
 
     def filter_collection(self, qs, name, collection):
         if not collection.can_read(self.request):
@@ -76,105 +64,97 @@ class DocumentFilter(filters.FilterSet):
 
         qs = qs.filter(
             filingcabinet_collectiondocument__collection=collection
-        ).order_by(
-            'filingcabinet_collectiondocument__order'
-        )
-        data_filters = collection.settings.get('filters', [])
+        ).order_by("filingcabinet_collectiondocument__order")
+        data_filters = collection.settings.get("filters", [])
         qs = self.apply_data_filters(qs, data_filters)
         return qs
 
     def filter_portal(self, qs, name, portal):
         qs = qs.filter(portal=portal)
-        qs = self.apply_data_filters(qs, portal.settings.get('filters', []))
+        qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
         return qs
 
     def apply_data_filters(self, qs, filters):
         for filt in filters:
-            if not filt['key'].startswith('data.'):
+            if not filt["key"].startswith("data."):
                 continue
-            val = self.request.GET.get(filt['key'])
+            val = self.request.GET.get(filt["key"])
             if not val:
                 continue
-            data_type = filt.get('datatype')
+            data_type = filt.get("datatype")
             if data_type:
                 try:
-                    if data_type == 'int':
+                    if data_type == "int":
                         val = int(val)
                 except ValueError:
                     continue
-            filt_key = filt['key'].replace('.', '__')
+            filt_key = filt["key"].replace(".", "__")
             qs = qs.filter(**{filt_key: val})
         return qs
 
     def filter_created_at(self, qs, name, value):
         range_kwargs = {}
         if value.start is not None:
-            range_kwargs['gte'] = value.start
+            range_kwargs["gte"] = value.start
         if value.stop is not None:
-            range_kwargs['lte'] = value.stop
+            range_kwargs["lte"] = value.stop
 
         for comp, val in range_kwargs.items():
             qs = qs.filter(
-                Q(**{
-                    'published_at__isnull': False,
-                    'published_at__{}'.format(comp): val
-                }) |
-                Q(**{
-                    'published_at__isnull': True,
-                    'created_at__{}'.format(comp): val
-                })
+                Q(
+                    **{
+                        "published_at__isnull": False,
+                        "published_at__{}".format(comp): val,
+                    }
+                )
+                | Q(
+                    **{"published_at__isnull": True, "created_at__{}".format(comp): val}
+                )
             )
         return qs
 
 
 class PageDocumentFilterset(filters.FilterSet):
-    q = filters.CharFilter(
-        to_field_name='content',
-        lookup_expr='contains'
-    )
+    q = filters.CharFilter(to_field_name="content", lookup_expr="contains")
 
     tag = filters.ModelChoiceFilter(
-        queryset=Tag.objects.all(),
-        to_field_name='slug',
-        method='filter_tag'
+        queryset=Tag.objects.all(), to_field_name="slug", method="filter_tag"
     )
     collection = filters.ModelChoiceFilter(
         queryset=DocumentCollection.objects.all(),
-        to_field_name='pk',
-        method='filter_collection',
+        to_field_name="pk",
+        method="filter_collection",
     )
     portal = filters.ModelChoiceFilter(
         queryset=DocumentPortal.objects.filter(public=True),
-        to_field_name='pk',
-        method='filter_portal',
+        to_field_name="pk",
+        method="filter_portal",
     )
     document = filters.ModelChoiceFilter(
         queryset=Document.objects.all(),
-        to_field_name='pk',
-        method='filter_document',
+        to_field_name="pk",
+        method="filter_document",
     )
     number = filters.NumberFilter(
-        method='filter_number',
+        method="filter_number",
     )
 
     class Meta:
         model = Page
-        fields = [
-            'q', 'tag', 'collection', 'document',
-            'number', 'portal'
-        ]
+        fields = ["q", "tag", "collection", "document", "number", "portal"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        request = kwargs.get('request')
+        request = kwargs.get("request")
         if request is None:
             request = self.view.request
         self.request = request
 
     def filter_queryset(self, queryset):
-        required_unlisted_filters = {'document', 'collection'}
+        required_unlisted_filters = {"document", "collection"}
         filter_present = any(
-            v for k, v in self.form.cleaned_data.items()
+            v
+            for k, v in self.form.cleaned_data.items()
             if k in required_unlisted_filters
         )
         if not filter_present:
@@ -188,50 +168,52 @@ class PageDocumentFilterset(filters.FilterSet):
         if not collection.can_read(self.request):
             return qs.none()
         qs = qs.filter(document__collections=collection)
-        qs = self.apply_data_filters(
-            qs, collection.settings.get('filters', [])
-        )
+        qs = self.apply_data_filters(qs, collection.settings.get("filters", []))
         return qs
 
     def filter_portal(self, qs, name, portal):
         qs = qs.filter(document__portal=portal)
-        qs = self.apply_data_filters(qs, portal.settings.get('filters', []))
+        qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
         return qs
 
     def apply_data_filters(self, qs, filters):
         for filt in filters:
-            if not filt['key'].startswith('data.'):
+            if not filt["key"].startswith("data."):
                 continue
-            val = self.request.GET.get(filt['key'])
+            val = self.request.GET.get(filt["key"])
             if not val:
                 continue
-            data_type = filt.get('datatype')
+            data_type = filt.get("datatype")
             if data_type:
                 try:
-                    if data_type == 'int':
+                    if data_type == "int":
                         val = int(val)
                 except ValueError:
                     continue
-            filt_key = 'document__{}'.format(filt['key'].replace('.', '__'))
+            filt_key = "document__{}".format(filt["key"].replace(".", "__"))
             qs = qs.filter(**{filt_key: val})
         return qs
 
     def filter_created_at(self, qs, name, value):
         range_kwargs = {}
         if value.start is not None:
-            range_kwargs['gte'] = value.start
+            range_kwargs["gte"] = value.start
         if value.stop is not None:
-            range_kwargs['lte'] = value.stop
+            range_kwargs["lte"] = value.stop
 
         for comp, val in range_kwargs.items():
             qs = qs.filter(
-                Q(**{
-                    'document__published_at__isnull': False,
-                    'document__published_at__{}'.format(comp): val
-                }) |
-                Q(**{
-                    'document__published_at__isnull': True,
-                    'document__created_at__{}'.format(comp): val
-                })
+                Q(
+                    **{
+                        "document__published_at__isnull": False,
+                        "document__published_at__{}".format(comp): val,
+                    }
+                )
+                | Q(
+                    **{
+                        "document__published_at__isnull": True,
+                        "document__created_at__{}".format(comp): val,
+                    }
+                )
             )
         return qs

@@ -10,22 +10,30 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.FILINGCABINET_DOCUMENT_MODEL),
-        ('filingcabinet', '0001_initial'),
+        ("filingcabinet", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DocumentCollection',
+            name="DocumentCollection",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('slug', models.SlugField(blank=True, max_length=250)),
-                ('title', models.CharField(blank=True, max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('public', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("slug", models.SlugField(blank=True, max_length=250)),
+                ("title", models.CharField(blank=True, max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("public", models.BooleanField(default=True)),
             ],
             options={
-                'abstract': False,
-                'swappable': 'FILINGCABINET_DOCUMENTCOLLECTION_MODEL',
+                "abstract": False,
+                "swappable": "FILINGCABINET_DOCUMENTCOLLECTION_MODEL",
             },
         ),
     ]
