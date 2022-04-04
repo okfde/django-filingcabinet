@@ -46,9 +46,8 @@ setup(
         "django-mptt",
         "djangorestframework",
         "reportlab",
-        "webp",
     ],
-    extras_require={"tabledetection": ["camelot-py[cv]"]},
+    extras_require={"tabledetection": ["camelot-py[cv]"], "webp": ["webp"]},
     test_requires=["factory_boy"],
     include_package_data=True,
     classifiers=[
