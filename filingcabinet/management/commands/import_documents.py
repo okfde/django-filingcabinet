@@ -47,7 +47,7 @@ class Command(BaseCommand):
             self.import_pdf(pdf_file)
 
     def get_content_hash(self, pdf_filename):
-        h = hashlib.sha256()
+        h = hashlib.sha1()
         with open(pdf_filename, "rb") as f:
             while True:
                 chunk = f.read(h.block_size)
