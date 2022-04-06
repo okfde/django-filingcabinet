@@ -58,8 +58,11 @@ class Command(BaseCommand):
 
     def import_pdf(self, pdf_filename):
         metadata_filename = pdf_filename.replace(".pdf", ".json")
-        with open(metadata_filename) as f:
-            metadata = json.load(f)
+        if os.path.exists(metadata_filename):
+            with open(metadata_filename) as f:
+                metadata = json.load(f)
+        else:
+            metadata = {"title": ""}
 
         content_hash = metadata.get("content_hash")
         if content_hash is None:
