@@ -193,10 +193,14 @@ def get_document_portal_context(portal, request):
 
 
 class DocumentPortalView(DetailView):
-    queryset = DocumentPortal.objects.filter(public=True)
     template_name = "filingcabinet/documentportal_detail.html"
     redirect_url_name = "filingcabinet:document-portal"
     redirect_short_url_name = "filingcabinet:document-portal_short"
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return DocumentPortal.objects.all()
+        return DocumentPortal.objects.filter(public=True)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
