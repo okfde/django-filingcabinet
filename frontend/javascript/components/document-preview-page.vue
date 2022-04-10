@@ -8,7 +8,7 @@
       <source
         v-for="format in imageFormats"
         :key="format"
-        :srcset="imageUrl + '.' + format"
+        :srcset="imageUrl.replace(/\.png/, '.png.' + format)"
         :type="'image/' + format"
       >
       <img

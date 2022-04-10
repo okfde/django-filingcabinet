@@ -13,7 +13,7 @@
             <source
               v-for="format in supportedFormats"
               :key="format"
-              :srcset="previewImageUrl + '.' + format"
+              :srcset="previewImageUrl.replace(/\.png/, '.png.' + format)"
               :type="'image/' + format"
             >
             <img
