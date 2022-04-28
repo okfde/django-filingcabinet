@@ -135,7 +135,7 @@ class DocumentCollectionViewSet(
 
     def get_queryset(self):
         if self.action == "list":
-            cond = Q(public=True, listed=True)
+            cond = Q(public=True) | Q(listed=True)
         else:
             cond = Q(public=True)
         if self.request.user.is_authenticated:
