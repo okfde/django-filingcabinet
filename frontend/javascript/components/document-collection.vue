@@ -275,7 +275,7 @@ export default {
     getCollectionData () {
       let url = [this.documentCollection.resource_uri]
       if (url[0].indexOf('?') === -1) {
-        url.push('?')
+        url.push(`?${this.collectionAuth}`)
       } else {
         url.push(`&${this.collectionAuth}`)
       }
