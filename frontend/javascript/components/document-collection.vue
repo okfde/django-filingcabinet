@@ -340,6 +340,7 @@ export default {
       if (url[0].indexOf('?') === -1) {
         url.push('?')
       }
+      url.push(`&${this.collectionAuth}`);
       url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : '-'}`)
       url.push(`&offset=${offset}&limit=${DOCUMENTS_API_LIMIT}`)
       this.documentOffset = offset + DOCUMENTS_API_LIMIT
