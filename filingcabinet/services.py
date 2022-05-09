@@ -65,9 +65,10 @@ def process_document(doc):
             doc.title = doc.properties["title"]
         else:
             doc.title = doc.title.rsplit(".pdf")[0]
+    doc.title = doc.title[:500]
 
     if not doc.slug and doc.title:
-        doc.slug = slugify(doc.title)
+        doc.slug = slugify(doc.title)[:250]
 
     if not doc.outline:
         doc.outline = pdf.get_markdown_outline()
