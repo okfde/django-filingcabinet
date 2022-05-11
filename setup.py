@@ -46,6 +46,7 @@ setup(
         "django-mptt",
         "djangorestframework",
         "reportlab",
+        "celery",
     ],
     extras_require={"tabledetection": ["camelot-py[cv]"], "webp": ["webp"]},
     test_requires=["factory_boy"],
