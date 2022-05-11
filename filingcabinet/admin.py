@@ -1,14 +1,19 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, JSONField, Q
+from django.shortcuts import redirect
+from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_json_widget.widgets import JSONEditorWidget
 from mptt.admin import MPTTModelAdmin
 
+from . import get_document_model
 from .admin_utils import NullFilter
 from .models import Page
+from .services import create_document_from_file
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -81,7 +86,7 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     search_fields = ("title",)
     date_hierarchy = "created_at"
     list_display = (
-        "title",
+        "get_title",
         "created_at",
         "public",
         "listed",
@@ -107,6 +112,20 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         "detect_tables",
     ]
 
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "upload/",
+                self.admin_site.admin_view(self.upload_documents),
+                name="filingcabinet-document-upload",
+            ),
+        ]
+        return custom_urls + urls
+
+    def get_title(self, obj):
+        return obj.title or "<%s>" % obj.pk
+
     def get_changelist(self, request):
         return DocumentChangeList
 
@@ -129,6 +148,26 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         super().save_model(request, doc, form, change)
         if not change:
             doc.process_document()
+
+    def upload_documents(self, request):
+        if not request.method == "POST":
+            raise PermissionDenied
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+
+        Document = get_document_model()
+
+        pdf_files = request.FILES.getlist("file")
+        for pdf_file in pdf_files:
+            create_document_from_file(pdf_file)
+
+        return redirect(
+            reverse(
+                "admin:{}_{}_changelist".format(
+                    Document._meta.app_label, Document._meta.model_name
+                )
+            )
+        )
 
     def process_document(self, request, queryset):
         for instance in queryset:

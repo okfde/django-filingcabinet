@@ -6,7 +6,8 @@ from io import BytesIO
 from pathlib import PurePath
 
 from django.conf import settings
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
+from django.db import transaction
 from django.utils.text import slugify
 
 try:
@@ -381,3 +382,10 @@ def encode_to_webp(pil_image, config=None):
         config = get_webp_default_config()
     pic = webp.WebPPicture.from_pil(pil_image)
     return pic.encode(config).buffer()
+
+
+def create_document_from_file(file_obj):
+    doc = Document.objects.create()
+    pdf_filename = file_obj.name
+    doc.pdf_file.save(os.path.basename(pdf_filename), File(file_obj), save=True)
+    transaction.on_commit(lambda: process_document_task.delay(doc.pk))
