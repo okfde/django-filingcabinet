@@ -11,6 +11,8 @@ from filingcabinet.api_views import (
     PageViewSet,
 )
 
+from . import admin as fc_admin  # noqa
+
 api_router = DefaultRouter()
 
 api_router.register(r"document", DocumentViewSet, basename="document")
@@ -19,7 +21,6 @@ api_router.register(
 )
 api_router.register(r"page", PageViewSet, basename="page")
 api_router.register(r"pageannotation", PageAnnotationViewSet, basename="pageannotation")
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
