@@ -5,7 +5,6 @@ import zipfile
 from io import BytesIO
 from pathlib import PurePath
 
-from django.conf import settings
 from django.core.files.base import ContentFile, File
 from django.db import transaction
 from django.utils.text import slugify
@@ -26,6 +25,7 @@ from .models import (
     get_page_filename,
 )
 from .pdf_utils import PDFProcessor, crop_image, detect_tables, draw_highlights
+from .settings import TESSERACT_DATA_PATH
 from .tasks import convert_images_to_webp_task, process_document_task
 from .utils import estimate_time
 
@@ -43,7 +43,7 @@ def get_copy_func(doc):
 
 
 def get_pdf_processor(doc):
-    config = {"TESSERACT_DATA_PATH": settings.TESSERACT_DATA_PATH}
+    config = {"TESSERACT_DATA_PATH": TESSERACT_DATA_PATH}
     pdf_path = doc.get_file_path()
     return PDFProcessor(
         pdf_path, copy_func=get_copy_func(doc), language=doc.language, config=config

@@ -9,3 +9,7 @@ FILINGCABINET_DOCUMENTCOLLECTION_MODEL = getattr(
     "FILINGCABINET_DOCUMENTCOLLECTION_MODEL",
     "filingcabinet.DocumentCollection",
 )
+
+TESSERACT_DATA_PATH = getattr(
+    settings, "TESSERACT_DATA_PATH", "/usr/local/share/tessdata"
+)
