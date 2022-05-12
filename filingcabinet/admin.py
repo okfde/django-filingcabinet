@@ -13,7 +13,7 @@ from mptt.admin import MPTTModelAdmin
 from . import get_document_model
 from .admin_utils import NullFilter
 from .models import Page
-from .services import create_document_from_file
+from .services import create_documents_from_files
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -155,11 +155,10 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         if not self.has_change_permission(request):
             raise PermissionDenied
 
-        Document = get_document_model()
-
         pdf_files = request.FILES.getlist("file")
-        for pdf_file in pdf_files:
-            create_document_from_file(pdf_file)
+        create_documents_from_files(request.user, pdf_files)
+
+        Document = get_document_model()
 
         return redirect(
             reverse(

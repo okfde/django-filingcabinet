@@ -5,7 +5,7 @@ import zipfile
 from io import BytesIO
 from pathlib import PurePath
 
-from django.core.files.base import ContentFile, File
+from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils.text import slugify
 
@@ -238,6 +238,13 @@ def fix_file_paths_for_pageannotation(annotation):
         annotation.save()
 
 
+def trigger_process_document_task(doc_pk):
+    def trigger():
+        process_document_task.delay(doc_pk)
+
+    return trigger
+
+
 class DocumentStorer:
     ZIP_BLOCK_LIST = set(["__MACOSX"])
 
@@ -261,7 +268,7 @@ class DocumentStorer:
 
         if file_obj:
             doc.pdf_file.save(filename, file_obj, save=True)
-            process_document_task.delay(doc.pk)
+            transaction.on_commit(trigger_process_document_task(doc.pk))
 
         if self.tags:
             doc.tags.set(*self.tags)
@@ -384,8 +391,8 @@ def encode_to_webp(pil_image, config=None):
     return pic.encode(config).buffer()
 
 
-def create_document_from_file(file_obj):
-    doc = Document.objects.create()
-    pdf_filename = file_obj.name
-    doc.pdf_file.save(os.path.basename(pdf_filename), File(file_obj), save=True)
-    transaction.on_commit(lambda: process_document_task.delay(doc.pk))
+def create_documents_from_files(user, file_objs):
+    storer = DocumentStorer(user)
+    for file_obj in file_objs:
+        filename = os.path.basename(file_obj.name)
+        storer.create_from_file(file_obj, filename)
