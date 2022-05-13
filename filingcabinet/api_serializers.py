@@ -70,6 +70,8 @@ class PagesMixin(object):
 
 
 class DocumentDetailSerializer(PagesMixin, DocumentSerializer):
+    pages = serializers.SerializerMethodField(source="get_pages")
+
     class Meta(DocumentSerializer.Meta):
         fields = DocumentSerializer.Meta.fields + ("pages",)
 
