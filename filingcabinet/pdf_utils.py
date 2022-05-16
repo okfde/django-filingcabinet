@@ -220,7 +220,7 @@ class PDFProcessor(object):
         text = self._get_text_for_page(page_no)
         if not text.strip():
             if use_ocr and image is None:
-                for image in self.get_images([page_no]):
+                for _page_number, image in self.get_images([page_no]):
                     text = self.run_ocr_on_image(image)
             elif image is not None:
                 text = self.run_ocr_on_image(image)
