@@ -502,16 +502,21 @@ class Page(models.Model):
     def get_large_image_url(self):
         return self.document.get_page_template(page=self.number, size="large")
 
+    def get_original_image_url(self):
+        return self.document.get_page_template(page=self.number, size="original")
+
     def dim_ratio_percent(self):
         if self.width and self.height:
             return str(self.height / self.width * 100)
         return str(70)
 
     def get_image_srcset(self, ext=""):
-        return "{preview}{ext} 180w, {normal}{ext} 700w, {large}{ext} 1000w".format(
+        return "{preview}{ext} 180w, {normal}{ext} 700w, {large}{ext} 1000w, {original}{ext} {width}w".format(
             preview=self.get_preview_image_url(),
             normal=self.get_normal_image_url(),
             large=self.get_large_image_url(),
+            original=self.get_original_image_url(),
+            width=self.width,
             ext=ext,
         )
 

@@ -233,6 +233,7 @@ export default {
       for (let size in PAGE_SIZES) {
         srcset.push(`${this.page.image_url.replace(/\{size\}/, size)} ${PAGE_SIZES[size]}w`)
       }
+      srcset.push(`${this.page.image_url.replace(/\{size\}/, 'original')} ${this.page.width}w`)
       return srcset.join(', ')
     },
     pageId () {
