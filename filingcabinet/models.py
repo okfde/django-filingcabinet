@@ -422,6 +422,16 @@ class AbstractDocument(models.Model):
 
         process_document_task.delay(self.id)
 
+    def publish_delayed(self):
+        from .tasks import publish_document
+
+        publish_document.delay(self.pk, public=True)
+
+    def unpublish_delayed(self):
+        from .tasks import publish_document
+
+        publish_document.delay(self.pk, public=False)
+
     def has_format(self, format):
         format_marker = self.FORMAT_KEY.format(format)
         return self.properties.get(format_marker) is True
