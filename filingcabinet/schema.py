@@ -11,6 +11,14 @@ SETTINGS_SCHEMA = {
     "description": "Settings of a filingcabinet portal",
     "type": "object",
     "properties": {
+        "preferences": {
+            "description": "list of UI preferences",
+            "type": "object",
+            "properties": {
+                "showSearch": {"type": "boolean"},
+                "allowToggleSearch": {"type": "boolean"},
+            },
+        },
         "filters": {
             "description": "list of filters",
             "type": "array",
@@ -57,6 +65,6 @@ SETTINGS_SCHEMA = {
                 },
                 "required": ["id", "key", "type", "label"],
             },
-        }
+        },
     },
 }

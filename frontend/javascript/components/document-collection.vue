@@ -42,7 +42,7 @@
         </div>
 
         <div
-          v-if="!document"
+          v-if="!document && allowToggleSearch"
           class="col-auto order-md-4 ml-auto"
         >
           <button
@@ -215,11 +215,14 @@ export default {
       collection = this.documentCollection
     }
     let shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
+    let settings = collection.settings || {}
+    let preferences = settings.preferences
     return {
       document: null,
       collection: collection,
-      settings: collection.settings || {},
-      showSearch: false,
+      settings: settings,
+      showSearch: preferences.showSearch ?? false,
+      allowToggleSearch: preferences.allowToggleSearch ?? true,
       searcher: null,
       documentPage: 1,
       currentDirectory: null,
