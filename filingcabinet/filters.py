@@ -28,6 +28,9 @@ class DocumentFilter(filters.FilterSet):
         to_field_name="pk",
         method="filter_portal",
     )
+    tag = filters.ModelChoiceFilter(
+        queryset=Tag.objects.all(), to_field_name="slug", method="filter_tag"
+    )
     ids = filters.CharFilter(method="filter_ids")
     created_at = filters.DateFromToRangeFilter(
         method="filter_created_at",
@@ -73,6 +76,9 @@ class DocumentFilter(filters.FilterSet):
         qs = qs.filter(portal=portal)
         qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
         return qs
+
+    def filter_tag(self, qs, name, value):
+        return qs.filter(tags__slug=value)
 
     def apply_data_filters(self, qs, filters):
         for filt in filters:
