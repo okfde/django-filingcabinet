@@ -785,9 +785,11 @@ export default {
         })
         loadingTask.promise.then(pdfDocument => {
           this.pdfDocument = pdfDocument
+        }).catch((err) => {
+          console.warn(err)
         })
-      }).catch((err) =>{
-        console.log(err)
+      }).catch((err) => {
+        console.warn(err)
       })
     }
   }
