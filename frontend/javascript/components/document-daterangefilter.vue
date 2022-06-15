@@ -4,7 +4,8 @@
       :value="min"
       type="date"
       class="form-control"
-      @input="updateValue($event.target.value)"
+      @input="updateMin($event.target.value)"
+      @change="updateMin($event.target.value)"
     >
     <div class="input-group-prepend">
       <span class="input-group-text">-</span>
@@ -14,7 +15,8 @@
       :value="max"
       type="date"
       class="form-control"
-      @input="updateValue(undefined, $event.target.value)"
+      @input="updateMax($event.target.value)"
+      @change="updateMax($event.target.value)"
     >
   </div>
 </template>
@@ -32,6 +34,12 @@ export default {
       required: true
     },
   },
+  data () {
+    return {
+      currentMin: this.min,
+      currentMax: this.max
+    }
+  },
   computed: {
     min () {
       return this.value[`${this.filter.key}_after`]
@@ -41,12 +49,18 @@ export default {
     }
   },
   methods: {
-    updateValue(min, max) {
-      min = min || this.min
-      max = max || this.max
+    updateMin (min) {
+      this.currentMin = min
+      this.updateValue()
+    },
+    updateMax (max) {
+      this.currentMax = max
+      this.updateValue()
+    },
+    updateValue() {
       this.$emit('input', {
-        [`${this.filter.key}_after`]: min,
-        [`${this.filter.key}_before`]: max,
+        [`${this.filter.key}_after`]: this.currentMin,
+        [`${this.filter.key}_before`]: this.currentMax,
       })
     }
   }
