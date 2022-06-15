@@ -77,6 +77,7 @@ def get_js_config(request, obj=None):
             "downloadPDF": _("Download PDF"),
             "info": _("Document Info"),
             "author": _("Author"),
+            "publicationDate": _("publication date"),
             "creator": _("Creator"),
             "producer": _("producer"),
             "url": _("URL"),

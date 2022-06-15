@@ -7,17 +7,9 @@
       <dl>
         <dt>{{ i18n.title }}</dt>
         <dd>{{ document.properties.title || document.title }}</dd>
-        <template v-if="document.properties.author">
-          <dt>{{ i18n.author }}</dt>
-          <dd>{{ document.properties.author }}</dd>
-        </template>
-        <template v-if="document.properties.creator">
-          <dt>{{ i18n.creator }}</dt>
-          <dd>{{ document.properties.creator }}</dd>
-        </template>
-        <template v-if="document.properties.producer">
-          <dt>{{ i18n.producer }}</dt>
-          <dd>{{ document.properties.producer }}</dd>
+        <template v-if="document.published_at">
+          <dt>{{ i18n.publicationDate }}</dt>
+          <dd>{{ publishedAt }}</dd>
         </template>
         <template v-if="document.properties.url">
           <dt>{{ i18n.url }}</dt>
@@ -30,6 +22,18 @@
               {{ document.properties.url.slice(0, 20) }}&hellip;
             </a>
           </dd>
+        </template>
+        <template v-if="document.properties.author">
+          <dt>{{ i18n.author }}</dt>
+          <dd>{{ document.properties.author }}</dd>
+        </template>
+        <template v-if="document.properties.creator">
+          <dt>{{ i18n.creator }}</dt>
+          <dd>{{ document.properties.creator }}</dd>
+        </template>
+        <template v-if="document.properties.producer">
+          <dt>{{ i18n.producer }}</dt>
+          <dd>{{ document.properties.producer }}</dd>
         </template>
       </dl>
     </div>
@@ -49,6 +53,12 @@ export default {
     i18n () {
       return this.$root.config.i18n
     },
+    publishedAt () {
+      if (this.document.published_at) {
+        return new Intl.DateTimeFormat().format(new Date(this.document.published_at))
+      }
+      return null
+    }
   }
 }
 </script>

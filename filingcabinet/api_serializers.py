@@ -40,6 +40,7 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "title",
             "slug",
             "description",
+            "published_at",
             "num_pages",
             "public",
             "listed",
