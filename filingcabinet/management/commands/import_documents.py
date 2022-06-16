@@ -98,6 +98,8 @@ class Command(BaseCommand):
                 "portal": portal,
             },
         )
+        if metadata.get("tags"):
+            doc.tags.add(*metadata["tags"])
 
         if collection is not None:
             CollectionDocument.objects.create(
