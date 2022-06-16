@@ -216,7 +216,7 @@ export default {
     }
     let shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
     let settings = collection.settings || {}
-    let preferences = settings.preferences
+    let preferences = settings.preferences || {}
     return {
       document: null,
       collection: collection,
