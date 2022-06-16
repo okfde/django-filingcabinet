@@ -168,7 +168,7 @@ class PageDocumentFilterset(filters.FilterSet):
         return super().filter_queryset(queryset)
 
     def filter_tag(self, qs, name, value):
-        return qs.filter(tags=value)
+        return qs.filter(document__tags=value)
 
     def filter_collection(self, qs, name, collection):
         if not collection.can_read(self.request):
