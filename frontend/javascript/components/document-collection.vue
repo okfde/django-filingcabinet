@@ -66,7 +66,9 @@
       <document-collection-searchbar
         v-if="showSearch && !document"
         :searcher="searcher"
+        :directory="currentDirectory"
         :filters="settings.filters"
+        @clearsearch="clearSearch"
         @search="search"
       />
     </div>
@@ -282,6 +284,8 @@ export default {
       } else {
         url.push(`&${this.collectionAuth}`)
       }
+      this.documents = []
+      this.directories = []
       url.push(`&directory=${this.currentDirectory ? this.currentDirectory.id : ''}`)
       getData(url.join('')).then((docCollection) => {
         this.collection = docCollection
@@ -381,7 +385,9 @@ export default {
     },
     clearSearch () {
       this.searcher = null
-      this.showSearch = false
+      if (this.allowToggleSearch) {
+        this.showSearch = false
+      }
     },
     search ({ term, filters }) {
       this.document = null
@@ -396,6 +402,9 @@ export default {
         hasSearch = true
       } else {
         params.push('number=1')
+      }
+      if (this.currentDirectory) {
+        params.push(`directory=${this.currentDirectory.id}`)
       }
       for (let [key, value] of filters.entries()) {
         if (value) {

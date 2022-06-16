@@ -66,7 +66,21 @@
               </template>
               {{ i18n.found }} 
             </template>
+            <template v-if="directory">
+              <br>{{ i18n.searchingInDirectory }} {{ directory.name }}
+            </template>
           </small>
+        </div>
+        <div
+          v-if="searcher"
+          class="col-auto ml-auto mr-2"
+        >
+          <button
+            class="btn btn-dark"
+            @click="clear"
+          >
+            {{ i18n.clearSearch }}
+          </button>
         </div>
         <div class="col-auto ml-auto">
           <div
@@ -134,6 +148,10 @@ export default {
       type: Object,
       default: null
     },
+    directory: {
+      type: Object,
+      default: null
+    },
     filters: {
       type: Array,
       default: () => []
@@ -193,6 +211,7 @@ export default {
   },
   methods: {
     clear () {
+      this.search = ""
       this.$emit('clearsearch')
     },
     runSearch () {
