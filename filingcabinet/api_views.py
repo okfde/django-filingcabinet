@@ -118,6 +118,12 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             pages = pages.filter(document__in=collection.documents.all())
         except (ValueError, Document.DoesNotExist):
             return Page.objects.none()
+
+        # Always order by publication date on RSS format
+        has_query = self.request.GET.get("q")
+        if has_query and self.request.GET.get("format") == "rss":
+            pages = pages.order_by("-published_at")
+
         return pages.prefetch_related("document")
 
 
