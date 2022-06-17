@@ -66,7 +66,7 @@ def get_js_config(request, obj=None):
             "found_on": _("Found on"),
             "found": _("found"),
             "clearSearch": _("clear search"),
-            "searchingInDirectory": _("Suche in Verzeichnis"),
+            "searchingInDirectory": _("searched in directory"),
             "show_text": _("Show/hide Text"),
             "title": _("Title"),
             "description": _("Description"),
