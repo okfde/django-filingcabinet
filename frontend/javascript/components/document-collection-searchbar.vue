@@ -66,6 +66,17 @@
               </template>
               {{ i18n.found }} 
             </template>
+            <a
+              v-if="showSearchFeed"
+              :href="rssUrl"
+              class="text-white"
+              target="_blank"
+            >
+              <i
+                class="fa fa-rss"
+                aria-hidden="true"
+              />
+            </a>
             <template v-if="directory">
               <br>{{ i18n.searchingInDirectory }} {{ directory.name }}
             </template>
@@ -152,6 +163,10 @@ export default {
       type: Object,
       default: null
     },
+    showSearchFeed: {
+      type: Boolean,
+      default: false
+    },
     filters: {
       type: Array,
       default: () => []
@@ -207,6 +222,12 @@ export default {
         return this.searcher.docCount
       }
       return 0
+    },
+    rssUrl () {
+      if (this.searcher) {
+        return this.searcher.url + "&format=rss"
+      }
+      return ""
     }
   },
   methods: {

@@ -47,6 +47,7 @@ setup(
         "djangorestframework",
         "reportlab",
         "celery",
+        "feedgen",
     ],
     extras_require={"tabledetection": ["camelot-py[cv]"], "webp": ["webp"]},
     test_requires=["factory_boy"],

@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from . import get_document_model, get_documentcollection_model
+from .api_renderers import RSSRenderer
 from .api_serializers import (
     CreatePageAnnotationSerializer,
     DocumentCollectionSerializer,
@@ -95,6 +96,7 @@ class DocumentViewSet(
 class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
     filterset_class = PageDocumentFilterset
+    renderer_classes = viewsets.GenericViewSet.renderer_classes + [RSSRenderer]
     search_fields = ["content"]
 
     def get_queryset(self):

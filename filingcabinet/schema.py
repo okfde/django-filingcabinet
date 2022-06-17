@@ -17,6 +17,7 @@ SETTINGS_SCHEMA = {
             "properties": {
                 "showSearch": {"type": "boolean"},
                 "allowToggleSearch": {"type": "boolean"},
+                "showSearchFeed": {"type": "boolean"},
             },
         },
         "filters": {

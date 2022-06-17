@@ -67,6 +67,7 @@
         v-if="showSearch && !document"
         :searcher="searcher"
         :directory="currentDirectory"
+        :show-search-feed="showSearchFeed"
         :filters="settings.filters"
         @clearsearch="clearSearch"
         @search="search"
@@ -225,6 +226,7 @@ export default {
       settings: settings,
       showSearch: preferences.showSearch ?? false,
       allowToggleSearch: preferences.allowToggleSearch ?? true,
+      showSearchFeed: preferences.showSearchFeed ?? false,
       searcher: null,
       documentPage: 1,
       currentDirectory: null,
@@ -392,14 +394,36 @@ export default {
     search ({ term, filters }) {
       this.document = null
       console.log('searching for term', term, 'with filters', filters)
+      let hasSearch = false
+      if (term) {
+        hasSearch = true
+      }
+      for (let value of filters.values()) {
+        if (value) {
+          hasSearch = true
+        }
+      }
+      if (!hasSearch) {
+        this.searcher = null
+        return
+      }
+      this.searcher = {
+        term: term,
+        filters: filters,
+        url: this.getSearchUrl({ term, filters }),
+        done: false,
+        results: [],
+        documents: []
+      }
+      getData(this.searcher.url).then((response) => this.documentsReceived(response))
+    },
+    getSearchUrl ({ term, filters }) {
       let params = [
         this.collectionAuth,
       ]
-      let hasSearch = false
       let baseUrl = this.collection.pages_uri
       if (term) {
         params.push(`q=${encodeURIComponent(term)}`)
-        hasSearch = true
       } else {
         params.push('number=1')
       }
@@ -417,22 +441,9 @@ export default {
           } else {
             params.push(`${key}=${encodeURIComponent(value)}`)
           }
-          hasSearch = true
         }
       }
-      if (!hasSearch) {
-        this.searcher = null
-        return
-      }
-      this.searcher = {
-        term: term,
-        filters: filters,
-        done: false,
-        results: [],
-        documents: []
-      }
-      let searchUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${params.join('&')}`
-      getData(searchUrl).then((response) => this.documentsReceived(response))
+      return `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${params.join('&')}`
     },
     documentsReceived (response) {
       this.searcher.response = response
