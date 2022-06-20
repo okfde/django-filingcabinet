@@ -284,6 +284,7 @@ class PageAnnotationAdmin(admin.ModelAdmin):
 class CollectionDirectoryAdmin(MPTTModelAdmin):
     raw_id_fields = ("user", "collection", "parent")
     list_display = ("name", "collection", "created_at", "updated_at")
+    search_fields = ("name",)
 
 
 class DocumentCollectionBaseAdmin(admin.ModelAdmin):
