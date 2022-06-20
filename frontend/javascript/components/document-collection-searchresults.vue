@@ -2,11 +2,23 @@
   <div class="document-preview-grid">
     <div class="row bg-secondary pt-3">
       <div class="col-12">
-        <h4 class="text-white">{{ document.title }}</h4>
+        <h4 class="text-white">
+          {{ document.title }}
+          <small
+            v-if="documentPublicationDate"
+            class="badge badge-dark"
+          >
+            {{ documentPublicationDate }}
+          </small>
+        </h4>
       </div>
     </div>
     <div class="row bg-secondary">
-      <div v-for="page in pages" class="col-sm-4 col-md-3" :key="page.number">
+      <div
+        v-for="page in pages"
+        :key="page.number"
+        class="col-sm-4 col-md-3"
+      >
         <document-preview
           :document="document"
           :page="page.number"
@@ -26,15 +38,21 @@ import 'intersection-observer'
 import DocumentPreview from './document-preview.vue'
 
 export default {
-  name: 'document-collection-searchresult',
-  props: ['document', 'pages'],
+  name: 'DocumentCollectionSearchresult',
   components: {
     DocumentPreview,
   },
+  props: ['document', 'pages'],
   computed: {
     i18n () {
       return this.config.i18n
     },
+    documentPublicationDate () {
+      if (!this.document.published_at) {
+        return null
+      }
+      return new Intl.DateTimeFormat().format(new Date(this.document.published_at))
+    }
   },
   methods: {
     navigate (docAndPage) {
