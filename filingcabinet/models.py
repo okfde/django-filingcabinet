@@ -721,10 +721,8 @@ class AbstractDocumentCollection(models.Model):
         return not self.listed
 
     def get_directories(self, parent_directory=None):
-        return (
-            CollectionDirectory.objects.all()
-            .filter(collection=self, parent=parent_directory)
-            .order_by("name")
+        return CollectionDirectory.objects.all().filter(
+            collection=self, parent=parent_directory
         )
 
     def get_absolute_url(self):
