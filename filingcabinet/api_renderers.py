@@ -1,9 +1,17 @@
+import re
+
 from django.utils.translation import gettext as _
 
 from feedgen.feed import FeedGenerator
 from rest_framework import renderers
 
 from . import get_document_model
+
+CONTROLCHARS_RE = re.compile(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]")
+
+
+def clean_feed_output(output):
+    return CONTROLCHARS_RE.sub("", output)
 
 
 def get_doc_id(item):
@@ -53,8 +61,10 @@ class RSSRenderer(renderers.BaseRenderer):
             fe.title(_("{} (p. {})").format(doc.title, item["number"]))
             fe.link({"href": url})
             if "query_highlight" in item:
-                fe.content(content=item["query_highlight"], type="html")
+                fe.content(
+                    content=clean_feed_output(item["query_highlight"]), type="html"
+                )
             else:
-                fe.description(item["content"])
+                fe.description(clean_feed_output(item["content"]))
 
         return fg.rss_str(pretty=True)
