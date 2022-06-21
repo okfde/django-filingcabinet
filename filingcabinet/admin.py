@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_json_widget.widgets import JSONEditorWidget
-from mptt.admin import MPTTModelAdmin
+from mptt.admin import DraggableMPTTAdmin
 
 from . import get_document_model
 from .admin_utils import NullFilter
@@ -281,9 +281,14 @@ class PageAnnotationAdmin(admin.ModelAdmin):
         return qs
 
 
-class CollectionDirectoryAdmin(MPTTModelAdmin):
+class CollectionDirectoryAdmin(DraggableMPTTAdmin):
     raw_id_fields = ("user", "collection", "parent")
-    list_display = ("name", "collection", "created_at", "updated_at")
+    list_display = DraggableMPTTAdmin.list_display + (
+        "name",
+        "collection",
+        "created_at",
+        "updated_at",
+    )
     search_fields = ("name",)
 
 
