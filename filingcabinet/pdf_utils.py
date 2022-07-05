@@ -11,7 +11,7 @@ import pikepdf
 import wand
 from PIL import Image as PILImage
 from PyPDF2 import PdfFileReader
-from PyPDF2.utils import PdfReadError
+from PyPDF2.errors import PdfReadError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
