@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             index=models.Index(
                 condition=models.Q(content_hash__isnull=False),
                 fields=["content_hash"],
-                name="filingcabinet_document_chash_idx",
+                name="fc_document_chash_idx",
             ),
         ),
     ]
