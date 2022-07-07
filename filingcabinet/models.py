@@ -647,6 +647,12 @@ class CollectionDocument(models.Model):
 
     class Meta:
         ordering = ["order", "document__title"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["collection", "document"],
+                name="unique_doc_collection_%(app_label)s_%(class)s",
+            ),
+        ]
 
 
 class DocumentCollectionManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
