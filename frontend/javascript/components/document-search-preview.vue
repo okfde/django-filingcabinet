@@ -1,17 +1,17 @@
 <template>
   <a
     :href="pageAnchor"
-    class="media search-preview-page text-white"
+    class="d-flex search-preview-page text-white"
     :class="{'bg-dark': isCurrent}"
     @click.prevent="navigate"
   >
     <img
       :src="imageUrl"
       alt=""
-      class="d-flex img-fluid"
+      class="flex-shrink-0 img-fluid"
       style="height:90px"
     >
-    <div class="media-body ml-2">
+    <div class="flex-grow-1 ms-2">
       <h6>{{ i18n.page }} {{ page.number }} - 
         <template v-if="matches.count === 1">
           {{ i18n.one_match }}

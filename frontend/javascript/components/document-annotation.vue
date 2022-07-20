@@ -6,7 +6,7 @@
     <h6>
       {{ annotation.title }}
       <button v-if="annotation.can_delete"
-        class="btn btn-sm btn-danger float-right delete-button"
+        class="btn btn-sm btn-danger float-end delete-button"
         @click="deleteAnnotation">
         <i class="fa fa-ban"></i>
       </button>
@@ -16,7 +16,7 @@
     </p>
     <time
       :datetime="annotation.timestamp"
-      class="d-block small text-right text-muted"
+      class="d-block small text-end text-muted"
     >{{ annotationTime }}</time>
   </div>
 </template>

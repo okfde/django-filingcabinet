@@ -6,7 +6,7 @@
           {{ document.title }}
           <small
             v-if="documentPublicationDate"
-            class="badge badge-dark"
+            class="badge bg-dark"
           >
             {{ documentPublicationDate }}
           </small>
