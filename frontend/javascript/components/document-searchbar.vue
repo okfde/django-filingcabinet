@@ -27,7 +27,7 @@
           class="spinner-border spinner-border-sm"
           role="status"
         >
-          <span class="sr-only">{{ i18n.searching }}</span>
+          <span class="visually-hidden">{{ i18n.searching }}</span>
         </div>
       </div>
       <small
@@ -37,23 +37,21 @@
         {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
       </small>
     </div>
-    <div class="col col-md-auto ml-auto">
+    <div class="col col-md-auto ms-auto">
       <div class="input-group input-group-sm">
         <input
+          ref="searchInput"
           v-model="search"
           type="text"
-          ref="searchInput"
           class="search-input form-control form-control-sm"
           @keydown.enter="runSearch"
         >
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-light"
-            @click="runSearch"
-          >
-            {{ i18n.search }}
-          </button>
-        </div>
+        <button
+          class="btn btn-outline-light"
+          @click="runSearch"
+        >
+          {{ i18n.search }}
+        </button>
       </div>
     </div>
   </div>

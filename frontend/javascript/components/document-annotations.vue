@@ -1,20 +1,20 @@
 <template>
   <div class="annotation-container" :style="style">
-    <div v-if="!showAnnotationForm && canAnnotate" class="text-right mb-2">
+    <div v-if="!showAnnotationForm && canAnnotate" class="text-end mb-2">
       <button class="btn btn-sm btn-light text-muted" @click="activateForm(false)">
         {{ i18n.addAnnotation }}
       </button>
     </div>
-    <div v-if="showAnnotationForm" class="">
-      <div class="form-group">
+    <div v-if="showAnnotationForm">
+      <div class="mb-3">
         <label for="">{{ i18n.title }}</label>
         <input type="text" class="form-control form-control-sm" v-model="title">
       </div>
-      <div class="form-group">
+      <div class="mb-3">
         <label>{{ i18n.description }}</label>
         <textarea class="form-control form-control-sm" v-model="description"></textarea>
       </div>
-      <div class="text-right">
+      <div class="text-end">
         <button class="btn btn-sm btn-light" @click.prevent="$emit('activateannotationform', null)">
           {{ i18n.cancel }}
         </button>

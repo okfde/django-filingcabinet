@@ -1,6 +1,6 @@
 <template>
   <div class="annotation" :style="annotationStyle" :class="{'current': isCurrent}" @click="$emit('currentannotation', annotation.id)">
-    <span class="sr-only">{{ annotation.title }}</span>
+    <span class="visually-hidden">{{ annotation.title }}</span>
   </div>
 </template>
 

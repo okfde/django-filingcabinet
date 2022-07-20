@@ -6,7 +6,7 @@
         class="row"
       >
         <div class="col">
-          <div class="form-group row">
+          <div class="mb-3 row">
             <label
               for="document-collection-search"
               class="col-sm-2 col-form-label"
@@ -33,7 +33,7 @@
         </div>
       </div>
       <div class="row mb-2">
-        <div class="col mr-auto">
+        <div class="col me-auto">
           <div
             v-if="searching"
             class="spinner-border spinner-border-sm"
@@ -84,7 +84,7 @@
         </div>
         <div
           v-if="searcher"
-          class="col-auto ml-auto mr-2"
+          class="col-auto ms-auto me-2"
         >
           <button
             class="btn btn-dark"
@@ -93,7 +93,7 @@
             {{ i18n.clearSearch }}
           </button>
         </div>
-        <div class="col-auto ml-auto">
+        <div class="col-auto ms-auto">
           <div
             v-if="!hasFilters"
             class="input-group input-group-sm"
@@ -104,14 +104,12 @@
               class="search-input form-control form-control-sm"
               @keydown.enter="runSearch"
             >
-            <div class="input-group-append">
-              <button
-                class="btn btn-outline-light"
-                @click="runSearch"
-              >
-                {{ i18n.search }}
-              </button>
-            </div>
+            <button
+              class="btn btn-outline-light"
+              @click="runSearch"
+            >
+              {{ i18n.search }}
+            </button>
           </div>
           <button
             v-else

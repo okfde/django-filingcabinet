@@ -20,7 +20,7 @@
         class="spinner-grow"
         role="status"
       >
-        <span class="sr-only">Loading...</span>
+        <span class="visually-hidden">Loading...</span>
       </div>
       <p
         class="text-truncate"

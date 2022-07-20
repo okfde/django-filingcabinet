@@ -27,7 +27,7 @@
       class="spinner-grow"
       role="status"
     >
-      <span class="sr-only">{{ i18n.loading }}</span>
+      <span class="visually-hidden">{{ i18n.loading }}</span>
     </div>
     <p>
       {{ page.number }}

@@ -35,27 +35,25 @@
                 </button>
               </div>
             </div>
-            <div class="col col-md-auto pr-0 pl-1 px-sm-2">
+            <div class="col col-md-auto pe-0 ps-1 px-sm-2">
               <div class="input-group input-group-sm">
                 <input type="number" class="page-number-input form-control bg-light form-control-sm" disabled value="{{ page_number }}" style="width: 70px!important">
-                <div class="input-group-append">
-                  <span class="d-none d-sm-inline input-group-text">/ {{ object.num_pages }}</span>
-                </div>
+                <span class="d-none d-sm-inline input-group-text">/ {{ object.num_pages }}</span>
               </div>
             </div>
-            <div class="col col-md-auto pl-0 pr-1 px-sm-2">
+            <div class="col col-md-auto ps-0 pe-1 px-sm-2">
               <div role="group" class="btn-group">
                 <button class="btn btn-sm btn-secondary" disabled>
                   <i class="fa fa-info-circle"></i>
-                  <span class="sr-only">Dokumentendetails</span>
+                  <span class="visually-hidden">Dokumentendetails</span>
                 </button>
                 <button type="button" class="btn btn-sm btn-secondary" disabled>
                   <i class="fa fa-file-text"></i>
-                  <span class="sr-only">Zeige/verstecke Text</span>
+                  <span class="visually-hidden">Zeige/verstecke Text</span>
                 </button>
                 <a href="#" class="btn btn-sm btn-secondary">
                   <i class="fa fa-download"></i>
-                  <span class="sr-only">PDF herunterladen</span>
+                  <span class="visually-hidden">PDF herunterladen</span>
                 </a>
               </div>
             </div>
@@ -69,7 +67,7 @@
                 </button>
               </div>
             </div>
-            <div class="col col-sm-auto px-1 px-sm-2 ml-auto text-right">
+            <div class="col col-sm-auto px-1 px-sm-2 ms-auto text-end">
               <button type="button" class="btn btn-sm btn-secondary" disabled>
                 <i class="fa fa-search"></i>
               </button>
@@ -115,7 +113,7 @@
                 <div class="col">
                   <div class="page-wrapper">
                     <div id="page-{{ page.number }}" class="page" style="width:100%;padding-bottom:{{ page.dim_ratio_percent }}%;">
-                      <pre class="sr-only">{{ page.content }}</pre>
+                      <pre class="visually-hidden">{{ page.content }}</pre>
                       <picture>
                         {% if object.has_format_webp %}
                           <source

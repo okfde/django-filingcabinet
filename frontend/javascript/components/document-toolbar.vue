@@ -36,7 +36,7 @@
     </div>
     <div
       v-if="preferences.showPageNumberInput"
-      class="col col-md-auto pr-0 pl-1 px-sm-2"
+      class="col col-md-auto pe-0 ps-1 px-sm-2"
     >
       <div class="input-group input-group-sm">
         <input
@@ -47,14 +47,12 @@
           :max="document.num_pages"
           @change="submitChange"
         >
-        <div class="input-group-append">
-          <span class="d-none d-sm-inline input-group-text">/ {{ document.num_pages }}</span>
-        </div>
+        <span class="d-none d-sm-inline input-group-text">/ {{ document.num_pages }}</span>
       </div>
     </div>
     <div
       v-if="preferences.showTextToggle"
-      class="col col-md-auto pl-0 pr-1 px-sm-2"
+      class="col col-md-auto ps-0 pe-1 px-sm-2"
     >
       <div
         class="btn-group"
@@ -66,7 +64,7 @@
           @click="showInfo"
         >
           <i class="fa fa-info-circle" />
-          <span class="sr-only">{{ i18n.info }}</span>
+          <span class="visually-hidden">{{ i18n.info }}</span>
         </button>
         <button
           type="button"
@@ -75,14 +73,14 @@
           @click="toggleShowText"
         >
           <i class="fa fa-file-text" />
-          <span class="sr-only">{{ i18n.show_text }}</span>
+          <span class="visually-hidden">{{ i18n.show_text }}</span>
         </button>
         <button
           class="btn btn-sm btn-secondary"
           @click="download"
         >
           <i class="fa fa-download" />
-          <span class="sr-only">{{ i18n.downloadPDF }}</span>
+          <span class="visually-hidden">{{ i18n.downloadPDF }}</span>
         </button>
       </div>
     </div>
@@ -114,7 +112,7 @@
     </div>
     <div
       v-if="preferences.showSearch"
-      class="col col-sm-auto px-1 px-sm-2 ml-auto text-right"
+      class="col col-sm-auto px-1 px-sm-2 ms-auto text-end"
     >
       <button
         type="button"
@@ -127,7 +125,7 @@
     </div>
     <div
       v-if="preferences.showAnnotationsToggle"
-      class="col-auto px-1 px-sm-2 text-right"
+      class="col-auto px-1 px-sm-2 text-end"
     >
       <div
         class="btn-group"
@@ -143,7 +141,7 @@
           <i class="fa fa-commenting-o" />
           <span
             v-if="!preferences.showAnnotations && annotationCount && annotationCount > 0"
-            class="badge badge-light badge-pill badge-annotation-count"
+            class="badge bg-light rounded-pill bg-annotation-count"
           >
             {{ annotationCount }}
           </span>
@@ -266,7 +264,7 @@ export default {
   max-width: 70px;
   text-align: right;
 }
-.badge-annotation-count {
+.bg-annotation-count {
   position: absolute !important;
   top: -5px !important;
   right: -5px !important;

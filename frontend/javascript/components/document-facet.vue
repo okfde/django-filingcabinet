@@ -7,7 +7,7 @@
         class="btn btn-sm btn-link text-white"
         @click="$emit('select', '')"
       >
-        <span class="sr-only">{{ i18n.clear }}</span>
+        <span class="visually-hidden">{{ i18n.clear }}</span>
         <i class="fa fa-close" />
       </button>
     </h5>

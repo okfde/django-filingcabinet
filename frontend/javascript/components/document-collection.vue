@@ -20,7 +20,7 @@
             </button>
           </div>
         </div>
-        <div class="col-auto order-md-3 ml-auto">
+        <div class="col-auto order-md-3 ms-auto">
           <span class="text-muted d-inline-block text-truncate">
             <template v-if="document">
               {{ collection.title }}
@@ -43,12 +43,12 @@
 
         <div
           v-if="!document && allowToggleSearch"
-          class="col-auto order-md-4 ml-auto"
+          class="col-auto order-md-4 ms-auto"
         >
           <button
             v-if="!showSearch"
             type="button"
-            class="ml-2 btn btn-sm btn-secondary"
+            class="ms-2 btn btn-sm btn-secondary"
             @click="enableSearch"
           >
             <i class="fa fa-search" />
@@ -56,7 +56,7 @@
           <button
             v-else
             type="button"
-            class="ml-2 btn btn-sm btn-secondary"
+            class="ms-2 btn btn-sm btn-secondary"
             @click="clearSearch"
           >
             <i class="fa fa-close" />
@@ -135,7 +135,7 @@
               class="list-group-item list-group-item-action list-group-item-dark text-center"
               @click="selectDirectory()"
             >
-              <i class="fa fa-arrow-left float-left" />
+              <i class="fa fa-arrow-left float-start" />
               {{ currentDirectory.name }}
             </button>
             <button

@@ -7,10 +7,7 @@
       @input="updateMin($event.target.value)"
       @change="updateMin($event.target.value)"
     >
-    <div class="input-group-prepend">
-      <span class="input-group-text">-</span>
-    </div>
-  
+    <span class="input-group-text">-</span>
     <input
       :value="max"
       type="date"
