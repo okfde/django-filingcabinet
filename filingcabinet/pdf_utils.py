@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 OFFICE_FILETYPES = (
     "application/msexcel",
     "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "application/msword",
     "application/vnd.msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
