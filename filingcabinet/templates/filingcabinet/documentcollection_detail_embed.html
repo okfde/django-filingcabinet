@@ -1,21 +1,12 @@
 {% extends "filingcabinet/base.html" %}
 
-{% load i18n %}
-{% load static %}
-
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block body_tag %}
-{% include "filingcabinet/_documentcollection_viewer.html" with container_fluid=True %}
-{% endblock %}
-
-{% block css %}
-  {{ block.super }}
-  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
+  {% include "filingcabinet/_documentcollection_viewer.html" with container_fluid=True %}
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  <script src="{% static 'js/common.js' %}" defer></script>
-  <script src="{% static 'js/filingcabinet.js' %}" defer></script>
+  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}
