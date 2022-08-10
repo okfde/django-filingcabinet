@@ -121,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vue-virtual-scroller/dist/vue-virtual-scroller.css';
+@import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 .scroller {
   height: 100%;
