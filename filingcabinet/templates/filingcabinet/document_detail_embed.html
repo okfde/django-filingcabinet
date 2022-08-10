@@ -1,7 +1,6 @@
 {% extends "filingcabinet/base.html" %}
 
 {% load i18n %}
-{% load static %}
 
 {% block title %}{{ object.title }}{% endblock %}
 
@@ -14,11 +13,9 @@
   {% if object.pending %}
     <meta http-equiv="refresh" content="30">
   {% endif %}
-  <link href="{% static 'css/filingcabinet.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  <script src="{% static 'js/common.js' %}" defer></script>
-  <script src="{% static 'js/filingcabinet.js' %}" defer></script>
+  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}
