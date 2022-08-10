@@ -141,6 +141,8 @@
 <script>
 import Vue from 'vue'
 
+import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.js?url'
+
 import DocumentPages from './document-pages.vue'
 import DocumentPreviewSidebar from './document-preview-sidebar.vue'
 import DocumentOutlineSidebar from './document-outline-sidebar.vue'
@@ -707,7 +709,7 @@ export default {
             scrollRatio = d.scrollTop / d.scrollHeight
           }
         } else {
-          let h = document.documentElement, 
+          let h = document.documentElement,
             b = document.body,
             st = 'scrollTop',
             sh = 'scrollHeight';
@@ -715,7 +717,6 @@ export default {
           scrollRatio = (h[st]||b[st]) / ((h[sh]||b[sh]));
         }
       }
-        
       this.resize(scrollRatio)
     },
     getDocumentScrollTop () {
@@ -751,7 +752,7 @@ export default {
         return
       }
       postData(
-        this.config.urls.pageAnnotationApiUrl, 
+        this.config.urls.pageAnnotationApiUrl,
         {
           document: this.document.id,
           page_number: this.activeAnnotationForm.number,
@@ -780,8 +781,8 @@ export default {
     loadPDF () {
       import('pdfjs-dist').then((PDFJS) => {
         this.$root.PDFJS = PDFJS
-        this.$root.PDFJS.GlobalWorkerOptions.workerSrc = this.config.resources.pdfjsWorker
-        console.log('Loaded PDFJS', this.config.resources.pdfjsWorker, this.$root.PDFJS)
+        this.$root.PDFJS.GlobalWorkerOptions.workerSrc = PDFJSWorkerUrl
+        console.log('Loaded PDFJS', PDFJSWorkerUrl, this.$root.PDFJS)
         console.log('Loading PDF', this.document.file_url)
         let loadingTask = this.$root.PDFJS.getDocument({
           url: this.document.file_url,
