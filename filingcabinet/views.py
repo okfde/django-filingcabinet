@@ -1,7 +1,6 @@
 import json
 
 from django.shortcuts import Http404, get_object_or_404, redirect
-from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, TemplateView
@@ -48,7 +47,6 @@ class AuthMixin:
 
 def get_js_config(request, obj=None):
     context = {
-        "resources": {"pdfjsWorker": static("js/pdf.worker.min.js")},
         "urls": {
             "pageAnnotationApiUrl": reverse("api:pageannotation-list"),
         },
