@@ -222,6 +222,7 @@ export default {
   },
   data () {
     let doc = this.documentPreview
+    let sidebarVisibleDefault = true;
     if (doc !== null) {
       this.pageTemplate = decodeURI(this.documentPreview.page_template)
       doc.pages = doc.pages || []
@@ -238,17 +239,20 @@ export default {
           ...tail
         ]
       }
+      if (doc.num_pages === 1) {
+        sidebarVisibleDefault = false
+      }
     }
     let preferences = {
       showToolbar: true,
       showTextToggle: true,
       showZoom: true,
       showSearch: true,
-      showSidebarToggle: true,
+      showSidebarToggle: sidebarVisibleDefault,
       showOutlineToggle: doc.outline.length > 0,
       showAnnotationsToggle: null,
       showText: false,
-      showSidebar: true,
+      showSidebar: sidebarVisibleDefault,
       showOutline: false,
       showAnnotations: false,
       maxHeight: null,
