@@ -28,7 +28,7 @@
 
 <script>
 export default {
-  name: 'document-page-annotation',
+  name: 'DocumentPageAnnotation',
   props: ['annotation', 'currentAnnotation'],
   data() {
     return {

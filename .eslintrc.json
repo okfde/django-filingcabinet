@@ -1,15 +1,22 @@
 {
   "parserOptions": {
     "sourceType": "module",
-    "project": ["./jsconfig.json"]
+    "project": [
+      "./jsconfig.json"
+    ]
   },
   "extends": [
-    "plugin:vue/essential",
-    "standard"
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended",
+    "prettier"
   ],
-  "plugins": ["prettier", "html"],
+  "plugins": [
+    "prettier",
+    "html"
+  ],
   "rules": {
     "indent": "off",
+    "vue/html-self-closing": "off",
     "vue/component-tags-order": "off",
     "prettier/prettier": "error",
     "space-before-function-paren": [
@@ -21,5 +28,8 @@
       }
     ]
   },
-  "ignorePatterns": ["node_modules/**", "**/static/**"]
+  "ignorePatterns": [
+    "node_modules/**",
+    "**/static/**"
+  ]
 }

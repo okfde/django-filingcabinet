@@ -52,7 +52,11 @@ function triggerDownload(blobUrl, filename) {
   }
   // <a> must be in the document for IE and recent Firefox versions,
   // otherwise .click() is ignored.
-  ;(document.body || document.documentElement).appendChild(a)
+  if (document.body) {
+    document.body.appendChild(a)
+  } else {
+    document.documentElement.appendChild(a)
+  }
   a.click()
   a.remove()
 }
@@ -78,4 +82,4 @@ function findPageByOffset(ar, scrollTop, viewportHeight) {
   return ar[ar.length - 1].number
 }
 
-export { getData, postData, triggerDownload, findPageByOffset }
+export { findPageByOffset, getData, postData, triggerDownload }

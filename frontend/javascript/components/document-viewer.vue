@@ -126,19 +126,19 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import { nextTick } from 'vue'
 
 import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.js?url'
 
+import DocumentOutlineSidebar from './document-outline-sidebar.vue'
 import DocumentPages from './document-pages.vue'
 import DocumentPreviewSidebar from './document-preview-sidebar.vue'
-import DocumentOutlineSidebar from './document-outline-sidebar.vue'
-import DocumentSearchSidebar from './document-search-sidebar.vue'
-import DocumentToolbar from './document-toolbar.vue'
-import DocumentSearchbar from './document-searchbar.vue'
 import DocumentProperties from './document-properties.vue'
+import DocumentSearchSidebar from './document-search-sidebar.vue'
+import DocumentSearchbar from './document-searchbar.vue'
+import DocumentToolbar from './document-toolbar.vue'
 
-import { getData, postData, findPageByOffset } from '../lib/utils.js'
+import { findPageByOffset, getData, postData } from '../lib/utils.js'
 
 const BOOTSTRAP_MD = 768
 const BOOTSTRAP_LG = 992
@@ -405,7 +405,7 @@ export default {
       this.pageTemplate = decodeURI(doc.page_template)
       this.document = doc
       this.document.loaded = true
-      Vue.set(this.document, 'pages', this.processPages(doc.pages, true))
+      this.document.pages = this.processPages(doc.pages, true)
       this.willResize()
       const forceLoadPDF = this.document.properties._force_load_pdf
       const forceLoadPDFSet = typeof forceLoadPDF !== 'undefined'
@@ -415,7 +415,7 @@ export default {
       ) {
         this.loadPDF()
       }
-      Vue.nextTick(() => this.pagesInitialized())
+      nextTick(() => this.pagesInitialized())
     })
     getData(
       `${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}&${this.docAuth}`
@@ -433,11 +433,8 @@ export default {
       if (this.preferences.showAnnotationsToggle === null) {
         // Only show annotation toggle if explicitly set (non-null)
         // and we either have annotations or can annotate
-        Vue.set(
-          this.preferences,
-          'showAnnotationsToggle',
+        this.preferences.showAnnotationsToggle =
           this.hasAnnotations || this.canAnnotate
-        )
       }
     })
   },
@@ -458,10 +455,10 @@ export default {
         return
       }
       this.resizing = true
-      Vue.nextTick(() => {
+      nextTick(() => {
         this.calcResponsive()
-        Vue.set(this.document, 'pages', this.processPages(this.document.pages))
-        Vue.nextTick(() => {
+        this.document.pages = this.processPages(this.document.pages)
+        nextTick(() => {
           if (scrollRatio) {
             console.log('scrolling to ', scrollRatio)
             if (this.isFramed) {
@@ -553,9 +550,9 @@ export default {
         const normalSize = Math.ceil(zoomedWidth * ratio) + 60
         offset += normalSize
         p.offset = offset
-        Vue.set(p, 'zoomedWidth', zoomedWidth)
-        Vue.set(p, 'normalSize', normalSize)
-        Vue.set(p, 'smallSize', Math.ceil(smallWidth * ratio) + 40)
+        p.zoomedWidth = zoomedWidth
+        p.normalSize = normalSize
+        p.smallSize = Math.ceil(smallWidth * ratio) + 40
 
         return p
       })
@@ -630,7 +627,7 @@ export default {
     search(term) {
       console.log('searching for term', term)
       if (this.isMediumScreen && this.preferences.showAnnotations) {
-        Vue.set(this.preferences, 'showAnnotations', false)
+        this.preferences.showAnnotations = false
       }
       if (this.searcher && this.searcher.term === term) {
         this.preferences.showSearchResults = true
@@ -694,13 +691,13 @@ export default {
     },
     updatePreferences(update) {
       for (const key in update) {
-        Vue.set(this.preferences, key, update[key])
+        this.preferences[key] = update[key]
       }
       if (this.isMediumScreen) {
         if (update.showSidebar && this.preferences.showAnnotations) {
-          Vue.set(this.preferences, 'showAnnotations', false)
+          this.preferences.showAnnotations = false
         } else if (update.showAnnotations && this.preferences.showSidebar) {
-          Vue.set(this.preferences, 'showSidebar', false)
+          this.preferences.showSidebar = false
         }
       }
       if (
@@ -780,10 +777,10 @@ export default {
       ).then((data) => {
         if (data.status === 'success') {
           const annotation = data.annotation
-          Vue.set(this.annotations, annotation.number, [
+          this.annotations[annotation.number] = [
             ...(this.annotations[annotation.number] || []),
             annotation
-          ])
+          ]
           this.currentAnnotation = annotation.id
         }
       })
@@ -793,7 +790,7 @@ export default {
         const pageAnnotations = this.annotations[annotation.number].filter(
           (a) => a.id !== annotation.id
         )
-        Vue.set(this.annotations, annotation.number, pageAnnotations)
+        this.annotations[annotation.number] = pageAnnotations
         const url = `${this.config.urls.pageAnnotationApiUrl}${annotation.id}/?document=${this.document.id}`
         postData(url, {}, this.$root.csrfToken, 'DELETE')
       }

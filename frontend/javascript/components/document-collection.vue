@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import { nextTick } from 'vue'
 
 import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
 import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
@@ -335,7 +335,7 @@ export default {
         }
         this.documents = []
         this.lastOffset = offset
-        Vue.nextTick(() => this.goTop())
+        nextTick(() => this.goTop())
         return this.getDocuments(offset)
       }
       const offsetStep = offset / DOCUMENTS_API_LIMIT
@@ -524,7 +524,7 @@ export default {
       })
       this.searcher.documents = searcherDocs
       this.searcher.results = docsWithPages
-      Vue.set(this.searcher, 'docCount', docCount)
+      this.searcher.docCount = docCount
       this.searcher.done = true
     },
     loadMoreSearchResults() {

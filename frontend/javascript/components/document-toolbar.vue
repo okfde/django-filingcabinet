@@ -132,10 +132,10 @@
             {{ annotationCount }}
             <span class="visually-hidden">{{ i18n.annotations }}</span>
           </span>
-          <span class="visually-hidden" v-if="!preferences.showAnnotations">{{
+          <span v-if="!preferences.showAnnotations" class="visually-hidden">{{
             i18n.showAnnotations
           }}</span>
-          <span class="visually-hidden" v-else>{{ i18n.hideAnnotations }}</span>
+          <span v-else class="visually-hidden">{{ i18n.hideAnnotations }}</span>
         </button>
       </div>
     </div>

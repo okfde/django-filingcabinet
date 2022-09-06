@@ -72,7 +72,7 @@ export default {
     */
     this.$refs.outline.addEventListener('click', this.outlineClick)
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$refs.outline.removeEventListener('click', this.outlineClick)
   },
   methods: {

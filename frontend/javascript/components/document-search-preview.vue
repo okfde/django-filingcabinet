@@ -18,8 +18,10 @@
         <template v-else> {{ matches.count }} {{ i18n.matches }} </template>
       </h6>
       <div class="query-highlight">
-        <template v-for="result in matches.results">
-          <span :key="result.query_highlight" v-html="result.query_highlight" />
+        <template
+          v-for="result in matches.results"
+          :key="result.query_highlight">
+          <span v-html="result.query_highlight" />
         </template>
       </div>
     </div>
