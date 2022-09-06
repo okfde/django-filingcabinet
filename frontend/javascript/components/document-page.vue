@@ -295,13 +295,13 @@ export default {
       })
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
       // Cancel image download on destroy
       this.$refs.image.setAttribute('src', '')
     }
   },
-  destroyed() {
+  unmounted() {
     this.destroyed = true
   },
   methods: {

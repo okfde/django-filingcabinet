@@ -14,34 +14,34 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.6",
+    "@vue/compat": "^3.2.38",
     "bootstrap": "^5.3.0",
     "font-awesome": "^4.7.0",
-    "intersection-observer": "^0.7.0",
+    "intersection-observer": "^0.12.2",
     "pdfjs-dist": "==2.9.359",
-    "vue": "^2.7.10",
-    "vue-virtual-scroller": "^1.0.0-rc.2"
+    "vue": "^3.3.4",
+    "vue-virtual-scroller": "^2.0.0-alpha.1"
   },
   "files": [
     "frontend/*"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@vitejs/plugin-vue2": "^1.1.2",
-    "eslint": "^8.21.0",
-    "eslint-config-prettier": "^8.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "8.9.0",
     "eslint-config-standard": "^17.0.0",
-    "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.4",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-prettier": "4",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^9.3.0",
-    "prettier": "^2.7.1",
+    "prettier": "^2.4.0",
     "prettier-config-standard": "^5.0.0",
     "sass": "^1.54.4",
-    "typescript": "^4.9.3",
-    "vite": "^3.0.8",
-    "vue-template-compiler": "^2.5.16"
+    "typescript": "^5.1.6",
+    "vite": "^4.4.7"
   }
 }

@@ -1,27 +1,17 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 
-import DocumentViewer from './components/document-viewer.vue'
 import DocumentCollection from './components/document-collection.vue'
-
-Vue.config.productionTip = false
+import DocumentViewer from './components/document-viewer.vue'
 
 function createDocumentViewer(selector, props) {
-  /* eslint-disable no-new */
-  const DocumentClass = Vue.extend(DocumentViewer)
-  props.preview = true
-  const instance = new DocumentClass({
-    propsData: props
-  })
-  instance.$mount(selector)
+  createApp(DocumentViewer, {
+    preview: true,
+    ...props
+  }).mount(selector)
 }
 
 function createDocumentCollectionViewer(selector, props) {
-  /* eslint-disable no-new */
-  const DocumentCollectionClass = Vue.extend(DocumentCollection)
-  const instance = new DocumentCollectionClass({
-    propsData: props
-  })
-  instance.$mount(selector)
+  createApp(DocumentCollection, props).mount(selector)
 }
 
 Array.from(document.querySelectorAll('[data-fcdocument]')).forEach((el) => {

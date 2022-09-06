@@ -1,13 +1,15 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "target": "es6"
-    },
-    "exclude": ["node_modules"],
-    "vueCompilerOptions": {
-      "extensions": [
-        ".vue"
-      ],
-      "target": 2.7,
-    }
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "vueCompilerOptions": {
+    "extensions": [
+      ".vue"
+    ],
+    "target": 3.3,
   }
+}

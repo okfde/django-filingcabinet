@@ -11,15 +11,15 @@
       <div class="mb-3">
         <label for="">{{ i18n.title }}</label>
         <input
+          v-model="title"
           type="text"
-          class="form-control form-control-sm"
-          v-model="title" />
+          class="form-control form-control-sm" />
       </div>
       <div class="mb-3">
         <label>{{ i18n.description }}</label>
         <textarea
-          class="form-control form-control-sm"
-          v-model="description"></textarea>
+          v-model="description"
+          class="form-control form-control-sm"></textarea>
       </div>
       <div class="text-end">
         <button
@@ -51,7 +51,10 @@
 import PageAnnotation from './document-annotation.vue'
 
 export default {
-  name: 'document-page-annotations',
+  name: 'DocumentPageAnnotations',
+  components: {
+    PageAnnotation
+  },
   props: [
     'page',
     'annotations',
@@ -59,9 +62,6 @@ export default {
     'canAnnotate',
     'activeAnnotationForm'
   ],
-  components: {
-    PageAnnotation
-  },
   data() {
     return {
       title: '',

@@ -73,7 +73,7 @@ export default {
       return url
     }
   },
-  beforeDestroy() {
+  beforeUnmount() {
     if (this.document.cover_image && !this.imageLoaded) {
       // Cancel image download on destroy
       this.$refs.image.setAttribute('src', '')
