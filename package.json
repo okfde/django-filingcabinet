@@ -8,7 +8,7 @@
   "dependencies": {
     "intersection-observer": "^0.7.0",
     "pdfjs-dist": "==2.9.359",
-    "vue": "^2.5.16",
+    "vue": "^2.7.10",
     "vue-virtual-scroller": "^1.0.0-rc.2"
   },
   "files": [
