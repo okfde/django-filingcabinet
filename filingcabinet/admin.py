@@ -352,7 +352,7 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
 
 
 class CollectionDocumentBaseAdmin(admin.ModelAdmin):
-    list_display = ("document", "collection", "order")
+    list_display = ("document", "collection", "order", "directory")
     raw_id_fields = ("document", "collection", "directory")
 
     def get_queryset(self, request):
