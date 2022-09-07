@@ -9,3 +9,4 @@ example_project/
 node_modules/
 fc-env/
 *.sqlite3
+.DS_Store
