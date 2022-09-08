@@ -414,11 +414,16 @@ class AbstractDocument(models.Model):
     def process_document(self, reprocess=True):
         from .tasks import process_document_task
 
-        self.pending = True
-        self.save()
-
         if reprocess:
             Page.objects.filter(document=self).update(pending=True)
+            webp_marker = self.FORMAT_KEY.format("webp")
+            try:
+                del self.properties[webp_marker]
+            except KeyError:
+                pass
+
+        self.pending = True
+        self.save()
 
         process_document_task.delay(self.id)
 
