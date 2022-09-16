@@ -353,15 +353,19 @@ class AbstractDocument(models.Model):
         except IOError:
             pass
 
-    def get_page_template(self, page="{page}", size="{size}"):
-        return self.get_file_url(filename=get_page_image_filename(page=page, size=size))
-
-    def get_cover_image(self):
-        return self.get_file_url(filename=get_page_image_filename(page=1, size="small"))
-
-    def get_full_cover_image(self):
+    def get_page_template(self, page="{page}", size="{size}", filetype="png"):
         return self.get_file_url(
-            filename=get_page_image_filename(page=1, size="original")
+            filename=get_page_image_filename(page=page, size=size, filetype=filetype)
+        )
+
+    def get_cover_image(self, filetype="png"):
+        return self.get_file_url(
+            filename=get_page_image_filename(page=1, size="small", filetype=filetype)
+        )
+
+    def get_full_cover_image(self, filetype="png"):
+        return self.get_file_url(
+            filename=get_page_image_filename(page=1, size="original", filetype=filetype)
         )
 
     @classmethod
@@ -505,20 +509,33 @@ class Page(models.Model):
     def get_absolute_url(self):
         return "{}?page={}".format(self.document.get_absolute_url(), self.number)
 
-    def get_image_url(self, size="{size}"):
-        return self.document.get_page_template(page=self.number, size=size)
+    def get_image_url(self, size="{size}", filetype="png"):
+        return self.document.get_page_template(
+            page=self.number, size=size, filetype=filetype
+        )
 
-    def get_preview_image_url(self):
-        return self.document.get_page_template(page=self.number, size="small")
+    def get_preview_image_url(self, filetype="png"):
+        return self.document.get_page_template(
+            page=self.number, size="small", filetype=filetype
+        )
 
-    def get_normal_image_url(self):
-        return self.document.get_page_template(page=self.number, size="normal")
+    def get_preview_image_url_webp(self):
+        return self.get_preview_image_url(filetype="png.webp")
 
-    def get_large_image_url(self):
-        return self.document.get_page_template(page=self.number, size="large")
+    def get_normal_image_url(self, filetype="png"):
+        return self.document.get_page_template(
+            page=self.number, size="normal", filetype=filetype
+        )
 
-    def get_original_image_url(self):
-        return self.document.get_page_template(page=self.number, size="original")
+    def get_large_image_url(self, filetype="png"):
+        return self.document.get_page_template(
+            page=self.number, size="large", filetype=filetype
+        )
+
+    def get_original_image_url(self, filetype="png"):
+        return self.document.get_page_template(
+            page=self.number, size="original", filetype=filetype
+        )
 
     def dim_ratio_percent(self):
         if self.width and self.height:
@@ -526,13 +543,14 @@ class Page(models.Model):
         return str(70)
 
     def get_image_srcset(self, ext=""):
-        return "{preview}{ext} 180w, {normal}{ext} 700w, {large}{ext} 1000w, {original}{ext} {width}w".format(
-            preview=self.get_preview_image_url(),
-            normal=self.get_normal_image_url(),
-            large=self.get_large_image_url(),
-            original=self.get_original_image_url(),
-            width=self.width,
-            ext=ext,
+        return (
+            "{preview} 180w, {normal} 700w, {large} 1000w, {original} {width}w".format(
+                preview=self.get_preview_image_url(filetype="png{}".format(ext)),
+                normal=self.get_normal_image_url(filetype="png{}".format(ext)),
+                large=self.get_large_image_url(filetype="png{}".format(ext)),
+                original=self.get_original_image_url(filetype="png{}".format(ext)),
+                width=self.width,
+            )
         )
 
     def get_image_srcset_webp(self):
