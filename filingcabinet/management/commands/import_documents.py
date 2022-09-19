@@ -23,11 +23,8 @@ def parse_date(date_str):
         date = datetime.fromisoformat(date_str)
     except ValueError:
         return None
-    tz = timezone.get_default_timezone()
-    if date.tzinfo is not None:
-        date = tz.normalize(date)
-    else:
-        date = tz.localize(date)
+    if timezone.is_naive(date):
+        date = date.replace(tzinfo=timezone.get_default_timezone())
     return date
 
 
