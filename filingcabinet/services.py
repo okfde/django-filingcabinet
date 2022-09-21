@@ -311,12 +311,15 @@ class DocumentStorer:
             if parent_path not in directories:
                 parent_parent_path = parent_path.parent
                 parent_parent_dir = directories.get(parent_parent_path)
-                directory = CollectionDirectory.objects.create(
+                directory = CollectionDirectory(
                     name=str(parent_path),
                     user=self.user,
                     collection=self.collection,
-                    parent=parent_parent_dir,
                 )
+                if parent_parent_dir is None:
+                    directory = CollectionDirectory.add_root(instance=directory)
+                else:
+                    directory = CollectionDirectory.add_child(instance=directory)
                 directories[parent_path] = directory
 
 

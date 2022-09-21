@@ -5,8 +5,6 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import mptt.fields
-
 
 class Migration(migrations.Migration):
 
@@ -55,7 +53,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "parent",
-                    mptt.fields.TreeForeignKey(
+                    models.ForeignKey(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
