@@ -8,11 +8,12 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from django_json_widget.widgets import JSONEditorWidget
-from mptt.admin import DraggableMPTTAdmin
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
 
 from . import get_document_model
 from .admin_utils import NullFilter
-from .models import Page
+from .models import CollectionDirectory, Page
 from .services import create_documents_from_files
 
 
@@ -281,9 +282,13 @@ class PageAnnotationAdmin(admin.ModelAdmin):
         return qs
 
 
-class CollectionDirectoryAdmin(DraggableMPTTAdmin):
-    raw_id_fields = ("user", "collection", "parent")
-    list_display = DraggableMPTTAdmin.list_display + (
+class CollectionDirectoryAdmin(TreeAdmin):
+    form = movenodeform_factory(CollectionDirectory)
+    raw_id_fields = (
+        "user",
+        "collection",
+    )
+    list_display = (
         "name",
         "collection",
         "created_at",

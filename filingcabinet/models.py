@@ -13,9 +13,9 @@ from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from mptt.models import MPTTModel, TreeForeignKey
 from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
+from treebeard.mp_tree import MP_Node
 
 from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
@@ -616,15 +616,11 @@ class PageAnnotation(models.Model):
         )
 
 
-class CollectionDirectory(MPTTModel):
+class CollectionDirectory(MP_Node):
     name = models.CharField(max_length=255)
     collection = models.ForeignKey(
         FILINGCABINET_DOCUMENTCOLLECTION_MODEL, on_delete=models.CASCADE
     )
-    parent = TreeForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children"
-    )
-
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now, null=True)
 
@@ -636,8 +632,7 @@ class CollectionDirectory(MPTTModel):
         verbose_name=_("User"),
     )
 
-    class MPTTMeta:
-        order_insertion_by = ["name"]
+    node_order_by = ["name"]
 
     class Meta:
         verbose_name = _("Collection directory")
@@ -750,9 +745,9 @@ class AbstractDocumentCollection(models.Model):
         return not self.listed
 
     def get_directories(self, parent_directory=None):
-        return CollectionDirectory.objects.all().filter(
-            collection=self, parent=parent_directory
-        )
+        if parent_directory is None:
+            return CollectionDirectory.get_root_nodes().filter(collection=self)
+        return parent_directory.get_children().filter(collection=self)
 
     def get_absolute_url(self):
         if self.slug:

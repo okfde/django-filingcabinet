@@ -43,7 +43,7 @@ setup(
         "django-json-widget",
         "jsonschema",
         "django-taggit",
-        "django-mptt",
+        "django-treebeard",
         "djangorestframework",
         "reportlab",
         "celery",
