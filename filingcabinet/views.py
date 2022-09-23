@@ -9,6 +9,7 @@ from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
 from .forms import get_viewer_preferences
 from .models import DocumentPortal
+from .settings import FILINGCABINET_ENABLE_WEBP
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -93,7 +94,7 @@ def get_document_viewer_context(doc, request, page_number=1, defaults=None):
     if defaults is None:
         defaults = {}
 
-    if not doc.has_format_webp() and not doc.pending:
+    if FILINGCABINET_ENABLE_WEBP and not doc.has_format_webp() and not doc.pending:
         from .tasks import convert_images_to_webp_task
 
         convert_images_to_webp_task.delay(doc.pk)

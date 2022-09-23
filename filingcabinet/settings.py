@@ -13,3 +13,4 @@ FILINGCABINET_DOCUMENTCOLLECTION_MODEL = getattr(
 TESSERACT_DATA_PATH = getattr(
     settings, "TESSERACT_DATA_PATH", "/usr/local/share/tessdata"
 )
+FILINGCABINET_ENABLE_WEBP = getattr(settings, "FILINGCABINET_ENABLE_WEBP", False)
