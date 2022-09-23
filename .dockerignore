@@ -1,0 +1,11 @@
+Dockerfile
+.dockerignore
+venv/
+.env
+.vscode/
+*.egg-info
+__pycache__
+.github
+./db.sqlite3
+node_modules/
+data/

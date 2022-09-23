@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.admin.sites import AlreadyRegistered
 
 from filingcabinet import get_document_model, get_documentcollection_model
 from filingcabinet.admin import (
@@ -21,10 +22,18 @@ from filingcabinet.models import (
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
 
-admin.site.register(Document, DocumentBaseAdmin)
-admin.site.register(Page, PageAdmin)
-admin.site.register(PageAnnotation, PageAnnotationAdmin)
-admin.site.register(DocumentCollection, DocumentCollectionBaseAdmin)
-admin.site.register(CollectionDocument, CollectionDocumentBaseAdmin)
-admin.site.register(DocumentPortal, DocumentPortalAdmin)
-admin.site.register(CollectionDirectory, CollectionDirectoryAdmin)
+
+def try_rgegister(model, model_admin):
+    try:
+        admin.site.register(model, model_admin)
+    except AlreadyRegistered:
+        pass
+
+
+try_rgegister(Document, DocumentBaseAdmin)
+try_rgegister(Page, PageAdmin)
+try_rgegister(PageAnnotation, PageAnnotationAdmin)
+try_rgegister(DocumentCollection, DocumentCollectionBaseAdmin)
+try_rgegister(CollectionDocument, CollectionDocumentBaseAdmin)
+try_rgegister(DocumentPortal, DocumentPortalAdmin)
+try_rgegister(CollectionDirectory, CollectionDirectoryAdmin)

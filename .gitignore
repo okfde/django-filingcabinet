@@ -2,6 +2,7 @@ build/
 dist/
 *.egg-info/
 .vscode/
+.venv/
 *.pyc
 *.mo
 tmp/
@@ -9,7 +10,7 @@ example_project/
 node_modules/
 fc-env/
 .env
-data/
 *.sqlite3
 .DS_Store
+data/
 .venv/

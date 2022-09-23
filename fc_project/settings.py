@@ -1,9 +1,17 @@
+import os
 from pathlib import Path
+
+from django.core.management.utils import get_random_secret_key
+
+
+def env(name, default=None):
+    return os.environ.get(name, default)
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
@@ -26,6 +34,7 @@ INSTALLED_APPS = [
     "taggit",
     "django_json_widget",
     "filingcabinet",
+    "fcdocs_annotate.annotation.apps.AnnotationConfig",
 ]
 
 FILINGCABINET_DOCUMENT_MODEL = "filingcabinet.Document"
@@ -36,6 +45,7 @@ FILINGCABINET_ENABLE_WEBP = True
 
 
 MIDDLEWARE = [
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -70,10 +80,14 @@ TIME_ZONE = "UTC"
 
 # Required for django-webtest to work
 STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "static"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = env("MEDIA_ROOT", BASE_DIR / "media")
 
 # Random secret key
 
-SECRET_KEY = 'hTuFaTK;N3>hgE9@"*=[mY@)Nk[6g(PEMbOnP?&2@QyyCaGDjw'
+SECRET_KEY = env("SECRET_KEY", get_random_secret_key())
 
 # Logs all newsletter app messages to the console
 LOGGING = {
@@ -84,10 +98,17 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
     },
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
+        }
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
     "loggers": {
-        "newsletter": {
+        "": {"handlers": ["console"], "level": "WARNING"},
+        "django": {
             "handlers": ["console"],
-            "propagate": True,
+            "level": "INFO",
         },
     },
 }
@@ -106,7 +127,8 @@ REST_FRAMEWORK = {
     ),
 }
 
-CELERY_TASK_ALWAYS_EAGER = True
-CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_TASK_ALWAYS_EAGER = bool(int(env("CELERY_TASK_ALWAYS_EAGER", "1")))
+CELERY_TASK_EAGER_PROPAGATES = CELERY_TASK_ALWAYS_EAGER
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 
 TESSERACT_DATA_PATH = "/usr/local/share/tessdata"

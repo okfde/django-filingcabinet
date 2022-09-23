@@ -49,8 +49,14 @@ setup(
         "celery",
         "feedgen",
     ],
-    extras_require={"tabledetection": ["camelot-py[cv]"], "webp": ["webp"]},
-    test_requires=["factory_boy"],
+    extras_require={
+        "tabledetection": ["camelot-py[cv]"],
+        "webp": ["webp"],
+        "annotate": [
+            "fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"
+        ],
+    },
+    test_requires=["factory_boy", "whitenoise"],
     include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",

@@ -1,0 +1,31 @@
+version: '3'
+
+x-fcapp-defaults:
+  &fcapp_defaults
+  build: .
+  restart: unless-stopped
+  environment:
+    - DJANGO_SETTINGS_MODULE=fc_project.settings
+    - CELERY_TASK_ALWAYS_EAGER=0
+    - CELERY_BROKER_URL=redis://redis:6379/0
+    - MEDIA_ROOT=/data
+    - SECRET_KEY
+  volumes:
+    - ./db.sqlite3:/project/db.sqlite3
+    - ./data:/data
+  depends_on:
+    - redis
+  links:
+    - redis
+
+services:
+  web:
+    <<: *fcapp_defaults
+    command: gunicorn --access-logfile=- --error-logfile=- --log-level=info --workers 3 -b 0.0.0.0:8000 fc_project.wsgi:application
+    ports:
+      - "127.0.0.1:5000:8000"
+  worker:
+    <<: *fcapp_defaults
+    command: celery -A fc_project worker -Q celery,document -l DEBUG --without-gossip --without-mingle --without-heartbeat
+  redis:
+    image: "redis:alpine"
