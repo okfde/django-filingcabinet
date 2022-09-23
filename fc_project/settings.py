@@ -50,7 +50,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [BASE_DIR / "fc_project/templates"],
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
