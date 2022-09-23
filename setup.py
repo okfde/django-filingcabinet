@@ -42,7 +42,7 @@ setup(
         "django-filter",
         "django-json-widget",
         "jsonschema",
-        "django-taggit",
+        "django-taggit>=2",
         "django-treebeard",
         "djangorestframework",
         "reportlab",

@@ -268,7 +268,7 @@ class DocumentStorer:
             transaction.on_commit(trigger_process_document_task(doc.pk))
 
         if self.tags:
-            doc.tags.set(*self.tags)
+            doc.tags.set(self.tags)
         if self.collection:
             CollectionDocument.objects.get_or_create(
                 collection=self.collection, document=doc, directory=directory
