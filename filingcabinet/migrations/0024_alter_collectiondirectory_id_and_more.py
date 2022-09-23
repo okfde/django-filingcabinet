@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("taggit", "0003_taggeditem_add_unique_index.py"),
+        ("taggit", "0003_taggeditem_add_unique_index"),
         ("filingcabinet", "0023_auto_20220707_1205"),
     ]
 
