@@ -1,6 +1,7 @@
 Dockerfile
 .dockerignore
 venv/
+.venv
 .env
 .vscode/
 *.egg-info
@@ -9,3 +10,6 @@ __pycache__
 ./db.sqlite3
 node_modules/
 data/
+static/
+tests
+test_project

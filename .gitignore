@@ -13,4 +13,5 @@ fc-env/
 *.sqlite3
 .DS_Store
 data/
+static/
 .venv/
