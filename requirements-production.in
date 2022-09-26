@@ -1,0 +1,21 @@
+Django
+wand
+pypdf2
+pikepdf
+Pillow
+django-filter
+django-json-widget
+jsonschema
+django-taggit>=2
+django-treebeard
+djangorestframework
+reportlab
+celery
+feedgen
+
+fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip
+de-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.3.0/de_core_news_sm-3.3.0-py3-none-any.whl
+fcdocs
+gunicorn
+celery[redis]
+whitenoise

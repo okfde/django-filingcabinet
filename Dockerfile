@@ -15,9 +15,11 @@ RUN useradd -m -r appuser && chown appuser /project
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh && chown appuser /entrypoint.sh
 
+COPY requirements-production.txt .
+RUN pip install -r requirements-production.txt
+
 # copy the whole project except what is in .dockerignore
 COPY . .
-RUN pip install -e .[annotate] gunicorn celery[redis] whitenoise
 
 USER appuser
 EXPOSE 8000
