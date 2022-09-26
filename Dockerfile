@@ -9,12 +9,6 @@ WORKDIR /project
 
 RUN useradd -m -r appuser && chown appuser /project
 
-# COPY requirements.txt ./
-# RUN pip install -r requirements.txt
-
-COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh && chown appuser /entrypoint.sh
-
 COPY requirements-production.txt .
 RUN pip install -r requirements-production.txt
 
