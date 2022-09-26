@@ -32,12 +32,10 @@ if FeatureViewSet:
 urlpatterns = (
     [
         path("admin/", admin.site.urls),
-        path(
-            "documents/",
-        ),
+        path("documents/", include("filingcabinet.urls")),
     ]
     + (
-        [path("documents/features/", include("fcdocs_annotate.urls"))]
+        [path("documents/features/", include("fcdocs_annotate.annotation.urls"))]
         if FeatureViewSet
         else []
     )
