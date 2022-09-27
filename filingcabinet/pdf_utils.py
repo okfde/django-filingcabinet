@@ -130,26 +130,34 @@ class PikePDFProcessor:
 
     def __enter__(self):
         self.open()
-        self.page_list = list(self._pdf.pages)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
     def get_page_number_for_page(self, page):
-        return self.page_list.index(page) + 1
+        try:
+            return self._pdf.pages.index(page) + 1
+        except ValueError:
+            return None
 
     def get_outline(self, outlines=None, depth=0):
         if outlines is None:
             outline = self._pdf.open_outline()
             outlines = outline.root
         for item in outlines:
+            page_number = None
             try:
-                if not item or not item.destination or not item.destination[0]:
+                if not item or not item.destination:
                     continue
-            except TypeError:
+                page_number = self.get_page_number_for_page(item.destination[0])
+            except (TypeError, AttributeError, IndexError):
+                try:
+                    page_number = self.get_page_number_for_page(item.destination)
+                except (TypeError, AttributeError, IndexError):
+                    pass
+            if page_number is None:
                 continue
-            page_number = self.get_page_number_for_page(item.destination[0])
             title = fix_text(item.title)
             yield depth, title, page_number
             yield from self.get_outline(item.children, depth=depth + 1)
