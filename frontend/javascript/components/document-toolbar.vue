@@ -141,7 +141,7 @@
           <i class="fa fa-commenting-o" />
           <span
             v-if="!preferences.showAnnotations && annotationCount && annotationCount > 0"
-            class="badge bg-light rounded-pill bg-annotation-count"
+            class="badge text-bg-light rounded-pill bg-annotation-count"
           >
             {{ annotationCount }}
           </span>
