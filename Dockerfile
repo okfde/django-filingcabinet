@@ -1,3 +1,13 @@
+FROM node:16-alpine as jsbuilder
+WORKDIR /usr/src/js
+COPY package.json yarn.lock /usr/src/js/
+RUN yarn install
+COPY frontend /usr/src/js/frontend
+COPY vite.config.js .
+RUN yarn build
+
+# ---
+
 FROM python:3.10
 
 ENV PYTHONUNBUFFERED 1
@@ -14,6 +24,7 @@ RUN pip install -r requirements-production.txt
 
 # copy the whole project except what is in .dockerignore
 COPY . .
+COPY --from=jsbuilder /usr/src/js/build /project/build
 
 USER appuser
 EXPOSE 8000

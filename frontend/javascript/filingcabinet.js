@@ -43,7 +43,7 @@ Array.from(document.querySelectorAll('[data-fcdocumentcollection]')).forEach(el 
 })
 
 const exp = {
-  createDocumentViewer
+  createDocumentViewer, createDocumentCollectionViewer
 }
 
 export default exp

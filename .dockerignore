@@ -13,3 +13,4 @@ data/
 static/
 tests
 test_project
+build/
