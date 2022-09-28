@@ -15,7 +15,7 @@ from .api_serializers import (
     PageSerializer,
     UpdateDocumentSerializer,
 )
-from .api_utils import make_oembed_response
+from .api_utils import CustomLimitOffsetPagination, make_oembed_response
 from .filters import DocumentFilter, PageDocumentFilterset
 from .models import CollectionDirectory, Page, PageAnnotation
 
@@ -64,6 +64,7 @@ class DocumentViewSet(
         "retrieve": DocumentDetailSerializer,
         "update": UpdateDocumentSerializer,
     }
+    pagination_class = CustomLimitOffsetPagination
     permission_classes = (CanReadWritePermission,)
     filterset_class = DocumentFilter
 
@@ -97,6 +98,7 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PageSerializer
     filterset_class = PageDocumentFilterset
     renderer_classes = viewsets.GenericViewSet.renderer_classes + [RSSRenderer]
+    pagination_class = CustomLimitOffsetPagination
     search_fields = ["content"]
 
     def get_queryset(self):
@@ -134,6 +136,7 @@ class DocumentCollectionViewSet(
         "list": DocumentCollectionSerializer,
     }
     permission_classes = (CanReadWritePermission,)
+    pagination_class = CustomLimitOffsetPagination
 
     def get_serializer_class(self):
         try:
@@ -189,6 +192,7 @@ class PageAnnotationViewSet(
 ):
     serializer_class = PageAnnotationSerializer
     permission_classes = (IsUserOrReadOnly,)
+    pagination_class = CustomLimitOffsetPagination
 
     def get_serializer_class(self):
         if self.action == "create":

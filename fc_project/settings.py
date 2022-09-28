@@ -125,6 +125,8 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
+    "DEFAULT_PAGINATION_CLASS": "filingcabinet.api_utils.CustomLimitOffsetPagination",
+    "PAGE_SIZE": 50,
 }
 
 CELERY_TASK_ALWAYS_EAGER = bool(int(env("CELERY_TASK_ALWAYS_EAGER", "1")))

@@ -1,6 +1,9 @@
+from collections import OrderedDict
+
 from django.conf import settings
 
 from rest_framework import status
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 
@@ -45,3 +48,33 @@ src="{url}?maxHeight={height}"></iframe>
             ).strip(),
         }
     )
+
+
+class CustomLimitOffsetPagination(LimitOffsetPagination):
+    max_limit = 50
+
+    def get_paginated_response(self, data):
+        if "facets" in data:
+            # Split out facets into root object
+            result = [("objects", data["objects"]), ("facets", data["facets"])]
+        else:
+            result = [("objects", data)]
+        return Response(
+            OrderedDict(
+                [
+                    (
+                        "meta",
+                        OrderedDict(
+                            [
+                                ("limit", self.limit),
+                                ("next", self.get_next_link()),
+                                ("offset", self.offset),
+                                ("previous", self.get_previous_link()),
+                                ("total_count", self.count),
+                            ]
+                        ),
+                    ),
+                    *result,
+                ]
+            )
+        )
