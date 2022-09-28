@@ -258,7 +258,7 @@ class PDFProcessor(object):
         img_blob = image.make_blob("RGB")
         pil_image = PILImage.frombytes("RGB", image.size, img_blob)
 
-        lang = TESSERACT_LANGUAGE[self.language]
+        lang = TESSERACT_LANGUAGE.get(self.language)
         config = ""
         path = self.config.get("TESSERACT_DATA_PATH", "")
         if path:
@@ -268,8 +268,8 @@ class PDFProcessor(object):
             return pytesseract.image_to_string(
                 pil_image, lang=lang, config=config, timeout=timeout
             )
-        except RuntimeError:
-            logger.warning("Timeout on OCR")
+        except RuntimeError as e:
+            logger.warning(e)
             return ""
 
 
@@ -367,12 +367,17 @@ def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
     if binary_name is None:
         return
     outpath = tempfile.mkdtemp()
-    lang = TESSERACT_LANGUAGE[language]
+    lang = TESSERACT_LANGUAGE.get(language)
     output_file = os.path.join(outpath, "out.pdf")
-    arguments = [
-        binary_name,
-        "-l",
-        lang,
+    arguments = [binary_name]
+    if lang is not None:
+        arguments.extend(
+            [
+                "-l",
+                lang,
+            ]
+        )
+    arguments += [
         "--deskew",
         "--skip-text",
         # '--title', title

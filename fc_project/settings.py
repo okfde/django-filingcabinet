@@ -97,7 +97,7 @@ MEDIA_ROOT = env("MEDIA_ROOT", BASE_DIR / "data")
 
 # Random secret key
 
-SECRET_KEY = env("SECRET_KEY", get_random_secret_key())
+SECRET_KEY = env("SECRET_KEY", "not-secret" if DEBUG else get_random_secret_key())
 
 # Logs all newsletter app messages to the console
 LOGGING = {
@@ -143,4 +143,4 @@ CELERY_TASK_ALWAYS_EAGER = bool(int(env("CELERY_TASK_ALWAYS_EAGER", "1")))
 CELERY_TASK_EAGER_PROPAGATES = CELERY_TASK_ALWAYS_EAGER
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 
-TESSERACT_DATA_PATH = "/usr/local/share/tessdata"
+TESSERACT_DATA_PATH = None

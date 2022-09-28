@@ -162,6 +162,7 @@ packaging==21.3
     #   build
     #   deprecation
     #   pikepdf
+    #   pytesseract
     #   redis
     #   spacy
 pandas==1.4.4
@@ -177,6 +178,7 @@ pillow==9.2.0
     #   -r requirements-production.in
     #   django-filingcabinet
     #   pikepdf
+    #   pytesseract
     #   reportlab
     #   torchvision
 pip-tools==6.8.0
@@ -203,6 +205,8 @@ pypdf2==2.10.9
     #   django-filingcabinet
 pyrsistent==0.18.1
     # via jsonschema
+pytesseract==0.3.10
+    # via -r requirements-production.in
 python-dateutil==2.8.2
     # via
     #   arrow

@@ -51,6 +51,7 @@ setup(
     ],
     extras_require={
         "tabledetection": ["camelot-py[cv]"],
+        "ocr": ["pytesseract"],
         "webp": ["webp"],
         "annotate": [
             "fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"
