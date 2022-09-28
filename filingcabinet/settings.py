@@ -14,3 +14,6 @@ TESSERACT_DATA_PATH = getattr(
     settings, "TESSERACT_DATA_PATH", "/usr/local/share/tessdata"
 )
 FILINGCABINET_ENABLE_WEBP = getattr(settings, "FILINGCABINET_ENABLE_WEBP", False)
+FILINGCABINET_MEDIA_PRIVATE_INTERNAL = getattr(
+    settings, "FILINGCABINET_MEDIA_PRIVATE_INTERNAL", "/protected/"
+)

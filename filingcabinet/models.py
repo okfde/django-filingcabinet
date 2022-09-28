@@ -303,7 +303,7 @@ class AbstractDocument(models.Model):
     def get_file_url(self, filename=None):
         if filename is None:
             return self.get_document_file_url()
-        if self.public:
+        if self.public or settings.DEBUG:
             return settings.MEDIA_URL + self.get_file_name(filename=filename)
         uid = self.uid.hex
         return reverse(

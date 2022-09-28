@@ -1,6 +1,5 @@
 import json
 
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import Http404, get_object_or_404, redirect
 from django.urls import reverse
@@ -11,7 +10,7 @@ from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
 from .forms import get_viewer_preferences
 from .models import DocumentPortal
-from .settings import FILINGCABINET_ENABLE_WEBP
+from .settings import FILINGCABINET_ENABLE_WEBP, FILINGCABINET_MEDIA_PRIVATE_INTERNAL
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -256,7 +255,9 @@ class DocumentListEmbedView(DocumentListView):
     template_name = "filingcabinet/documentcollection_detail_embed.html"
 
 
-class DocumentFileDetailView(DetailView):
+class DocumentFileDetailView(AuthMixin, DetailView):
+    model = Document
+
     def get_object(self):
         uid = self.kwargs["uuid"]
         if (
@@ -265,13 +266,12 @@ class DocumentFileDetailView(DetailView):
             or uid[4:6] != self.kwargs["u3"]
         ):
             raise Http404
-        return get_object_or_404(Document, uid=uid)
+        return get_object_or_404(self.get_queryset(), uid=uid)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         url = self.object.get_file_name(filename=self.kwargs["filename"])
-        url = settings.FILINGCABINET_MEDIA_PRIVATE_INTERNAL + url
-        print(url)
+        url = FILINGCABINET_MEDIA_PRIVATE_INTERNAL + url
         response = HttpResponse()
         # Content-Type is filled in by nginx
         response["Content-Type"] = ""
