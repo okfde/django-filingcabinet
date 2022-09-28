@@ -11,8 +11,9 @@ def env(name, default=None):
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEBUG = os.getenv("DEBUG", "False") == "True"
+DEBUG = os.getenv("DEBUG", "0") == "1"
 ALLOWED_HOSTS = ["*"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080"]
 
 DATABASES = {
     "default": {
@@ -41,6 +42,7 @@ FILINGCABINET_DOCUMENT_MODEL = "filingcabinet.Document"
 FILINGCABINET_DOCUMENTCOLLECTION_MODEL = "filingcabinet.DocumentCollection"
 FILINGCABINET_MEDIA_PUBLIC_PREFIX = "docs"
 FILINGCABINET_MEDIA_PRIVATE_PREFIX = "docs-private"
+FILINGCABINET_MEDIA_PRIVATE_INTERNAL = "/protected/"
 FILINGCABINET_ENABLE_WEBP = False
 
 
@@ -81,6 +83,14 @@ TIME_ZONE = "UTC"
 # Required for django-webtest to work
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "static"
+
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+)
+
+FRONTEND_BUILD_DIR = BASE_DIR / "build"
+STATICFILES_DIRS = [FRONTEND_BUILD_DIR]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = env("MEDIA_ROOT", BASE_DIR / "data")

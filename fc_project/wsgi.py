@@ -1,5 +1,5 @@
 """
-WSGI config for fcdocs_annotate project.
+WSGI config for filingcabinet project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

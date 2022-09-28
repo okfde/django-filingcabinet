@@ -1,5 +1,7 @@
 import json
 
+from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import Http404, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -268,4 +270,10 @@ class DocumentFileDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         url = self.object.get_file_name(filename=self.kwargs["filename"])
-        return redirect(url)
+        url = settings.FILINGCABINET_MEDIA_PRIVATE_INTERNAL + url
+        print(url)
+        response = HttpResponse()
+        # Content-Type is filled in by nginx
+        response["Content-Type"] = ""
+        response["X-Accel-Redirect"] = url
+        return response
