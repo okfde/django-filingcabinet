@@ -121,7 +121,7 @@ class DocumentFilter(filters.FilterSet):
 
 
 class PageDocumentFilterset(filters.FilterSet):
-    q = filters.CharFilter(to_field_name="content", lookup_expr="contains")
+    q = filters.CharFilter(field_name="content", lookup_expr="contains")
 
     tag = filters.ModelChoiceFilter(
         queryset=Tag.objects.all(), to_field_name="slug", method="filter_tag"
@@ -164,7 +164,7 @@ class PageDocumentFilterset(filters.FilterSet):
             if k in required_unlisted_filters
         )
         if not filter_present:
-            queryset = queryset.filter(listed=True)
+            queryset = queryset.filter(document__listed=True)
         return super().filter_queryset(queryset)
 
     def filter_tag(self, qs, name, value):
@@ -176,6 +176,11 @@ class PageDocumentFilterset(filters.FilterSet):
         qs = qs.filter(document__collections=collection)
         qs = self.apply_data_filters(qs, collection.settings.get("filters", []))
         return qs
+
+    def filter_document(self, qs, name, value):
+        if not value.can_read(self.request):
+            return qs.none()
+        return qs.filter(document=value)
 
     def filter_portal(self, qs, name, portal):
         qs = qs.filter(document__portal=portal)

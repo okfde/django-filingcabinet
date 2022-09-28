@@ -105,21 +105,28 @@ class PageViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         document_id = self.request.query_params.get("document", "")
         collection_id = self.request.query_params.get("collection", "")
 
+        if not document_id and not collection_id:
+            return Page.objects.none()
+
         pages = Page.objects.all()
-        try:
-            doc = Document.objects.get(pk=document_id)
-            if not doc.can_read(self.request):
+
+        if document_id:
+            try:
+                doc = Document.objects.get(pk=document_id)
+                if not doc.can_read(self.request):
+                    return Page.objects.none()
+                pages = pages.filter(document=doc)
+            except (ValueError, Document.DoesNotExist):
                 return Page.objects.none()
-            pages = pages.filter(document=doc)
-        except (ValueError, Document.DoesNotExist):
-            return Page.objects.none()
-        try:
-            collection = DocumentCollection.objects.get(pk=collection_id)
-            if not collection.can_read(self.request):
+
+        if collection_id:
+            try:
+                collection = DocumentCollection.objects.get(pk=collection_id)
+                if not collection.can_read(self.request):
+                    return Page.objects.none()
+                pages = pages.filter(document__in=collection.documents.all())
+            except (ValueError, DocumentCollection.DoesNotExist):
                 return Page.objects.none()
-            pages = pages.filter(document__in=collection.documents.all())
-        except (ValueError, Document.DoesNotExist):
-            return Page.objects.none()
 
         # Always order by publication date on RSS format
         has_query = self.request.GET.get("q")
