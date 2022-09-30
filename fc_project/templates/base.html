@@ -8,6 +8,9 @@
 </head>
 <body>
   <main>{% block body %}{% endblock %}</main>
-  {% block scripts %}{% endblock %}
+  
+  {% block scripts %}
+  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+  {% endblock %}
 </body>
 </html>
