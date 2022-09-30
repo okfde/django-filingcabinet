@@ -57,6 +57,14 @@ You can provide extra metadata as a JSON file with the same name as the PDF file
 }
 ```
 
+## Manual feature annotation
+
+You can generate training data by annotating documents in your database.
+Create features in the admin and then visit:
+
+http://localhost:8080/documents/features/
+
+
 ## Feature prediction on documents
 
 Use a ZIP-export of a kedro feature model: https://github.com/okfde/fcdocs#packaging-the-models
