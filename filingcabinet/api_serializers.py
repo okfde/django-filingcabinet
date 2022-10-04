@@ -58,7 +58,10 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
     def get_pages_uri(self, obj):
-        return "{}?document={}".format(reverse("api:page-list"), obj.id)
+        extra = ""
+        if not obj.listed:
+            extra = "&uid={}".format(obj.uid)
+        return "{}?document={}{}".format(reverse("api:page-list"), obj.id, extra)
 
 
 class PagesMixin(object):
@@ -177,10 +180,14 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         ).data
 
     def get_documents_uri(self, obj):
-        return "{}?collection={}".format(reverse("api:document-list"), obj.id)
+        return "{}?collection={}&uid={}".format(
+            reverse("api:document-list"), obj.id, obj.uid
+        )
 
     def get_pages_uri(self, obj):
-        return "{}?collection={}".format(reverse("api:page-list"), obj.id)
+        return "{}?collection={}&uid={}".format(
+            reverse("api:page-list"), obj.id, obj.uid
+        )
 
     def get_directories(self, obj):
         parent = self.context.get("parent_directory")
