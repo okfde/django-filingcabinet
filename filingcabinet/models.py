@@ -10,6 +10,7 @@ from django.core.files.base import File
 from django.db import models
 from django.urls import Resolver404, resolve, reverse
 from django.utils import timezone
+from django.utils.crypto import constant_time_compare
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
@@ -380,8 +381,7 @@ class AbstractDocument(models.Model):
         if self.public and self.listed:
             return True
         if self.public and not self.listed:
-            if request.GET.get("uid") == str(self.uid):
-                return True
+            return constant_time_compare(str(self.uid), request.GET.get("uid", ""))
         return False
 
     def can_read(self, request):
@@ -785,8 +785,7 @@ class AbstractDocumentCollection(models.Model):
         if self.public and self.listed:
             return True
         if self.public and not self.listed:
-            if request.GET.get("uid") == str(self.uid):
-                return True
+            return constant_time_compare(str(self.uid), request.GET.get("uid", ""))
         return False
 
     def can_read(self, request):
