@@ -191,6 +191,8 @@ preshed==3.0.7
     #   thinc
 prompt-toolkit==3.0.31
     # via click-repl
+pycryptodome==3.15.0
+    # via -r requirements-production.in
 pydantic==1.8.2
     # via
     #   spacy

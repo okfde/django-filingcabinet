@@ -37,6 +37,7 @@ setup(
         "Django",
         "wand",
         "pypdf2",
+        "PyCryptodome",
         "pikepdf",
         "Pillow",
         "django-filter",
