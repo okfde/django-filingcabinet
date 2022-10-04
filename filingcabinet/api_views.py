@@ -74,8 +74,17 @@ class DocumentViewSet(
         except (KeyError, AttributeError):
             return DocumentSerializer
 
+    def can_read_unlisted_via_collection(self):
+        try:
+            collection = DocumentCollection.objects.get(
+                id=self.request.GET.get("collection")
+            )
+        except DocumentCollection.DoesNotExist:
+            return False
+        return collection.can_read(self.request)
+
     def get_base_queryset(self):
-        if self.action == "list":
+        if self.action == "list" and not self.can_read_unlisted_via_collection():
             cond = Q(public=True, listed=True)
         else:
             cond = Q(public=True)
