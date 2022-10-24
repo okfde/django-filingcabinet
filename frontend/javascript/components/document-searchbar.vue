@@ -93,6 +93,6 @@ export default {
 <style lang="scss">
 .document-searchbar {
   position: relative;
-  z-index: 30;
+  z-index: 20;
 }
 </style>
