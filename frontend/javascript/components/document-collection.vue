@@ -249,20 +249,16 @@ export default {
     },
     collectionAuth() {
       if (!this.collection.listed && this.collection.uid) {
-        return `uid=${this.collection.uid}`;
+        return ['uid', this.collection.uid]
       }
-      return "";
     },
-    canPaginate() {
-      return (
-        this.collection.document_directory_count >
-        this.lastOffset + DOCUMENTS_API_LIMIT
-      );
-    },
+    canPaginate () {
+      return this.collection.document_directory_count > this.lastOffset + DOCUMENTS_API_LIMIT
+    }
   },
-  created() {
+  created () {
     if (!this.documentCollection.id && this.documentCollection.resource_uri) {
-      this.getCollectionData();
+      this.getCollectionData()
     }
   },
   mounted() {
@@ -275,24 +271,23 @@ export default {
     }
   },
   methods: {
-    getCollectionData() {
-      let url = [this.documentCollection.resource_uri];
-      if (url[0].indexOf("?") === -1) {
-        url.push(`?${this.collectionAuth}`);
-      } else {
-        url.push(`&${this.collectionAuth}`);
-      }
-      this.documents = [];
-      this.directories = [];
-      url.push(
-        `&directory=${this.currentDirectory ? this.currentDirectory.id : ""}`
-      );
-      getData(url.join("")).then((docCollection) => {
-        this.collection = docCollection;
-        this.documentsUri = docCollection.documents_uri;
-        this.documentOffsets = this.makeOffsets(docCollection);
-        this.documents = this.makeDocuments(docCollection);
-        this.directories = docCollection.directories;
+    getCollectionData () {
+      const url = new URL(this.documentCollection.resource_uri, window.location.origin)
+      const params = new URLSearchParams(url.search)
+
+      if (this.collectionAuth) params.append(...this.collectionAuth)
+      
+      this.documents = []
+      this.directories = []
+      params.append('directory', this.currentDirectory ? this.currentDirectory.id : '')
+      url.search = params
+
+      getData(url).then((docCollection) => {
+        this.collection = docCollection
+        this.documentsUri = docCollection.documents_uri
+        this.documentOffsets = this.makeOffsets(docCollection)
+        this.documents = this.makeDocuments(docCollection)
+        this.directories = docCollection.directories
         if (!this.settings) {
           this.settings = docCollection.settings;
         }
@@ -344,18 +339,19 @@ export default {
         this.abortController.abort();
       }
       this.abortController = new AbortController();
-      this.lastOffset = offset;
-      let url = [this.documentsUri];
-      if (url[0].indexOf("?") === -1) {
-        url.push("?");
-      }
-      url.push(`&${this.collectionAuth}`);
-      url.push(
-        `&directory=${this.currentDirectory ? this.currentDirectory.id : "-"}`
-      );
-      url.push(`&offset=${offset}&limit=${DOCUMENTS_API_LIMIT}`);
-      this.documentOffset = offset + DOCUMENTS_API_LIMIT;
-      getData(url.join(""), {}, this.abortController.signal).then((result) => {
+      this.lastOffset = offset
+      const url = new URL(this.documentsUri, window.location.origin);
+      const params = new URLSearchParams(url.search);
+      
+      if (this.collectionAuth) params.append(...this.collectionAuth);
+
+      params.append('directory', this.currentDirectory ? this.currentDirectory.id : '-')
+      params.append('offset', offset)
+      params.append('limit', DOCUMENTS_API_LIMIT)
+      url.search = params
+
+      this.documentOffset = offset + DOCUMENTS_API_LIMIT
+      getData(url, {}, this.abortController.signal).then(result => {
         if (!result) {
           return;
         }
@@ -421,33 +417,35 @@ export default {
         this.documentsReceived(response)
       );
     },
-    getSearchUrl({ term, filters }) {
-      let params = [this.collectionAuth];
-      let baseUrl = this.collection.pages_uri;
+    getSearchUrl ({ term, filters }) {
+      const baseUrl = this.collection.pages_uri
+      const url = new URL(baseUrl, window.location.origin);
+      const params = new URLSearchParams(url.search);
+      
       if (term) {
-        params.push(`q=${encodeURIComponent(term)}`);
+        params.append('q', term)
       } else {
-        params.push("number=1");
+        params.append('number', '1')
       }
       if (this.currentDirectory) {
-        params.push(`directory=${this.currentDirectory.id}`);
+        params.append(directory, this.currentDirectory.id)
       }
       for (let [key, value] of filters.entries()) {
         if (value) {
           if (typeof value === "object") {
             for (let urlKey in value) {
               if (value[urlKey]) {
-                params.push(`${urlKey}=${encodeURIComponent(value[urlKey])}`);
+                params.append(urlKey ,value[urlKey])
               }
             }
           } else {
-            params.push(`${key}=${encodeURIComponent(value)}`);
+            params.push(key, value)
           }
         }
       }
-      return `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}${params.join(
-        "&"
-      )}`;
+
+      url.search = params
+      return url.toString()
     },
     documentsReceived(response) {
       this.searcher.response = response;
@@ -460,12 +458,14 @@ export default {
         }
       });
       if (missingDocs.length > 0) {
-        let docsUrl = `${this.collection.documents_uri}${
-          this.collection.documents_uri.includes("?") ? "&" : "?"
-        }ids=${missingDocs.join(",")}`;
-        getData(docsUrl).then((docsResponse) => {
-          this.setSearchResults(response.objects, docsResponse.objects);
-        });
+        const url = new URL(this.collection.documents_uri, window.location.origin)
+        const params = new URLSearchParams(url.search)
+        params.append('ids', missingDocs.join(','))
+        url.search = params
+        
+        getData(url).then((docsResponse) => {
+          this.setSearchResults(response.objects, docsResponse.objects)
+        })
       } else {
         this.setSearchResults(response.objects, []);
       }
