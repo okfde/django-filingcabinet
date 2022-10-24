@@ -75,13 +75,15 @@
           <i class="fa fa-file-text" />
           <span class="visually-hidden">{{ i18n.show_text }}</span>
         </button>
-        <button
+        <a
+          :href="document.file_url"
+          rel="noopener"
           class="btn btn-sm btn-secondary"
           @click="download"
         >
           <i class="fa fa-download" />
           <span class="visually-hidden">{{ i18n.downloadPDF }}</span>
-        </button>
+        </a>
       </div>
     </div>
     <div
@@ -228,7 +230,10 @@ export default {
     toggleShowAnnotations () {
       this.$emit('updatepreferences', {showAnnotations: !this.preferences.showAnnotations})
     },
-    download () {
+    download (e) {
+      if (e) {
+        e.preventDefault()
+      }
       let filename = this.document.slug
       if (filename.length === 0) {
         filename = `${this.document.id}.pdf`
