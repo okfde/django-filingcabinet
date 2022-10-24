@@ -108,21 +108,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.preview-doc {
+.preview-doc, .preview-doc:hover {
   display: block;
   text-align: center;
-}
-.preview-doc:hover {
+  color: white;
   text-decoration: none;
 }
+
 .preview-doc .page-image {
   border: 1px solid #aaa;
   margin: 0 auto;
-}
-.preview-doc p, .preview-doc p:hover {
-  text-align: center;
-  color: #fff;
-  text-decoration: none;
 }
 
 .query-highlight {
