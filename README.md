@@ -7,6 +7,8 @@ A Django app that manages documents with pages, page annotations and collections
 Install [docker](https://docs.docker.com/get-docker/) and [docker compose plugin](https://docs.docker.com/compose/install/).
 
 ```bash
+# Copy example environment and set a secret key
+cp .env.example .env
 # Create database file to mount into container
 touch db.sqlite3
 docker-compose run --rm web python manage.py migrate
