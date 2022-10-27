@@ -426,7 +426,9 @@ export default {
       this.document.loaded = true
       Vue.set(this.document, 'pages',  this.processPages(doc.pages, true))
       this.willResize()
-      if (this.document.file_size <= MAX_PDF_SIZE || this.document.properties._force_load_pdf) {
+      const forceLoadPDF = this.document.properties._force_load_pdf
+      const forceLoadPDFSet = typeof forceLoadPDF !== 'undefined'
+      if ((!forceLoadPDFSet && this.document.file_size <= MAX_PDF_SIZE) || forceLoadPDF) {
         this.loadPDF()
       }
       Vue.nextTick(() => this.pagesInitialized())
