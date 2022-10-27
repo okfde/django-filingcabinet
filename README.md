@@ -2,12 +2,13 @@
 
 A Django app that manages documents with pages, page annotations and collections. [Optionally can use document feature annotation and prediction.](https://github.com/okfde/fcdocs-annotate)
 
-
 ## Quickstart with Docker
 
 Install [docker](https://docs.docker.com/get-docker/) and [docker compose plugin](https://docs.docker.com/compose/install/).
 
 ```bash
+# Create database file to mount into container
+touch db.sqlite3
 docker-compose run --rm web python manage.py migrate
 # Create a user account
 docker-compose run --rm web python manage.py createsuperuser
@@ -16,7 +17,6 @@ docker-compose up
 # Nginx will be available at localhost:8080 by default
 ```
 
-
 ### Example User flow
 
 Access the admin interface at: http://localhost:8080/admin/
@@ -24,7 +24,6 @@ Access the admin interface at: http://localhost:8080/admin/
 Set the correct site domain at: http://localhost:8080/admin/sites/site/
 
 Upload documents at: http://localhost:8080/admin/filingcabinet/document/
-
 
 ## Integrate into a Django project
 
@@ -40,20 +39,20 @@ You can provide extra metadata as a JSON file with the same name as the PDF file
 
 ```json
 {
-    "title": "",
-    "description": "",
-    "language": "<ISO language code>",
-    "published_at": "<ISO date string>",
-    "public": true,
-    "listed": true,
-    "properties": {
-        "custom": "properties"
-    },
-    "data": {
-        "filterable": "data"
-    },
-    "tags": ["Tag"],
-    "collection": 123
+  "title": "",
+  "description": "",
+  "language": "<ISO language code>",
+  "published_at": "<ISO date string>",
+  "public": true,
+  "listed": true,
+  "properties": {
+    "custom": "properties"
+  },
+  "data": {
+    "filterable": "data"
+  },
+  "tags": ["Tag"],
+  "collection": 123
 }
 ```
 
@@ -64,7 +63,6 @@ Create features in the admin and then visit:
 
 http://localhost:8080/documents/features/
 
-
 ## Feature prediction on documents
 
 Use a ZIP-export of a kedro feature model: https://github.com/okfde/fcdocs#packaging-the-models
@@ -72,7 +70,6 @@ Use a ZIP-export of a kedro feature model: https://github.com/okfde/fcdocs#packa
 Upload a packaged feature model as .zip: http://localhost:8080/admin/fcdocs_annotation/feature/
 
 Start feature prediction tasks on documents via document admin action dropdown.
-
 
 ## Prediction microservice
 
@@ -90,27 +87,26 @@ This will return a JSON document like this:
 
 ```json
 {
-        "callback_url": "http://example.com/callback/", 
-        "document_url": "http://example.com/document.pdf",
-        "feature_id": 1,
-        "task_id": "93e84b09-78ca-4c27-97ce-90b23d13fae5",
-        "result": null,
-        "status": "pending",
-        "details": ""
+  "callback_url": "http://example.com/callback/",
+  "document_url": "http://example.com/document.pdf",
+  "feature_id": 1,
+  "task_id": "93e84b09-78ca-4c27-97ce-90b23d13fae5",
+  "result": null,
+  "status": "pending",
+  "details": ""
 }
 ```
-
 
 The callback URL will be POSTed a JSON document like this:
 
 ```json
 {
-        "callback_url": "http://example.com/callback/", 
-        "document_url": "http://example.com/document.pdf",
-        "feature_id": 1,
-        "task_id": "93e84b09-78ca-4c27-97ce-90b23d13fae5",
-        "result": false,
-        "status": "complete",
-        "details": ""
+  "callback_url": "http://example.com/callback/",
+  "document_url": "http://example.com/document.pdf",
+  "feature_id": 1,
+  "task_id": "93e84b09-78ca-4c27-97ce-90b23d13fae5",
+  "result": false,
+  "status": "complete",
+  "details": ""
 }
 ```
