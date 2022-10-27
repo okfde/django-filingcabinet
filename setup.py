@@ -23,6 +23,28 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 
+tests_require = [
+    "black",
+    "coverage",
+    "django-coverage-plugin",
+    "django-stubs",
+    "djangorestframework-stubs",
+    "factory_boy",
+    "flake8-bugbear",
+    "flake8",
+    "isort",
+    "monkeytype",
+    "mypy-extensions",
+    "mypy",
+    "pre-commit",
+    "pycodestyle",
+    "pytest-django",
+    "pytest-factoryboy",
+    "pytest-playwright",
+    "pytest",
+]
+
+
 setup(
     name="django-filingcabinet",
     version=find_version("filingcabinet", "__init__.py"),
@@ -57,8 +79,9 @@ setup(
         "annotate": [
             "fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"
         ],
+        "test": tests_require,
     },
-    test_requires=["factory_boy", "whitenoise"],
+    tests_require=tests_require,
     include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
