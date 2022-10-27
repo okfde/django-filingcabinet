@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('filingcabinet', '0027_remove_collectiondirectory_level_and_more'),
+        ("filingcabinet", "0027_remove_collectiondirectory_level_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='collectiondirectory',
-            name='depth',
+            model_name="collectiondirectory",
+            name="depth",
             field=models.PositiveIntegerField(),
         ),
         migrations.AlterField(
-            model_name='collectiondirectory',
-            name='numchild',
+            model_name="collectiondirectory",
+            name="numchild",
             field=models.PositiveIntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='collectiondirectory',
-            name='path',
+            model_name="collectiondirectory",
+            name="path",
             field=models.CharField(max_length=255, unique=True),
         ),
     ]
