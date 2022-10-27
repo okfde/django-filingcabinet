@@ -2,30 +2,26 @@
   <a
     :href="pageAnchor"
     class="d-flex search-preview-page text-white"
-    :class="{'bg-dark': isCurrent}"
+    :class="{ 'bg-dark': isCurrent }"
     @click.prevent="navigate"
   >
     <img
       :src="imageUrl"
       alt=""
       class="flex-shrink-0 img-fluid"
-      style="height:90px"
-    >
+      style="height: 90px"
+    />
     <div class="flex-grow-1 ms-2">
-      <h6>{{ i18n.page }} {{ page.number }} - 
+      <h6>
+        {{ i18n.page }} {{ page.number }} -
         <template v-if="matches.count === 1">
           {{ i18n.one_match }}
         </template>
-        <template v-else>
-          {{ matches.count }} {{ i18n.matches }}
-        </template>
+        <template v-else> {{ matches.count }} {{ i18n.matches }} </template>
       </h6>
       <div class="query-highlight">
         <template v-for="result in matches.results">
-          <span
-            :key="result.query_highlight"
-            v-html="result.query_highlight"
-          />
+          <span :key="result.query_highlight" v-html="result.query_highlight" />
         </template>
       </div>
     </div>
@@ -33,30 +29,29 @@
 </template>
 
 <script>
-
 export default {
-  name: 'DocumentSearchPreview',
-  props: ['page', 'matches', 'currentPage'],
+  name: "DocumentSearchPreview",
+  props: ["page", "matches", "currentPage"],
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    imageUrl () {
-      return this.page.image_url.replace(/\{size\}/, 'small')
+    imageUrl() {
+      return this.page.image_url.replace(/\{size\}/, "small");
     },
-    pageAnchor () {
-      return `#page-${this.page.number}`
+    pageAnchor() {
+      return `#page-${this.page.number}`;
     },
-    isCurrent () {
-      return this.page.number === this.currentPage
-    }
+    isCurrent() {
+      return this.page.number === this.currentPage;
+    },
   },
   methods: {
-    navigate () {
-      this.$emit('navigate', this.page.number)
-    }
-  }
-}
+    navigate() {
+      this.$emit("navigate", this.page.number);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

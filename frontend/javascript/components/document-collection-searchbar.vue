@@ -1,10 +1,7 @@
 <template>
   <div class="row py-1 bg-dark text-white document-searchbar">
     <div class="col-12">
-      <div
-        v-if="hasFilters"
-        class="row"
-      >
+      <div v-if="hasFilters" class="row">
         <div class="col">
           <div class="mb-3 row">
             <label
@@ -20,7 +17,7 @@
                 type="search"
                 class="search-input form-control"
                 @keydown.enter="runSearch"
-              >
+              />
             </div>
           </div>
           <document-filter
@@ -46,7 +43,7 @@
                 {{ pageCount }} {{ i18n.page }}
               </template>
               <template v-else>
-                {{ pageCount }} {{ i18n.pages }} {{ i18n.found }} 
+                {{ pageCount }} {{ i18n.pages }} {{ i18n.found }}
               </template>
               –
               <template v-if="resultCount == 1">
@@ -61,10 +58,8 @@
               <template v-if="pageCount == 1">
                 {{ pageCount }} {{ i18n.document }}
               </template>
-              <template v-else>
-                {{ pageCount }} {{ i18n.documents }}
-              </template>
-              {{ i18n.found }} 
+              <template v-else> {{ pageCount }} {{ i18n.documents }} </template>
+              {{ i18n.found }}
             </template>
             <a
               v-if="showSearchFeed"
@@ -72,63 +67,37 @@
               class="text-white"
               target="_blank"
             >
-              <i
-                class="fa fa-rss"
-                aria-hidden="true"
-              />
+              <i class="fa fa-rss" aria-hidden="true" />
             </a>
             <template v-if="directory">
-              <br>{{ i18n.searchingInDirectory }} {{ directory.name }}
+              <br />{{ i18n.searchingInDirectory }} {{ directory.name }}
             </template>
           </small>
         </div>
-        <div
-          v-if="searcher"
-          class="col-auto ms-auto me-2"
-        >
-          <button
-            class="btn btn-dark"
-            @click="clear"
-          >
+        <div v-if="searcher" class="col-auto ms-auto me-2">
+          <button class="btn btn-dark" @click="clear">
             {{ i18n.clearSearch }}
           </button>
         </div>
         <div class="col-auto ms-auto">
-          <div
-            v-if="!hasFilters"
-            class="input-group input-group-sm"
-          >
+          <div v-if="!hasFilters" class="input-group input-group-sm">
             <input
               v-model="search"
               type="search"
               class="search-input form-control form-control-sm"
               @keydown.enter="runSearch"
-            >
-            <button
-              class="btn btn-outline-light"
-              @click="runSearch"
-            >
+            />
+            <button class="btn btn-outline-light" @click="runSearch">
               {{ i18n.search }}
             </button>
           </div>
-          <button
-            v-else
-            class="btn btn-outline-light"
-            @click="runSearch"
-          >
+          <button v-else class="btn btn-outline-light" @click="runSearch">
             {{ i18n.search }}
           </button>
         </div>
       </div>
-      <div
-        v-if="hasFacets"
-        class="row d-flex mb-2"
-      >
-        <div
-          v-for="facet in facetList"
-          :key="facet.key"
-          class="col-4"
-        >
+      <div v-if="hasFacets" class="row d-flex mb-2">
+        <div v-for="facet in facetList" :key="facet.key" class="col-4">
           <document-facet
             :values="facet.values"
             :filter="facet.filter"
@@ -142,114 +111,115 @@
 </template>
 
 <script>
-
-import DocumentFilter from './document-filter.vue'
-import DocumentFacet from './document-facet.vue'
+import DocumentFilter from "./document-filter.vue";
+import DocumentFacet from "./document-facet.vue";
 
 export default {
-  name: 'DocumentCollectionSearchbar',
+  name: "DocumentCollectionSearchbar",
   components: {
     DocumentFilter,
-    DocumentFacet
+    DocumentFacet,
   },
   props: {
     searcher: {
       type: Object,
-      default: null
+      default: null,
     },
     directory: {
       type: Object,
-      default: null
+      default: null,
     },
     showSearchFeed: {
       type: Boolean,
-      default: false
+      default: false,
     },
     filters: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
-      search: this.searcher?.term || '',
+      search: this.searcher?.term || "",
       filterValues: this.searcher?.filters || new Map(),
-    }
+    };
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    searching () {
-      return this.searcher && !this.searcher.done
+    searching() {
+      return this.searcher && !this.searcher.done;
     },
-    hasFilters () {
-      return !!this.filters && this.filters.length > 0
+    hasFilters() {
+      return !!this.filters && this.filters.length > 0;
     },
-    hasFacets () {
-      return !!(this.searcher && this.searcher.response && this.searcher.response.facets)
+    hasFacets() {
+      return !!(
+        this.searcher &&
+        this.searcher.response &&
+        this.searcher.response.facets
+      );
     },
-    facetList () {
+    facetList() {
       let facets = [];
       for (let field in this.searcher.response.facets.fields) {
         let facetValues = this.searcher.response.facets.fields[field];
         if (facetValues.length === 0) {
-          continue
+          continue;
         }
-        let filter = this.filters.filter(f => f.key === field)[0]
+        let filter = this.filters.filter((f) => f.key === field)[0];
         if (filter === undefined) {
-          continue
+          continue;
         }
         facets.push({
           key: filter.key,
           filter: filter,
           values: facetValues,
-          value: this.filterValues.get(filter.key) || ''
-        })
+          value: this.filterValues.get(filter.key) || "",
+        });
       }
-      return facets
+      return facets;
     },
-    pageCount () {
+    pageCount() {
       if (this.searcher !== null) {
-        return this.searcher.response.meta.total_count
+        return this.searcher.response.meta.total_count;
       }
-      return 0
+      return 0;
     },
-    resultCount () {
+    resultCount() {
       if (this.searcher !== null) {
-        return this.searcher.docCount
+        return this.searcher.docCount;
       }
-      return 0
+      return 0;
     },
-    rssUrl () {
+    rssUrl() {
       if (this.searcher) {
-        return this.searcher.url + "&format=rss"
+        return this.searcher.url + "&format=rss";
       }
-      return ""
-    }
+      return "";
+    },
   },
   methods: {
-    clear () {
-      this.search = ""
-      this.$emit('clearsearch')
+    clear() {
+      this.search = "";
+      this.$emit("clearsearch");
     },
-    runSearch () {
-      this.$emit('search', {
+    runSearch() {
+      this.$emit("search", {
         term: this.search,
-        filters: this.filterValues
-      })
+        filters: this.filterValues,
+      });
     },
     setFilter(key, event) {
-      this.updateFilter({key, value: event})
-      this.runSearch()
+      this.updateFilter({ key, value: event });
+      this.runSearch();
     },
-    updateFilter ({key, value}) {
-      this.filerValues = new Map(this.filterValues.set(key, value))
-    }
-  }
-}
+    updateFilter({ key, value }) {
+      this.filerValues = new Map(this.filterValues.set(key, value));
+    },
+  },
+};
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

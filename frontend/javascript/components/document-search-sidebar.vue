@@ -1,7 +1,7 @@
 <template>
   <div
     class="document-search-pages bg-secondary text-light"
-    :style="{'height': height}"
+    :style="{ height: height }"
   >
     <RecycleScroller
       v-slot="{ item }"
@@ -22,33 +22,31 @@
 </template>
 
 <script>
+import "intersection-observer";
 
-import 'intersection-observer'
+import { RecycleScroller } from "vue-virtual-scroller";
 
-import { RecycleScroller } from 'vue-virtual-scroller'
-
-import DocumentSearchPreview from './document-search-preview.vue'
+import DocumentSearchPreview from "./document-search-preview.vue";
 
 export default {
-  name: 'DocumentSearchSidebar',
+  name: "DocumentSearchSidebar",
   components: {
     DocumentSearchPreview,
-    RecycleScroller
+    RecycleScroller,
   },
-  props: ['documentPages', 'pages', 'currentPage', 'height'],
-  computed: {
-  },
+  props: ["documentPages", "pages", "currentPage", "height"],
+  computed: {},
   methods: {
-    navigate (item) {
-      let searchIndex = this.pages.findIndex((i) => i === item)
-      this.$emit('navigate', {
+    navigate(item) {
+      let searchIndex = this.pages.findIndex((i) => i === item);
+      this.$emit("navigate", {
         number: item.number,
-        source: 'search',
-        searchIndex: searchIndex
-      })
-    }
-  }
-}
+        source: "search",
+        searchIndex: searchIndex,
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss">

@@ -1,13 +1,19 @@
 <template>
-  <div :id="'sidebar-annotation-' + annotation.id" class="annotation" :class="{'current': isCurrent, 'has-rect': hasRect}"
+  <div
+    :id="'sidebar-annotation-' + annotation.id"
+    class="annotation"
+    :class="{ current: isCurrent, 'has-rect': hasRect }"
     @mouseover="activateAnnotation"
     @mouseout="deactivateAnnotation"
-    @click="permanentlyActivateAnnotation">
+    @click="permanentlyActivateAnnotation"
+  >
     <h6>
       {{ annotation.title }}
-      <button v-if="annotation.can_delete"
+      <button
+        v-if="annotation.can_delete"
         class="btn btn-sm btn-danger float-end delete-button"
-        @click="deleteAnnotation">
+        @click="deleteAnnotation"
+      >
         <i class="fa fa-ban"></i>
       </button>
     </h6>
@@ -17,59 +23,60 @@
     <time
       :datetime="annotation.timestamp"
       class="d-block small text-end text-muted"
-    >{{ annotationTime }}</time>
+      >{{ annotationTime }}</time
+    >
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'document-page-annotation',
-  props: ['annotation', 'currentAnnotation'],
-  data () {
+  name: "document-page-annotation",
+  props: ["annotation", "currentAnnotation"],
+  data() {
     return {
-      activated: false
-    }
+      activated: false,
+    };
   },
   computed: {
-    isCurrent () {
-      return this.annotation.id === this.currentAnnotation
+    isCurrent() {
+      return this.annotation.id === this.currentAnnotation;
     },
-    hasRect () {
-      return !!this.annotation.left
+    hasRect() {
+      return !!this.annotation.left;
     },
-    dtf () {
-      return new Intl.DateTimeFormat(
-        'de', {
-          year: 'numeric', month: 'numeric',
-          day: 'numeric', hour: 'numeric',
-          minute: 'numeric',
-      })
+    dtf() {
+      return new Intl.DateTimeFormat("de", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+      });
     },
-    annotationTime () {
-      const d = new Date(this.annotation.timestamp)
-      return this.dtf.format(d)
-    }
+    annotationTime() {
+      const d = new Date(this.annotation.timestamp);
+      return this.dtf.format(d);
+    },
   },
   methods: {
-    permanentlyActivateAnnotation () {
-      this.activated = true
-      this.activateAnnotation()
+    permanentlyActivateAnnotation() {
+      this.activated = true;
+      this.activateAnnotation();
     },
-    activateAnnotation () {
-      this.$emit('currentannotation', this.annotation.id)
+    activateAnnotation() {
+      this.$emit("currentannotation", this.annotation.id);
     },
-    deactivateAnnotation () {
+    deactivateAnnotation() {
       if (this.activated) {
-        return
+        return;
       }
-      this.$emit('currentannotation', null)
+      this.$emit("currentannotation", null);
     },
-    deleteAnnotation () {
-      this.$emit('deleteannotation', this.annotation)
-    }
-  }
-}
+    deleteAnnotation() {
+      this.$emit("deleteannotation", this.annotation);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -80,7 +87,7 @@ export default {
   margin-bottom: 0.5rem;
 
   p {
-    margin-bottom: 0
+    margin-bottom: 0;
   }
   .delete-button {
     visibility: hidden;
@@ -90,6 +97,6 @@ export default {
   }
 }
 .current.has-rect {
-  outline: 1px solid #FCED00;
+  outline: 1px solid #fced00;
 }
 </style>

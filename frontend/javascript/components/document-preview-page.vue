@@ -1,16 +1,12 @@
 <template>
-  <a
-    :href="pageAnchor"
-    class="document-preview-page"
-    @click.prevent="navigate"
-  >
+  <a :href="pageAnchor" class="document-preview-page" @click.prevent="navigate">
     <picture>
       <source
         v-for="format in imageFormats"
         :key="format"
         :srcset="imageUrl.replace(/\.png/, '.png.' + format)"
         :type="'image/' + format"
-      >
+      />
       <img
         v-if="page.image_url"
         v-show="imageLoaded"
@@ -20,13 +16,9 @@
         class="img-fluid page-image"
         loading="lazy"
         @load="onImageLoad"
-      >
+      />
     </picture>
-    <div
-      v-if="!imageLoaded"
-      class="spinner-grow"
-      role="status"
-    >
+    <div v-if="!imageLoaded" class="spinner-grow" role="status">
       <span class="visually-hidden">{{ i18n.loading }}</span>
     </div>
     <p>
@@ -36,60 +28,59 @@
 </template>
 
 <script>
-
 export default {
-  name: 'DocumentPreviewPage',
+  name: "DocumentPreviewPage",
   props: {
     page: {
       type: Object,
-      required: true
+      required: true,
     },
     imageFormats: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
-  data () {
+  data() {
     return {
-      imageLoaded: false
-    }
+      imageLoaded: false,
+    };
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    imageUrl () {
-      return this.page.image_url.replace(/\{size\}/, 'small')
+    imageUrl() {
+      return this.page.image_url.replace(/\{size\}/, "small");
     },
-    pageAnchor () {
-      return `#page-${this.page.number}`
+    pageAnchor() {
+      return `#page-${this.page.number}`;
     },
-    imageSources () {
-      return this.supportedFormats.map(format => {
-        let srcset = this.imageSrcSet
-        srcset = srcset.replace(/\.png/g, `.png.${format}`)
+    imageSources() {
+      return this.supportedFormats.map((format) => {
+        let srcset = this.imageSrcSet;
+        srcset = srcset.replace(/\.png/g, `.png.${format}`);
         return {
           srcset: srcset,
-          type: `image/${format}`
-        }
-      })
+          type: `image/${format}`,
+        };
+      });
     },
   },
-  beforeDestroy () {
+  beforeDestroy() {
     if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
       // Cancel image download on destroy
-      this.$refs.image.setAttribute('src', "")
+      this.$refs.image.setAttribute("src", "");
     }
   },
   methods: {
-    onImageLoad () {
-      this.imageLoaded = true
+    onImageLoad() {
+      this.imageLoaded = true;
     },
-    navigate () {
-      this.$emit('navigate', this.page.number)
-    }
-  }
-}
+    navigate() {
+      this.$emit("navigate", this.page.number);
+    },
+  },
+};
 </script>
 
 <style lang="scss">
@@ -102,7 +93,8 @@ export default {
   border: 1px solid #aaa;
   margin: 0 auto;
 }
-.document-preview-page p, .document-preview-page p:hover {
+.document-preview-page p,
+.document-preview-page p:hover {
   text-align: center;
   color: #fff;
   text-decoration: none;

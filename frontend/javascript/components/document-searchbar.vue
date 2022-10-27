@@ -1,11 +1,7 @@
 <template>
   <div class="row py-2 bg-secondary text-white document-searchbar">
     <div class="col-auto">
-      <div
-        v-if="searcher && !isSmallScreen"
-        class="btn-group"
-        role="group"
-      >
+      <div v-if="searcher && !isSmallScreen" class="btn-group" role="group">
         <button
           type="button"
           class="btn btn-sm btn-light"
@@ -30,10 +26,7 @@
           <span class="visually-hidden">{{ i18n.searching }}</span>
         </div>
       </div>
-      <small
-        v-if="searcher && searcher.done"
-        class="d-none d-sm-inline"
-      >
+      <small v-if="searcher && searcher.done" class="d-none d-sm-inline">
         {{ i18n.found_on }} {{ pages.length }} {{ i18n.pages }}
       </small>
     </div>
@@ -45,11 +38,8 @@
           type="text"
           class="search-input form-control form-control-sm"
           @keydown.enter="runSearch"
-        >
-        <button
-          class="btn btn-outline-light"
-          @click="runSearch"
-        >
+        />
+        <button class="btn btn-outline-light" @click="runSearch">
           {{ i18n.search }}
         </button>
       </div>
@@ -59,48 +49,45 @@
 
 <script>
 export default {
-  name: 'DocumentSearchbar',
-  props: [
-    'searcher', 'searchIndex', 'pages', 'defaultSearch',
-    'isSmallScreen'
-  ],
-  data () {
+  name: "DocumentSearchbar",
+  props: ["searcher", "searchIndex", "pages", "defaultSearch", "isSmallScreen"],
+  data() {
     return {
-      search: this.defaultSearch || '',
-    }
+      search: this.defaultSearch || "",
+    };
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    searching () {
-      return this.searcher && !this.searcher.done
+    searching() {
+      return this.searcher && !this.searcher.done;
     },
-    hasNext () {
-      return this.pages.length > 0 && this.searchIndex < this.pages.length - 1
+    hasNext() {
+      return this.pages.length > 0 && this.searchIndex < this.pages.length - 1;
     },
-    hasPrev () {
-      return this.pages.length > 0 && this.searchIndex > 0
-    }
+    hasPrev() {
+      return this.pages.length > 0 && this.searchIndex > 0;
+    },
   },
-  mounted () {
-    this.$refs.searchInput.focus()
+  mounted() {
+    this.$refs.searchInput.focus();
   },
   methods: {
-    runSearch () {
-      this.$emit('search', this.search)
+    runSearch() {
+      this.$emit("search", this.search);
     },
-    prevSearchResult () {
-      this.$emit('movesearchindex', -1)
+    prevSearchResult() {
+      this.$emit("movesearchindex", -1);
     },
-    nextSearchResult () {
-      this.$emit('movesearchindex', 1)
+    nextSearchResult() {
+      this.$emit("movesearchindex", 1);
     },
-    clear () {
-      this.$emit('clearsearch')
-    }
-  }
-}
+    clear() {
+      this.$emit("clearsearch");
+    },
+  },
+};
 </script>
 
 <style lang="scss">

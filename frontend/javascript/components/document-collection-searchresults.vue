@@ -4,21 +4,14 @@
       <div class="col-12">
         <h4 class="text-white">
           {{ document.title }}
-          <small
-            v-if="documentPublicationDate"
-            class="badge text-bg-dark"
-          >
+          <small v-if="documentPublicationDate" class="badge text-bg-dark">
             {{ documentPublicationDate }}
           </small>
         </h4>
       </div>
     </div>
     <div class="row bg-secondary">
-      <div
-        v-for="page in pages"
-        :key="page.number"
-        class="col-sm-4 col-md-3"
-      >
+      <div v-for="page in pages" :key="page.number" class="col-sm-4 col-md-3">
         <document-preview
           :document="document"
           :page="page.number"
@@ -32,36 +25,35 @@
 </template>
 
 <script>
+import "intersection-observer";
 
-import 'intersection-observer'
-
-import DocumentPreview from './document-preview.vue'
+import DocumentPreview from "./document-preview.vue";
 
 export default {
-  name: 'DocumentCollectionSearchresult',
+  name: "DocumentCollectionSearchresult",
   components: {
     DocumentPreview,
   },
-  props: ['document', 'pages'],
+  props: ["document", "pages"],
   computed: {
-    i18n () {
-      return this.config.i18n
+    i18n() {
+      return this.config.i18n;
     },
-    documentPublicationDate () {
+    documentPublicationDate() {
       if (!this.document.published_at) {
-        return null
+        return null;
       }
-      return new Intl.DateTimeFormat().format(new Date(this.document.published_at))
-    }
+      return new Intl.DateTimeFormat().format(
+        new Date(this.document.published_at)
+      );
+    },
   },
   methods: {
-    navigate (docAndPage) {
-      this.$emit('navigate', docAndPage)
-    }
-  }
-}
+    navigate(docAndPage) {
+      this.$emit("navigate", docAndPage);
+    },
+  },
+};
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

@@ -1,26 +1,41 @@
 <template>
   <div class="annotation-container" :style="style">
     <div v-if="!showAnnotationForm && canAnnotate" class="text-end mb-2">
-      <button class="btn btn-sm btn-light text-muted" @click="activateForm(false)">
+      <button
+        class="btn btn-sm btn-light text-muted"
+        @click="activateForm(false)"
+      >
         {{ i18n.addAnnotation }}
       </button>
     </div>
     <div v-if="showAnnotationForm">
       <div class="mb-3">
         <label for="">{{ i18n.title }}</label>
-        <input type="text" class="form-control form-control-sm" v-model="title">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          v-model="title"
+        />
       </div>
       <div class="mb-3">
         <label>{{ i18n.description }}</label>
-        <textarea class="form-control form-control-sm" v-model="description"></textarea>
+        <textarea
+          class="form-control form-control-sm"
+          v-model="description"
+        ></textarea>
       </div>
       <div class="text-end">
-        <button class="btn btn-sm btn-light" @click.prevent="$emit('activateannotationform', null)">
+        <button
+          class="btn btn-sm btn-light"
+          @click.prevent="$emit('activateannotationform', null)"
+        >
           {{ i18n.cancel }}
         </button>
-        <button class="btn btn-sm btn-secondary"
+        <button
+          class="btn btn-sm btn-secondary"
           :disabled="!formValid"
-          @click.prevent="postAnnotation">
+          @click.prevent="postAnnotation"
+        >
           {{ i18n.addAnnotation }}
         </button>
       </div>
@@ -38,60 +53,67 @@
   </div>
 </template>
 
-
 <script>
-
-import PageAnnotation from './document-annotation.vue'
+import PageAnnotation from "./document-annotation.vue";
 
 export default {
-  name: 'document-page-annotations',
+  name: "document-page-annotations",
   props: [
-    'page', 'annotations', 'currentAnnotation', 'canAnnotate',
-    'activeAnnotationForm'
+    "page",
+    "annotations",
+    "currentAnnotation",
+    "canAnnotate",
+    "activeAnnotationForm",
   ],
   components: {
-    PageAnnotation
+    PageAnnotation,
   },
-  data () {
+  data() {
     return {
-      title: '',
-      description: ''
-    }
+      title: "",
+      description: "",
+    };
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    style () {
+    style() {
       return {
-        height: (this.page.normalSize - 15) + 'px'
+        height: this.page.normalSize - 15 + "px",
+      };
+    },
+    formValid() {
+      return (
+        this.title.length > 0 &&
+        this.title.length < 255 &&
+        this.description.length < 1024
+      );
+    },
+    showAnnotationForm() {
+      if (this.activeAnnotationForm === null) {
+        return false;
       }
+      return this.activeAnnotationForm.number == this.page.number;
     },
-    formValid () {
-      return this.title.length > 0 && this.title.length < 255 && this.description.length < 1024
-    },
-    showAnnotationForm () {
-      if (this.activeAnnotationForm === null) { return false }
-      return this.activeAnnotationForm.number == this.page.number
-    }
   },
   methods: {
-    postAnnotation () {
-      this.activateForm(true)
-      this.$emit('activateannotationform', null)
-      this.title = ''
-      this.description = ''
+    postAnnotation() {
+      this.activateForm(true);
+      this.$emit("activateannotationform", null);
+      this.title = "";
+      this.description = "";
     },
-    activateForm (ready) {
-      this.$emit('activateannotationform', {
+    activateForm(ready) {
+      this.$emit("activateannotationform", {
         number: this.page.number,
         title: this.title,
         description: this.description,
-        ready: ready
-      })
-    }
-  }
-}
+        ready: ready,
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
