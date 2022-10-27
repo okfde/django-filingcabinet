@@ -58,4 +58,6 @@ jobs:
       - name: Build frontend
         run: yarn run build
       - name: Run tests
-        run: pytest
+        run: coverage run --branch -m pytest
+      - name: Show coverage report
+        run: coverage report
