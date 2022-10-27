@@ -53,6 +53,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -e ".[test]"
+          playwright install --with-deps chromium
           yarn install
       - name: Build frontend
         run: yarn run build
