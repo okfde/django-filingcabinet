@@ -1,9 +1,6 @@
 <template>
   <div class="mb-3 row">
-    <label
-      :for="filter.id"
-      class="col-sm-2 col-form-label"
-    >
+    <label :for="filter.id" class="col-sm-2 col-form-label">
       {{ label }}
     </label>
     <template v-if="filter.type == 'choice'">
@@ -14,9 +11,7 @@
           class="form-control"
           @input="updateFilter($event.target.value)"
         >
-          <option value="">
-            ---
-          </option>
+          <option value="">---</option>
           <option
             v-for="opt in filter.choices"
             :key="opt.value"
@@ -40,37 +35,37 @@
 </template>
 
 <script>
-const DEFAULT_LANG = 'en'
+const DEFAULT_LANG = "en";
 
-import DocumentDateRangeFilter from './document-daterangefilter.vue'
+import DocumentDateRangeFilter from "./document-daterangefilter.vue";
 
 export default {
-  name: 'DocumentFilter',
+  name: "DocumentFilter",
   components: {
-    DocumentDateRangeFilter
+    DocumentDateRangeFilter,
   },
   props: {
     filter: {
       type: Object,
-      required: true
+      required: true,
     },
     // eslint-disable-next-line vue/require-prop-types
     value: {
-      default: ''
-    }
+      default: "",
+    },
   },
   computed: {
-    lang () {
-      return document.documentElement.lang
+    lang() {
+      return document.documentElement.lang;
     },
-    label () {
-      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG]
-    }
+    label() {
+      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG];
+    },
   },
   methods: {
-    updateFilter (value) {
-      this.$emit('input', {key: this.filter.key, value})
-    }
-  }
-}
+    updateFilter(value) {
+      this.$emit("input", { key: this.filter.key, value });
+    },
+  },
+};
 </script>

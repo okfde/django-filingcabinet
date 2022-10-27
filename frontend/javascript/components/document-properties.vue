@@ -14,11 +14,7 @@
         <template v-if="document.properties.url">
           <dt>{{ i18n.url }}</dt>
           <dd>
-            <a
-              :href="document.properties.url"
-              target="_blank"
-              rel="noopener"
-            >
+            <a :href="document.properties.url" target="_blank" rel="noopener">
               {{ document.properties.url.slice(0, 20) }}&hellip;
             </a>
           </dd>
@@ -42,25 +38,27 @@
 
 <script>
 export default {
-  name: 'DocumentProperties',
+  name: "DocumentProperties",
   props: {
     document: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
-    publishedAt () {
+    publishedAt() {
       if (this.document.published_at) {
-        return new Intl.DateTimeFormat().format(new Date(this.document.published_at))
+        return new Intl.DateTimeFormat().format(
+          new Date(this.document.published_at)
+        );
       }
-      return null
-    }
-  }
-}
+      return null;
+    },
+  },
+};
 </script>
 
 <style scoped>

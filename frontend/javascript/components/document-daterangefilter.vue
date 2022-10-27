@@ -6,7 +6,7 @@
       class="form-control"
       @input="updateMin($event.target.value)"
       @change="updateMin($event.target.value)"
-    >
+    />
     <span class="input-group-text">-</span>
     <input
       :value="max"
@@ -14,52 +14,52 @@
       class="form-control"
       @input="updateMax($event.target.value)"
       @change="updateMax($event.target.value)"
-    >
+    />
   </div>
 </template>
 
 <script>
 export default {
-  name: 'DocumentDateRangeFilter',
+  name: "DocumentDateRangeFilter",
   props: {
     filter: {
       type: Object,
-      required: true
+      required: true,
     },
     value: {
       type: Object,
-      required: true
+      required: true,
     },
   },
-  data () {
+  data() {
     return {
-      currentMin: this.min,
-      currentMax: this.max
-    }
+      currentMin: this.value[`${this.filter.key}_after`],
+      currentMax: this.value[`${this.filter.key}_before`],
+    };
   },
   computed: {
-    min () {
-      return this.value[`${this.filter.key}_after`]
+    min() {
+      return this.value[`${this.filter.key}_after`];
     },
-    max () {
-      return this.value[`${this.filter.key}_before`]
-    }
+    max() {
+      return this.value[`${this.filter.key}_before`];
+    },
   },
   methods: {
-    updateMin (min) {
-      this.currentMin = min
-      this.updateValue()
+    updateMin(min) {
+      this.currentMin = min;
+      this.updateValue();
     },
-    updateMax (max) {
-      this.currentMax = max
-      this.updateValue()
+    updateMax(max) {
+      this.currentMax = max;
+      this.updateValue();
     },
     updateValue() {
-      this.$emit('input', {
+      this.$emit("input", {
         [`${this.filter.key}_after`]: this.currentMin,
         [`${this.filter.key}_before`]: this.currentMax,
-      })
-    }
-  }
-}
+      });
+    },
+  },
+};
 </script>

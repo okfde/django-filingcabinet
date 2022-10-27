@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="document-preview-pages"
-    :style="{'height': height}"
-  >
+  <div class="document-preview-pages" :style="{ height: height }">
     <RecycleScroller
       v-slot="{ item }"
       class="scroller"
@@ -22,18 +19,17 @@
 </template>
 
 <script>
+import "intersection-observer";
 
-import 'intersection-observer'
+import { RecycleScroller } from "vue-virtual-scroller";
 
-import { RecycleScroller } from 'vue-virtual-scroller'
-
-import DocumentPreviewPage from './document-preview-page.vue'
+import DocumentPreviewPage from "./document-preview-page.vue";
 
 export default {
-  name: 'DocumentPreviewSidebar',
+  name: "DocumentPreviewSidebar",
   components: {
     RecycleScroller,
-    DocumentPreviewPage
+    DocumentPreviewPage,
   },
   props: {
     pages: {
@@ -42,40 +38,40 @@ export default {
     },
     imageFormats: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     height: {
       type: String,
       required: true,
-    }
-  },
-  computed: {
-    i18n () {
-      return this.config.i18n
     },
   },
-  mounted () {
-    this.initialNav = false
+  computed: {
+    i18n() {
+      return this.config.i18n;
+    },
   },
-  updated () {
+  mounted() {
+    this.initialNav = false;
+  },
+  updated() {
     if (!this.initialNav) {
-      this.initialNav = true
-      this.$emit('navigatesidebar')
+      this.initialNav = true;
+      this.$emit("navigatesidebar");
     }
   },
   methods: {
-    navigate (number) {
-      this.$emit('navigate', {
+    navigate(number) {
+      this.$emit("navigate", {
         number,
-        source: 'sidebar'
-      })
-    }
-  }
-}
+        source: "sidebar",
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-@import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 .document-preview-pages {
   padding: 0.5rem 0;

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="document-pages"
-    :style="{'height': height}"
-  >
+  <div class="document-pages" :style="{ height: height }">
     <RecycleScroller
       v-slot="{ item }"
       class="scroller"
@@ -35,18 +32,17 @@
 </template>
 
 <script>
+import "intersection-observer";
 
-import 'intersection-observer'
+import { RecycleScroller } from "vue-virtual-scroller";
 
-import { RecycleScroller } from 'vue-virtual-scroller'
-
-import DocumentPage from './document-page.vue'
+import DocumentPage from "./document-page.vue";
 
 export default {
-  name: 'DocumentPages',
+  name: "DocumentPages",
   components: {
     RecycleScroller,
-    DocumentPage
+    DocumentPage,
   },
   props: {
     document: {
@@ -87,41 +83,41 @@ export default {
     },
   },
   computed: {
-    showText () {
-      return this.preferences.showText
+    showText() {
+      return this.preferences.showText;
     },
-    showAnnotations () {
-      return this.preferences.showAnnotations
+    showAnnotations() {
+      return this.preferences.showAnnotations;
     },
-    isPageMode () {
-      return !this.preferences.maxHeight
+    isPageMode() {
+      return !this.preferences.maxHeight;
     },
-    supportedFormats () {
+    supportedFormats() {
       if (this.document.properties && this.document.properties._format_webp) {
-        return ["webp"]
+        return ["webp"];
       }
-      return []
+      return [];
     },
-    buffer () {
+    buffer() {
       if (this.height) {
-        return Math.round(parseInt(this.height.replace('px', '')) * 0.7)
+        return Math.round(parseInt(this.height.replace("px", "")) * 0.7);
       }
       if (this.pages.length > 0) {
-        return Math.round(this.pages[0].normalSize * 0.7)
+        return Math.round(this.pages[0].normalSize * 0.7);
       }
-      return 200
-    }
+      return 200;
+    },
   },
   methods: {
-    updateCurrentPage (startIndex, endIndex) {
-      this.$emit('currentpage', {start: startIndex, end: endIndex})
-    }
-  }
-}
+    updateCurrentPage(startIndex, endIndex) {
+      this.$emit("currentpage", { start: startIndex, end: endIndex });
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-@import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
+@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 .scroller {
   height: 100%;

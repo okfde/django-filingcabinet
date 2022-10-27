@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 class PDFLinkService {
   /**
    * @param {PDFLinkServiceOptions} options
@@ -106,7 +105,7 @@ class PDFLinkService {
           // only occur during loading, before all pages have been resolved.
           this.pdfDocument
             .getPageIndex(destRef)
-            .then(pageIndex => {
+            .then((pageIndex) => {
               this.cachePageRef(pageIndex + 1, destRef);
               goToDestination({ namedDest, explicitDest });
             })
@@ -151,7 +150,7 @@ class PDFLinkService {
 
     new Promise((resolve) => {
       if (typeof dest === "string") {
-        this.pdfDocument.getDestination(dest).then(destArray => {
+        this.pdfDocument.getDestination(dest).then((destArray) => {
           resolve({
             namedDest: dest,
             explicitDest: destArray,
@@ -163,7 +162,7 @@ class PDFLinkService {
         namedDest: "",
         explicitDest: dest,
       });
-    }).then(data => {
+    }).then((data) => {
       if (!Array.isArray(data.explicitDest)) {
         console.error(
           `PDFLinkService.navigateTo: "${data.explicitDest}" is` +
@@ -211,7 +210,7 @@ class PDFLinkService {
    * @param {string} action
    */
   executeNamedAction() {
-  /* Currently not implemented by FC */
+    /* Currently not implemented by FC */
   }
 
   /**
@@ -302,6 +301,4 @@ class PDFLinkService {
 
 class FilingcabinetLinkService extends PDFLinkService {}
 
-export {
-  FilingcabinetLinkService
-}
+export { FilingcabinetLinkService };

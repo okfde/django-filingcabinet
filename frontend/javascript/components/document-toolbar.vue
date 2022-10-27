@@ -4,33 +4,31 @@
       v-if="preferences.showSidebarToggle || preferences.showOutlineToggle"
       class="col-auto px-1 px-sm-2"
     >
-      <div
-        class="btn-group"
-        role="group"
-      >
+      <div class="btn-group" role="group">
         <button
           v-if="preferences.showSidebarToggle"
           type="button"
           class="btn btn-sm btn-secondary"
-          :class="{'active': preferences.showSidebar}"
+          :class="{ active: preferences.showSidebar }"
           :disabled="!!searcher"
           @click="toggleShowSidebar"
         >
           <i
             class="fa"
-            :class="{'fa-toggle-left': preferences.showSidebar, 'fa-toggle-right': !preferences.showSidebar}"
+            :class="{
+              'fa-toggle-left': preferences.showSidebar,
+              'fa-toggle-right': !preferences.showSidebar,
+            }"
           />
         </button>
         <button
           v-if="preferences.showOutlineToggle"
           type="button"
           class="btn btn-sm btn-secondary"
-          :class="{'active': preferences.showOutline}"
+          :class="{ active: preferences.showOutline }"
           @click="toggleShowOutline"
         >
-          <i
-            class="fa fa-list-ul"
-          />
+          <i class="fa fa-list-ul" />
         </button>
       </div>
     </div>
@@ -46,21 +44,20 @@
           min="1"
           :max="document.num_pages"
           @change="submitChange"
+        />
+        <span class="d-none d-sm-inline input-group-text"
+          >/ {{ document.num_pages }}</span
         >
-        <span class="d-none d-sm-inline input-group-text">/ {{ document.num_pages }}</span>
       </div>
     </div>
     <div
       v-if="preferences.showTextToggle"
       class="col col-md-auto ps-0 pe-1 px-sm-2"
     >
-      <div
-        class="btn-group"
-        role="group"
-      >
+      <div class="btn-group" role="group">
         <button
           class="btn btn-sm btn-secondary"
-          :class="{'btn-light': preferences.showDocumentProperties}"
+          :class="{ 'btn-light': preferences.showDocumentProperties }"
           @click="showInfo"
         >
           <i class="fa fa-info-circle" />
@@ -69,7 +66,7 @@
         <button
           type="button"
           class="btn btn-sm btn-secondary"
-          :class="{'btn-light': preferences.showText}"
+          :class="{ 'btn-light': preferences.showText }"
           @click="toggleShowText"
         >
           <i class="fa fa-file-text" />
@@ -86,14 +83,8 @@
         </a>
       </div>
     </div>
-    <div
-      v-if="preferences.showZoom"
-      class="col col-md-auto px-1 px-sm-2"
-    >
-      <div
-        class="btn-group"
-        role="group"
-      >
+    <div v-if="preferences.showZoom" class="col col-md-auto px-1 px-sm-2">
+      <div class="btn-group" role="group">
         <button
           type="button"
           class="btn btn-sm btn-secondary"
@@ -119,7 +110,7 @@
       <button
         type="button"
         class="btn btn-sm btn-secondary"
-        :class="{'btn-light': preferences.showSearchbar}"
+        :class="{ 'btn-light': preferences.showSearchbar }"
         @click="toggleShowSearchbar"
       >
         <i class="fa fa-search" />
@@ -129,20 +120,20 @@
       v-if="preferences.showAnnotationsToggle"
       class="col-auto px-1 px-sm-2 text-end"
     >
-      <div
-        class="btn-group"
-        role="group"
-      >
+      <div class="btn-group" role="group">
         <button
-
           type="button"
           class="btn btn-sm btn-secondary"
-          :class="{'btn-light': preferences.showAnnotations}"
+          :class="{ 'btn-light': preferences.showAnnotations }"
           @click="toggleShowAnnotations"
         >
           <i class="fa fa-commenting-o" />
           <span
-            v-if="!preferences.showAnnotations && annotationCount && annotationCount > 0"
+            v-if="
+              !preferences.showAnnotations &&
+              annotationCount &&
+              annotationCount > 0
+            "
             class="badge text-bg-light rounded-pill bg-annotation-count"
           >
             {{ annotationCount }}
@@ -154,110 +145,126 @@
 </template>
 
 <script>
-
-import { triggerDownload } from "../lib/utils.js"
+import { triggerDownload } from "../lib/utils.js";
 
 export default {
-  name: 'DocumentToolbar',
+  name: "DocumentToolbar",
   props: [
-    'document', 'searcher', 'preferences', 'currentPage',
-    'zoom', 'isSmallScreen', 'annotationCount', 'pdfDocument'
+    "document",
+    "searcher",
+    "preferences",
+    "currentPage",
+    "zoom",
+    "isSmallScreen",
+    "annotationCount",
+    "pdfDocument",
   ],
-  data () {
+  data() {
     return {
-      storedPage: this.currentPage
-    }
+      storedPage: this.currentPage,
+    };
   },
   computed: {
-    i18n () {
-      return this.$root.config.i18n
+    i18n() {
+      return this.$root.config.i18n;
     },
     page: {
-      get () {
-        return this.currentPage
+      get() {
+        return this.currentPage;
       },
-      set (number) {
+      set(number) {
         if (number > this.document.num_pages) {
-          number = this.document.num_pages
+          number = this.document.num_pages;
         }
         if (number < 1) {
-          number = 1
+          number = 1;
         }
-        this.storedPage = number
-      }
+        this.storedPage = number;
+      },
     },
-    canZoomIn () {
-      return this.zoom < 3
+    canZoomIn() {
+      return this.zoom < 3;
     },
-    canZoomOut () {
-      return this.zoom > 1
+    canZoomOut() {
+      return this.zoom > 1;
     },
   },
   methods: {
-    submitChange () {
-      this.navigate(this.storedPage)
+    submitChange() {
+      this.navigate(this.storedPage);
     },
-    navigate (number) {
-      this.$emit('navigate', {
+    navigate(number) {
+      this.$emit("navigate", {
         number: number,
-        source: 'toolbar'
-      })
+        source: "toolbar",
+      });
     },
-    toggleShowText () {
-      this.$emit('updatepreferences', {showText: !this.preferences.showText})
+    toggleShowText() {
+      this.$emit("updatepreferences", { showText: !this.preferences.showText });
     },
-    toggleShowSidebar () {
+    toggleShowSidebar() {
       if (this.preferences.showSidebar) {
         if (this.preferences.showOutline) {
-          this.$emit('updatepreferences', {showOutline: !this.preferences.showOutline})
+          this.$emit("updatepreferences", {
+            showOutline: !this.preferences.showOutline,
+          });
         }
       }
-      this.$emit('updatepreferences', {showSidebar: !this.preferences.showSidebar})
+      this.$emit("updatepreferences", {
+        showSidebar: !this.preferences.showSidebar,
+      });
     },
-    toggleShowSearchbar () {
+    toggleShowSearchbar() {
       if (this.preferences.showSearchbar) {
-        this.$emit('clearsearch')
+        this.$emit("clearsearch");
       } else {
-        this.$emit('updatepreferences', {showSearchbar: true})
+        this.$emit("updatepreferences", { showSearchbar: true });
       }
     },
-    toggleShowOutline () {
+    toggleShowOutline() {
       if (!this.preferences.showSidebar) {
-        this.$emit('updatepreferences', {showSidebar: true})
+        this.$emit("updatepreferences", { showSidebar: true });
       }
-      this.$emit('updatepreferences', {showOutline: !this.preferences.showOutline})
+      this.$emit("updatepreferences", {
+        showOutline: !this.preferences.showOutline,
+      });
     },
-    toggleShowAnnotations () {
-      this.$emit('updatepreferences', {showAnnotations: !this.preferences.showAnnotations})
+    toggleShowAnnotations() {
+      this.$emit("updatepreferences", {
+        showAnnotations: !this.preferences.showAnnotations,
+      });
     },
-    download (e) {
+    download(e) {
       if (e) {
-        e.preventDefault()
+        e.preventDefault();
       }
-      let filename = this.document.slug
+      let filename = this.document.slug;
       if (filename.length === 0) {
-        filename = `${this.document.id}.pdf`
+        filename = `${this.document.id}.pdf`;
       } else {
-        filename = `${filename}.pdf`
+        filename = `${filename}.pdf`;
       }
       if (this.pdfDocument) {
-        this.pdfDocument.getData().then((data) => {
-          const blob = new Blob([data], { type: "application/pdf" });
-          const blobUrl = URL.createObjectURL(blob);
-          triggerDownload(blobUrl, filename)
-        }).catch(() => this.downloadByUrl(filename))
+        this.pdfDocument
+          .getData()
+          .then((data) => {
+            const blob = new Blob([data], { type: "application/pdf" });
+            const blobUrl = URL.createObjectURL(blob);
+            triggerDownload(blobUrl, filename);
+          })
+          .catch(() => this.downloadByUrl(filename));
       } else {
-        this.downloadByUrl(filename)
+        this.downloadByUrl(filename);
       }
     },
-    downloadByUrl (filename) {
-      triggerDownload(this.document.file_url, filename)
+    downloadByUrl(filename) {
+      triggerDownload(this.document.file_url, filename);
     },
-    showInfo () {
-      this.$emit('showinfo')
-    }
-  }
-}
+    showInfo() {
+      this.$emit("showinfo");
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
