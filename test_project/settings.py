@@ -32,6 +32,9 @@ FILINGCABINET_DOCUMENTCOLLECTION_MODEL = "app.DocumentCollection"
 FILINGCABINET_MEDIA_PUBLIC_PREFIX = "docs"
 FILINGCABINET_MEDIA_PRIVATE_PREFIX = "docs-private"
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "tests" / "testdata"
+STATIC_ROOT = BASE_DIR / "static"
 
 MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -51,6 +54,7 @@ TEMPLATES = [
         "APP_DIRS": True,
         "DIRS": [BASE_DIR / "fc_project" / "templates"],
         "OPTIONS": {
+            "debug": True,
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
@@ -66,8 +70,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 USE_TZ = True
 TIME_ZONE = "UTC"
 
-# Required for django-webtest to work
 STATIC_URL = "/static/"
+STATICFILES_FINDERS = (
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+)
+
+FRONTEND_BUILD_DIR = BASE_DIR / "build"
+STATICFILES_DIRS = [FRONTEND_BUILD_DIR]
 
 # Random secret key
 
@@ -103,4 +113,9 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ),
+    "DEFAULT_PAGINATION_CLASS": "filingcabinet.api_utils.CustomLimitOffsetPagination",
+    "PAGE_SIZE": 50,
 }
+
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = CELERY_TASK_ALWAYS_EAGER

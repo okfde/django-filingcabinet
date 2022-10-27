@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin.sites import AlreadyRegistered
 
-from fcdocs_annotate.annotation.admin import predict_feature
+try:
+    from fcdocs_annotate.annotation.admin import predict_feature
+except ImportError:
+    predict_feature = None
 
 from filingcabinet import get_document_model, get_documentcollection_model
 from filingcabinet.admin import (
@@ -40,5 +43,6 @@ try_rgegister(CollectionDocument, CollectionDocumentBaseAdmin)
 try_rgegister(DocumentPortal, DocumentPortalAdmin)
 try_rgegister(CollectionDirectory, CollectionDirectoryAdmin)
 
-DocumentBaseAdmin.predict_feature = predict_feature
-DocumentBaseAdmin.actions += ["predict_feature"]
+if predict_feature:
+    DocumentBaseAdmin.predict_feature = predict_feature
+    DocumentBaseAdmin.actions += ["predict_feature"]
