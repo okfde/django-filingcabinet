@@ -1,0 +1,60 @@
+name: filingcabinet CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: 3.x
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "yarn"
+      - name: Cache pip
+        uses: actions/cache@v1
+        with:
+          key: v0-${{ runner.os }}-pip-lint-${{ hashFiles('setup.py') }}
+          path: ~/.cache/pip
+          restore-keys: |
+            v0-${{ runner.os }}-pip-lint-
+            v0-${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          pip install ".[test]"
+          yarn install
+      - name: Run flake8
+        run: flake8 filingcabinet --statistics
+      - name: Run black
+        run: black --check filingcabinet
+      - name: Run isort
+        run: isort --check filingcabinet
+      - name: Run eslint
+        run: yarn lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install system-level dependencies
+        run: sudo apt-get update && sudo apt-get install python-dev libmagic-dev libmagickwand-dev
+      - name: Install dependencies
+        run: |
+          pip install -e ".[test]"
+          yarn install
+      - name: Build frontend
+        run: yarn run build
+      - name: Run tests
+        run: pytest
