@@ -493,7 +493,7 @@ export default {
     text-align: left;
     margin: 0 auto;
     overflow: auto;
-    padding: 15px;
+    padding: calc(.5 * var(--bs-gutter-x));
     font-family: sans-serif;
     background-color: rgba(255, 255, 255, 0.95);
     color: #333;

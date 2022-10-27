@@ -345,7 +345,7 @@ export default {
         return {
           height: this.preferences.maxHeight,
           overflow: 'auto',
-          padding: '0 15px'
+          padding: '0 calc(.5 * var(--bs-gutter-x))'
         }
       }
       return {}
@@ -806,8 +806,8 @@ export default {
   position: sticky;
   top: 0;
   z-index: 30;
-  padding: 0 15px;
-  margin: 0 -15px;
+  padding: 0 calc(.5 * var(--bs-gutter-x));
+  margin: 0 calc(-.5 * var(--bs-gutter-x));
   overflow: hidden;
 }
 .main-row {
