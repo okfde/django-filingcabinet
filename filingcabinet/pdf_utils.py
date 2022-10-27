@@ -527,9 +527,9 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
 
 
 def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300, timeout=5 * 60):
-    for pages in chunks(pages, chunk_size):
+    for page_chunks in chunks(pages, chunk_size):
         with get_images_from_pdf(
-            filename, pages=pages, dpi=dpi, timeout=timeout
+            filename, pages=page_chunks, dpi=dpi, timeout=timeout
         ) as images:
             yield from images
 
