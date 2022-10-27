@@ -69,7 +69,7 @@
     <div v-if="document" class="collection-document">
       <div class="row">
         <div class="col-12 px-0">
-          <document
+          <document-viewer
             :document-url="document.resource_uri"
             :document-preview="document"
             :page="documentPage"
@@ -163,7 +163,7 @@ import Vue from "vue";
 import DocumentPreviewGrid from "./document-preview-grid.vue";
 import DocumentCollectionSearchbar from "./document-collection-searchbar.vue";
 import DocumentCollectionSearchResults from "./document-collection-searchresults.vue";
-import Document from "./document.vue";
+import DocumentViewer from "./document-viewer.vue";
 
 import { getData } from "../lib/utils.js";
 
@@ -179,7 +179,7 @@ export default {
   name: "DocumentCollection",
   components: {
     DocumentPreviewGrid,
-    Document,
+    DocumentViewer,
     DocumentCollectionSearchbar,
     DocumentCollectionSearchResults,
   },
