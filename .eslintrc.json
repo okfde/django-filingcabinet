@@ -1,14 +1,18 @@
 {
   "parserOptions": {
     "sourceType": "module",
-    "parser": "babel-eslint"
+    "parser": "@babel/eslint-parser",
+    "project": ["./jsconfig.json"]
   },
   "extends": [
-    "eslint:recommended",
-    "plugin:vue/recommended"
+    "prettier",
+    "plugin:vue/essential"
   ],
-  "plugins": ["vue"],
+  "plugins": ["prettier", "vue"],
   "rules": {
-    "vue/component-tags-order": "off"
-  }
+    "indent": "off",
+    "vue/component-tags-order": "off",
+    "prettier/prettier": "error"
+  },
+  "ignorePatterns": ["node_modules/**"]
 }

@@ -1,7 +1,7 @@
 {
   "name": "@okfde/filingcabinet",
   "version": "0.0.1",
-  "main": "frontend/javascript/filingcabinet.js",
+  "main": "frontend/javascript/entry.js",
   "repository": "git@github.com:okfde/django-filingcabinet.git",
   "author": "Stefan Wehrmeyer <mail@stefanwehrmeyer.com>",
   "license": "MIT",
@@ -24,8 +24,13 @@
     "frontend/*"
   ],
   "devDependencies": {
+    "@babel/core": "^7.19.6",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.19.4",
+    "@babel/preset-env": "^7.19.4",
     "@vitejs/plugin-vue2": "^1.1.2",
     "eslint": "^8.21.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.2.4",
@@ -33,7 +38,6 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^9.3.0",
     "prettier": "^2.7.1",
-    "prettier-config-standard": "^5.0.0",
     "sass": "^1.54.4",
     "vite": "^3.0.8",
     "vue-template-compiler": "^2.5.16"
