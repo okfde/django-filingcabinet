@@ -32,6 +32,15 @@ def page(browser):
 
 
 @pytest.fixture()
+def long_timeout_page(browser):
+    context = browser.new_context(locale="en")
+    context.set_default_timeout(10000)
+    page = context.new_page()
+    yield page
+    page.close()
+
+
+@pytest.fixture()
 def processed_document():
     path = "docs/ef/39/5b/ef395b666014488aa551e431e653a1d9"
     doc = DocumentFactory(
