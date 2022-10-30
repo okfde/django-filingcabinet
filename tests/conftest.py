@@ -1,4 +1,5 @@
 import os
+import uuid
 
 import pytest
 from pytest_factoryboy import register
@@ -46,9 +47,11 @@ def long_timeout_page(browser):
 
 @pytest.fixture()
 def processed_document():
-    path = "docs/ef/39/5b/ef395b666014488aa551e431e653a1d9"
+    path = "docs-private/ef/39/5b/ef395b666014488aa551e431e653a1d9"
     doc = DocumentFactory(
-        uid="ef395b66-6014-488a-a551-e431e653a1d9",
+        title="Test Document",
+        description="Description of Test Document",
+        uid=uuid.UUID("ef395b66-6014-488a-a551-e431e653a1d9"),
         pdf_file=f"{path}/example.pdf",
         file_size=260082,
         pending=False,
@@ -68,3 +71,29 @@ def processed_document():
             image_small=f"{path}/page-p{i}-small.png",
         )
     yield doc
+
+
+@pytest.fixture()
+def document_collection(processed_document, document_collection_factory):
+    collection = document_collection_factory(
+        title="Test Collection",
+        slug="test-collection",
+        description="Test Collection Description",
+        public=True,
+    )
+    collection.documents.add(processed_document)
+    yield collection
+
+
+@pytest.fixture()
+def document_portal(processed_document, document_portal_factory):
+    portal = document_portal_factory(
+        title="Test Portal",
+        slug="test-portal",
+        description="Test Portal Description",
+        public=True,
+    )
+    processed_document.portal = portal
+    processed_document.save()
+
+    yield portal

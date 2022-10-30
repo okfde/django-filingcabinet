@@ -248,12 +248,18 @@ class AbstractDocument(models.Model):
         return getattr(settings, "SITE_URL", "") + self.get_absolute_url()
 
     def get_absolute_domain_embed_url(self):
-        path = reverse(
-            "filingcabinet:document-detail_embed_short",
-            kwargs={
-                "pk": self.pk,
-            },
-        )
+        if self.slug:
+            path = reverse(
+                "filingcabinet:document-detail_embed",
+                kwargs={"pk": self.pk, "slug": self.slug},
+            )
+        else:
+            path = reverse(
+                "filingcabinet:document-detail_embed_short",
+                kwargs={
+                    "pk": self.pk,
+                },
+            )
         return getattr(settings, "SITE_URL", "") + path
 
     @property
@@ -317,6 +323,9 @@ class AbstractDocument(models.Model):
                 "filename": filename,
             },
         )
+
+    def get_authorized_file_url(self, filename=None):
+        return self.get_file_url(filename=filename)
 
     def delete(self, **kwargs):
         # FIXME: this should be storage system agnostic
@@ -763,9 +772,15 @@ class AbstractDocumentCollection(models.Model):
         return getattr(settings, "SITE_URL", "") + self.get_absolute_url()
 
     def get_absolute_domain_embed_url(self):
-        path = reverse(
-            "filingcabinet:document-collection_embed_short", kwargs={"pk": self.pk}
-        )
+        if self.slug:
+            path = reverse(
+                "filingcabinet:document-collection_embed",
+                kwargs={"pk": self.pk, "slug": self.slug},
+            )
+        else:
+            path = reverse(
+                "filingcabinet:document-collection_embed_short", kwargs={"pk": self.pk}
+            )
         return getattr(settings, "SITE_URL", "") + path
 
     def get_cover_image(self):
