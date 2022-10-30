@@ -1,17 +1,20 @@
 import re
 from urllib.parse import urlparse
 
+import pytest
 from playwright.sync_api import expect
 
 PAGE_IMAGE_RE = re.compile(r"page-p(\d+)-\w+\.png$")
 
 
+@pytest.mark.slow
 def test_document_viewer(page, live_server, processed_document):
     page.goto(live_server.url + processed_document.get_absolute_url())
     assert processed_document.title in page.title()
     assert page.query_selector("h2").text_content() == processed_document.title
 
 
+@pytest.mark.slow
 def test_keyboard_scroll(long_timeout_page, live_server, processed_document):
     page = long_timeout_page
     page.goto(live_server.url + processed_document.get_absolute_url())
@@ -31,6 +34,7 @@ def test_keyboard_scroll(long_timeout_page, live_server, processed_document):
     expect(page.locator("#page-4")).to_be_visible()
 
 
+@pytest.mark.slow
 def test_number_input_scroll(page, live_server, processed_document):
     page.goto(live_server.url + processed_document.get_absolute_url())
     expect(page.locator("#page-4")).not_to_be_visible()
@@ -40,6 +44,7 @@ def test_number_input_scroll(page, live_server, processed_document):
     page.locator(".page-number-input").fill("4")
 
 
+@pytest.mark.slow
 def test_sidebar_hide(page, live_server, processed_document):
     page.goto(live_server.url + processed_document.get_absolute_url())
     expect(page.locator(".sidebar")).to_be_visible()
@@ -47,6 +52,7 @@ def test_sidebar_hide(page, live_server, processed_document):
     expect(page.locator(".sidebar")).not_to_be_visible()
 
 
+@pytest.mark.slow
 def test_show_search_bar(page, live_server, processed_document):
     page.goto(live_server.url + processed_document.get_absolute_url())
     expect(page.locator(".document-searchbar")).not_to_be_visible()
@@ -54,6 +60,7 @@ def test_show_search_bar(page, live_server, processed_document):
     expect(page.locator(".document-searchbar")).to_be_visible()
 
 
+@pytest.mark.slow
 def test_document_viewer_load_images_progressively(
     page, live_server, processed_document
 ):
