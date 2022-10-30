@@ -4,8 +4,10 @@ import pytest
 from pytest_factoryboy import register
 
 from .factories import (
+    CollectionDirectoryFactory,
     DocumentCollectionFactory,
     DocumentFactory,
+    DocumentPortalFactory,
     PageFactory,
     UserFactory,
 )
@@ -14,6 +16,8 @@ register(UserFactory)
 register(DocumentFactory)
 register(DocumentCollectionFactory)
 register(PageFactory)
+register(CollectionDirectoryFactory)
+register(DocumentPortalFactory)
 
 os.environ.setdefault("DJANGO_ALLOW_ASYNC_UNSAFE", "true")
 

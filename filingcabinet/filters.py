@@ -131,6 +131,12 @@ class PageDocumentFilterset(filters.FilterSet):
         to_field_name="pk",
         method="filter_collection",
     )
+    directory = filters.ModelChoiceFilter(
+        queryset=(CollectionDirectory.objects.all().select_related("collection")),
+        null_label="",
+        null_value=NULL_VALUE,
+        method="filter_directory",
+    )
     portal = filters.ModelChoiceFilter(
         queryset=DocumentPortal.objects.filter(public=True),
         to_field_name="pk",
@@ -141,8 +147,10 @@ class PageDocumentFilterset(filters.FilterSet):
         to_field_name="pk",
         method="filter_document",
     )
-    number = filters.NumberFilter(
-        method="filter_number",
+    number = filters.NumberFilter(field_name="number", lookup_expr="exact")
+
+    created_at = filters.DateFromToRangeFilter(
+        method="filter_created_at",
     )
 
     class Meta:
@@ -173,9 +181,20 @@ class PageDocumentFilterset(filters.FilterSet):
     def filter_collection(self, qs, name, collection):
         if not collection.can_read(self.request):
             return qs.none()
-        qs = qs.filter(document__collections=collection)
+        qs = qs.filter(document__in=collection.documents.all())
         qs = self.apply_data_filters(qs, collection.settings.get("filters", []))
         return qs
+
+    def filter_directory(self, qs, name, directory):
+        if NULL_VALUE == directory:
+            return qs.filter(
+                document__filingcabinet_collectiondocument__directory__isnull=True
+            )
+        if not directory.collection.can_read(self.request):
+            return qs.none()
+        return qs.filter(
+            document__filingcabinet_collectiondocument__directory=directory
+        ).order_by("document__filingcabinet_collectiondocument__order")
 
     def filter_document(self, qs, name, value):
         if not value.can_read(self.request):
@@ -186,6 +205,9 @@ class PageDocumentFilterset(filters.FilterSet):
         qs = qs.filter(document__portal=portal)
         qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
         return qs
+
+    def filter_number(self, qs, name, value):
+        return qs.filter(number=value)
 
     def apply_data_filters(self, qs, filters):
         for filt in filters:
