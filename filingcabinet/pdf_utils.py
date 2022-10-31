@@ -188,15 +188,6 @@ class PDFProcessor(object):
         self.language = language
         self.config = config or {}
 
-    def get_pdf_reader(self, filename):
-        try:
-            return PdfReader(filename)
-        except (PdfReadError, ValueError, OSError):
-            logger.error("Could not read PDF %s", filename)
-            pass
-        pdf_file_name = rewrite_pdf_in_place(filename)
-        return PdfReader(pdf_file_name)
-
     def get_meta(self):
         doc_info = self.pdf_reader.metadata
         if doc_info is None:
