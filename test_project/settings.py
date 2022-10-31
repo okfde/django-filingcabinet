@@ -1,6 +1,8 @@
 import random
 from pathlib import Path
 
+from fc_project.celery import app  # noqa
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
