@@ -40,7 +40,7 @@ class Command(BaseCommand):
         self.collections = {}
         pdf_files = glob.glob(os.path.join(directory, "*.pdf"))
         for pdf_file in pdf_files:
-            print("Importing", pdf_file)
+            self.stdout.write("Importing %s" % pdf_file)
             self.import_pdf(pdf_file)
 
     def get_content_hash(self, pdf_filename):
@@ -99,7 +99,7 @@ class Command(BaseCommand):
             doc.tags.add(*metadata["tags"])
 
         if collection is not None:
-            CollectionDocument.objects.create(
+            CollectionDocument.objects.get_or_create(
                 collection=collection,
                 document=doc,
             )
