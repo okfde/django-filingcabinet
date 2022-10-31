@@ -41,7 +41,8 @@ def test_table_detection(processed_document, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_zip_unpacking(dummy_user, document_collection_factory):
+def test_zip_unpacking(dummy_user, document_collection_factory, settings, tmp_path):
+    settings.MEDIA_ROOT = tmp_path
     fh = BytesIO()
     zfh = zipfile.ZipFile(fh, "w")
     zfh.writestr("foo/somefile.txt", "test")
@@ -72,8 +73,7 @@ def test_zip_unpacking(dummy_user, document_collection_factory):
 
 @pytest.mark.django_db
 @pytest.mark.slow
-def test_processing_document(processed_document, settings, tmp_path):
-    settings.MEDIA_ROOT = tmp_path
+def test_processing_document(processed_document, tmp_media_path):
     page = processed_document.pages.all()[0]
     page.pending = True
     page.save()
