@@ -112,3 +112,25 @@ The callback URL will be POSTed a JSON document like this:
   "details": ""
 }
 ```
+
+## Tests
+
+In this project we use [pytest](https://docs.pytest.org/en/7.2.x/) and [playwright](https://playwright.dev/python/) to test the application. To install all dependencies for the tests, use:
+
+```bash
+python3 -m venv fc-env
+source  fc-env/bin/activate
+pip install -e ".[test]"
+playwright install --with-deps chromium
+yarn install
+yarn run build
+```
+
+To run the tests, use:
+```bash
+pytest
+```
+or to run the tests and see the end-to-end tests running in the browser, use:
+```bash
+pytest --headed
+```
