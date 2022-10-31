@@ -73,7 +73,7 @@ def test_zip_unpacking(dummy_user, document_collection_factory, settings, tmp_pa
 
 @pytest.mark.django_db
 @pytest.mark.slow
-def test_processing_document(processed_document, tmp_media_path):
+def test_processing_document(processed_document):
     page = processed_document.pages.all()[0]
     page.pending = True
     page.save()

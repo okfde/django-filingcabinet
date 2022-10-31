@@ -35,7 +35,7 @@ FILINGCABINET_MEDIA_PUBLIC_PREFIX = "docs"
 FILINGCABINET_MEDIA_PRIVATE_PREFIX = "docs-private"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "tests" / "testdata"
+TEST_DATA_ROOT = BASE_DIR / "tests" / "testdata"
 STATIC_ROOT = BASE_DIR / "static"
 
 MIDDLEWARE = [
