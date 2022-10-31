@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 
 import pytest
@@ -97,3 +98,13 @@ def document_portal(processed_document, document_portal_factory):
     processed_document.save()
 
     yield portal
+
+
+@pytest.fixture()
+def tmp_media_path(settings, tmp_path):
+    shutil.copytree(
+        settings.MEDIA_ROOT / settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX,
+        tmp_path / settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX,
+    )
+    settings.MEDIA_ROOT = tmp_path
+    yield tmp_path
