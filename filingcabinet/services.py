@@ -284,7 +284,7 @@ class DocumentStorer:
 
         with zipfile.ZipFile(file_obj, "r") as zf:
             zip_paths = []
-            # step on collect files
+            # step one collect files
             for filepath in zf.namelist():
                 path = PurePath(filepath)
                 parts = path.parts
@@ -312,14 +312,14 @@ class DocumentStorer:
                 parent_parent_path = parent_path.parent
                 parent_parent_dir = directories.get(parent_parent_path)
                 directory = CollectionDirectory(
-                    name=str(parent_path),
+                    name=PurePath(parent_path).name,
                     user=self.user,
                     collection=self.collection,
                 )
                 if parent_parent_dir is None:
                     directory = CollectionDirectory.add_root(instance=directory)
                 else:
-                    directory = CollectionDirectory.add_child(instance=directory)
+                    directory = parent_parent_dir.add_child(instance=directory)
                 directories[parent_path] = directory
 
 
@@ -336,7 +336,6 @@ def remove_common_root_path(paths):
             if common_root != path.parts[0]:
                 return paths
         paths = [PurePath(os.path.join(*p.parts[1:])) for p in paths]
-    return paths
 
 
 def detect_tables_on_doc(doc, save=True):
