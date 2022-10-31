@@ -47,14 +47,23 @@ def long_timeout_page(browser):
 
 
 @pytest.fixture()
-def processed_document():
-    path = "docs-private/ef/39/5b/ef395b666014488aa551e431e653a1d9"
+def processed_document(tmp_path, dummy_user, settings):
+    path = "{}/ef/39/5b/ef395b666014488aa551e431e653a1d9".format(
+        settings.FILINGCABINET_MEDIA_PUBLIC_PREFIX
+    )
+    shutil.copytree(
+        settings.TEST_DATA_ROOT / "example-doc",
+        tmp_path / path,
+    )
+    settings.MEDIA_ROOT = tmp_path
+
     doc = DocumentFactory(
         title="Test Document",
         description="Description of Test Document",
         uid=uuid.UUID("ef395b66-6014-488a-a551-e431e653a1d9"),
         pdf_file=f"{path}/example.pdf",
         file_size=260082,
+        user=dummy_user,
         pending=False,
         num_pages=4,
         language="de",
@@ -98,13 +107,3 @@ def document_portal(processed_document, document_portal_factory):
     processed_document.save()
 
     yield portal
-
-
-@pytest.fixture()
-def tmp_media_path(settings, tmp_path):
-    shutil.copytree(
-        settings.MEDIA_ROOT / settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX,
-        tmp_path / settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX,
-    )
-    settings.MEDIA_ROOT = tmp_path
-    yield tmp_path

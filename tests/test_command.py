@@ -12,7 +12,8 @@ Document = get_document_model()
 
 
 @pytest.mark.django_db
-def test_import_command(tmp_media_path, processed_document, document_collection):
+@pytest.mark.slow
+def test_import_command(processed_document, document_collection):
     directory = PosixPath(processed_document.pdf_file.path).parent
     metadata = {
         "title": "Test title",
