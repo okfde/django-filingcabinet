@@ -10,7 +10,7 @@ import tempfile
 import pikepdf
 import wand
 from PIL import Image as PILImage
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from PyPDF2.errors import PdfReadError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
@@ -62,16 +62,16 @@ class PDFException(Exception):
 
 def try_reading_pdf(pdf_file, password=None):
     try:
-        pdf_reader = PdfFileReader(pdf_file, strict=False)
+        pdf_reader = PdfReader(pdf_file, strict=False)
     except (PdfReadError, ValueError, OSError) as e:
         raise PDFException(e, "rewrite")
 
-    if pdf_reader.isEncrypted:
+    if pdf_reader.is_encrypted:
         raise PDFException(None, "decrypt")
 
     try:
         # Try reading number of pages
-        pdf_reader.getNumPages()
+        len(pdf_reader.pages)
     except KeyError as e:  # catch KeyError '/Pages'
         raise PDFException(e, "rewrite")
     except ValueError as e:  # catch invalid literal for int() with base 10
@@ -184,21 +184,21 @@ class PDFProcessor(object):
         filename, pdf_reader = get_readable_pdf(filename, copy_func)
         self.filename = filename
         self.pdf_reader = pdf_reader
-        self.num_pages = self.pdf_reader.getNumPages()
+        self.num_pages = len(self.pdf_reader.pages)
         self.language = language
         self.config = config or {}
 
     def get_pdf_reader(self, filename):
         try:
-            return PdfFileReader(filename)
+            return PdfReader(filename)
         except (PdfReadError, ValueError, OSError):
             logger.error("Could not read PDF %s", filename)
             pass
         pdf_file_name = rewrite_pdf_in_place(filename)
-        return PdfFileReader(pdf_file_name)
+        return PdfReader(pdf_file_name)
 
     def get_meta(self):
-        doc_info = self.pdf_reader.getDocumentInfo()
+        doc_info = self.pdf_reader.metadata
         if doc_info is None:
             return {}
         return {
@@ -243,8 +243,8 @@ class PDFProcessor(object):
         if hasattr(self, "pdflib_pages"):
             page = self.pdflib_pages[page_no - 1]
             return " ".join(page.lines).strip()
-        page = self.pdf_reader.getPage(page_no - 1)
-        return page.extractText()
+        page = self.pdf_reader.pages[page_no - 1]
+        return page.extract_text()
 
     def get_text(self, pages=None, use_ocr=False):
         if pages is None:
