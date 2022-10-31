@@ -14,6 +14,13 @@ def test_document_detail(processed_document, client):
 
 
 @pytest.mark.django_db
+def test_document_list(processed_document, client):
+    response = client.get(reverse("filingcabinet:document-list"))
+    assert response.status_code == 200
+    assert processed_document.title in response.content.decode("utf-8")
+
+
+@pytest.mark.django_db
 def test_document_detail_private(processed_document, client, dummy_user):
     processed_document.public = False
     processed_document.user = dummy_user
