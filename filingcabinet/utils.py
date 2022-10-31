@@ -21,6 +21,7 @@ def estimate_time(filesize, page_count=None):
 @contextmanager
 def get_local_file(path, storage=default_storage):
     _, extension = os.path.splitext(path)
+    local_file_path = None
     try:
         local_file = tempfile.NamedTemporaryFile(
             mode="wb", delete=False, suffix=extension
@@ -33,4 +34,5 @@ def get_local_file(path, storage=default_storage):
 
         yield local_file.name
     finally:
-        os.remove(local_file_path)
+        if local_file_path:
+            os.remove(local_file_path)
