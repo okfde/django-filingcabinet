@@ -52,7 +52,7 @@ def publish_document(doc_pk, public=True):
         doc.public = public
         doc.pending = True
         doc.save()
-        doc._move_file()
+        doc._move_file(public)
         doc.save()
         files_moved_task.delay(doc.pk)
 
