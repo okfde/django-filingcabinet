@@ -117,14 +117,14 @@ class DocumentManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
     pass
 
 
-def get_document_file_path(instance, filename, public=None):
+def get_document_file_path(instance, filename, public):
     # UUID field is already filled
     hex_name = instance.uid.hex
     hex_name_02 = hex_name[:2]
     hex_name_24 = hex_name[2:4]
     hex_name_46 = hex_name[4:6]
     prefix = settings.FILINGCABINET_MEDIA_PUBLIC_PREFIX
-    if public is False or not instance.public:
+    if not public:
         prefix = settings.FILINGCABINET_MEDIA_PRIVATE_PREFIX
     return os.path.join(
         prefix, hex_name_02, hex_name_24, hex_name_46, hex_name, filename
@@ -134,7 +134,7 @@ def get_document_file_path(instance, filename, public=None):
 def get_document_path(instance, filename):
     name, ext = os.path.splitext(filename)
     slug = slugify(name)[:80]
-    return get_document_file_path(instance, slug + ext)
+    return get_document_file_path(instance, slug + ext, instance.public)
 
 
 def get_page_image_filename(
@@ -296,7 +296,7 @@ class AbstractDocument(models.Model):
     def get_file_name(self, filename=None):
         if filename is None:
             filename = self.get_document_filename()
-        return get_document_file_path(self, filename)
+        return get_document_file_path(self, filename, self.public)
 
     def get_document_file_url(self):
         if self.pdf_file:
@@ -330,11 +330,11 @@ class AbstractDocument(models.Model):
     def delete(self, **kwargs):
         # FIXME: this should be storage system agnostic
         res = super().delete(**kwargs)
-        dir_path = os.path.dirname(get_document_file_path(self, "foo"))
+        dir_path = os.path.dirname(get_document_file_path(self, "foo", self.public))
         shutil.rmtree(dir_path, ignore_errors=True)
         return res
 
-    def _move_file(self):
+    def _move_file(self, target_public):
         """
         Move the file from src to dst.
         This uses direct filesystem operations for efficiency
@@ -343,7 +343,8 @@ class AbstractDocument(models.Model):
         # FIXME: this should be storage system agnostic
         if not self.pending:
             return
-        dummy_src_file_name = get_document_file_path(self, "dummy.pdf", not self.public)
+        from_public = not target_public
+        dummy_src_file_name = get_document_file_path(self, "dummy.pdf", from_public)
         src_file_dir = os.path.dirname(
             os.path.join(settings.MEDIA_ROOT, dummy_src_file_name)
         )
@@ -351,7 +352,7 @@ class AbstractDocument(models.Model):
         if self.pdf_file:
             dst_file_name = get_document_path(self, self.get_document_filename())
         else:
-            dst_file_name = get_document_file_path(self, "dummy.pdf")
+            dst_file_name = get_document_file_path(self, "dummy.pdf", target_public)
         dst_file_dir = os.path.dirname(os.path.join(settings.MEDIA_ROOT, dst_file_name))
         try:
             src_exists = os.path.exists(src_file_dir)
