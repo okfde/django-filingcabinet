@@ -1,52 +1,49 @@
 <template>
   <div
     class="document-search-pages bg-secondary text-light"
-    :style="{ height: height }"
-  >
+    :style="{ height: height }">
     <RecycleScroller
       v-slot="{ item }"
       class="scroller"
       :items="pages"
       key-field="number"
-      :item-size="116"
-    >
+      :item-size="116">
       <document-search-preview
         :key="item.number"
         :matches="item"
         :page="documentPages[item.number - 1]"
         :current-page="currentPage"
-        @navigate="navigate(item)"
-      />
+        @navigate="navigate(item)" />
     </RecycleScroller>
   </div>
 </template>
 
 <script>
-import "intersection-observer";
+import 'intersection-observer'
 
-import { RecycleScroller } from "vue-virtual-scroller";
+import { RecycleScroller } from 'vue-virtual-scroller'
 
-import DocumentSearchPreview from "./document-search-preview.vue";
+import DocumentSearchPreview from './document-search-preview.vue'
 
 export default {
-  name: "DocumentSearchSidebar",
+  name: 'DocumentSearchSidebar',
   components: {
     DocumentSearchPreview,
-    RecycleScroller,
+    RecycleScroller
   },
-  props: ["documentPages", "pages", "currentPage", "height"],
+  props: ['documentPages', 'pages', 'currentPage', 'height'],
   computed: {},
   methods: {
     navigate(item) {
-      let searchIndex = this.pages.findIndex((i) => i === item);
-      this.$emit("navigate", {
+      const searchIndex = this.pages.findIndex((i) => i === item)
+      this.$emit('navigate', {
         number: item.number,
-        source: "search",
-        searchIndex: searchIndex,
-      });
-    },
-  },
-};
+        source: 'search',
+        searchIndex
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss">

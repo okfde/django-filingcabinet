@@ -6,8 +6,7 @@
           <div class="mb-3 row">
             <label
               for="document-collection-search"
-              class="col-sm-2 col-form-label"
-            >
+              class="col-sm-2 col-form-label">
               {{ i18n.searchTerm }}
             </label>
             <div class="col-sm-10">
@@ -16,8 +15,7 @@
                 v-model="search"
                 type="search"
                 class="search-input form-control"
-                @keydown.enter="runSearch"
-              />
+                @keydown.enter="runSearch" />
             </div>
           </div>
           <document-filter
@@ -25,8 +23,7 @@
             :key="filter.id"
             :filter="filter"
             :value="filterValues.get(filter.key) || ''"
-            @input="updateFilter"
-          />
+            @input="updateFilter" />
         </div>
       </div>
       <div class="row mb-2">
@@ -34,8 +31,7 @@
           <div
             v-if="searching"
             class="spinner-border spinner-border-sm"
-            role="status"
-          />
+            role="status" />
           <small v-if="searching">{{ i18n.searching }}</small>
           <small v-if="searcher && searcher.done">
             <template v-if="searcher.term">
@@ -65,8 +61,7 @@
               v-if="showSearchFeed"
               :href="rssUrl"
               class="text-white"
-              target="_blank"
-            >
+              target="_blank">
               <i class="fa fa-rss" aria-hidden="true" />
             </a>
             <template v-if="directory">
@@ -85,8 +80,7 @@
               v-model="search"
               type="search"
               class="search-input form-control form-control-sm"
-              @keydown.enter="runSearch"
-            />
+              @keydown.enter="runSearch" />
             <button class="btn btn-outline-light" @click="runSearch">
               {{ i18n.search }}
             </button>
@@ -102,8 +96,7 @@
             :values="facet.values"
             :filter="facet.filter"
             :value="facet.value"
-            @select="setFilter(facet.filter.key, $event)"
-          />
+            @select="setFilter(facet.filter.key, $event)" />
         </div>
       </div>
     </div>
@@ -111,115 +104,115 @@
 </template>
 
 <script>
-import DocumentFilter from "./document-filter.vue";
-import DocumentFacet from "./document-facet.vue";
+import DocumentFilter from './document-filter.vue'
+import DocumentFacet from './document-facet.vue'
 
 export default {
-  name: "DocumentCollectionSearchbar",
+  name: 'DocumentCollectionSearchbar',
   components: {
     DocumentFilter,
-    DocumentFacet,
+    DocumentFacet
   },
   props: {
     searcher: {
       type: Object,
-      default: null,
+      default: null
     },
     directory: {
       type: Object,
-      default: null,
+      default: null
     },
     showSearchFeed: {
       type: Boolean,
-      default: false,
+      default: false
     },
     filters: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
-      search: this.searcher?.term || "",
-      filterValues: this.searcher?.filters || new Map(),
-    };
+      search: this.searcher?.term || '',
+      filterValues: this.searcher?.filters || new Map()
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     searching() {
-      return this.searcher && !this.searcher.done;
+      return this.searcher && !this.searcher.done
     },
     hasFilters() {
-      return !!this.filters && this.filters.length > 0;
+      return !!this.filters && this.filters.length > 0
     },
     hasFacets() {
       return !!(
         this.searcher &&
         this.searcher.response &&
         this.searcher.response.facets
-      );
+      )
     },
     facetList() {
-      let facets = [];
-      for (let field in this.searcher.response.facets.fields) {
-        let facetValues = this.searcher.response.facets.fields[field];
+      const facets = []
+      for (const field in this.searcher.response.facets.fields) {
+        const facetValues = this.searcher.response.facets.fields[field]
         if (facetValues.length === 0) {
-          continue;
+          continue
         }
-        let filter = this.filters.filter((f) => f.key === field)[0];
+        const filter = this.filters.filter((f) => f.key === field)[0]
         if (filter === undefined) {
-          continue;
+          continue
         }
         facets.push({
           key: filter.key,
-          filter: filter,
+          filter,
           values: facetValues,
-          value: this.filterValues.get(filter.key) || "",
-        });
+          value: this.filterValues.get(filter.key) || ''
+        })
       }
-      return facets;
+      return facets
     },
     pageCount() {
       if (this.searcher !== null) {
-        return this.searcher.response.meta.total_count;
+        return this.searcher.response.meta.total_count
       }
-      return 0;
+      return 0
     },
     resultCount() {
       if (this.searcher !== null) {
-        return this.searcher.docCount;
+        return this.searcher.docCount
       }
-      return 0;
+      return 0
     },
     rssUrl() {
       if (this.searcher) {
-        return this.searcher.url + "&format=rss";
+        return this.searcher.url + '&format=rss'
       }
-      return "";
-    },
+      return ''
+    }
   },
   methods: {
     clear() {
-      this.search = "";
-      this.$emit("clearsearch");
+      this.search = ''
+      this.$emit('clearsearch')
     },
     runSearch() {
-      this.$emit("search", {
+      this.$emit('search', {
         term: this.search,
-        filters: this.filterValues,
-      });
+        filters: this.filterValues
+      })
     },
     setFilter(key, event) {
-      this.updateFilter({ key, value: event });
-      this.runSearch();
+      this.updateFilter({ key, value: event })
+      this.runSearch()
     },
     updateFilter({ key, value }) {
-      this.filerValues = new Map(this.filterValues.set(key, value));
-    },
-  },
-};
+      this.filerValues = new Map(this.filterValues.set(key, value))
+    }
+  }
+}
 </script>
 
 <style lang="scss"></style>

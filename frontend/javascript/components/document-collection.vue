@@ -7,8 +7,7 @@
             <button
               type="button"
               class="btn btn-sm btn-secondary"
-              @click="clearDocument"
-            >
+              @click="clearDocument">
               {{ i18n.backToCollection }}
             </button>
           </div>
@@ -36,22 +35,19 @@
 
         <div
           v-if="!document && allowToggleSearch"
-          class="col-auto order-md-4 ms-auto"
-        >
+          class="col-auto order-md-4 ms-auto">
           <button
             v-if="!showSearch"
             type="button"
             class="ms-2 btn btn-sm btn-secondary"
-            @click="enableSearch"
-          >
+            @click="enableSearch">
             <i class="fa fa-search" />
           </button>
           <button
             v-else
             type="button"
             class="ms-2 btn btn-sm btn-secondary"
-            @click="clearSearch"
-          >
+            @click="clearSearch">
             <i class="fa fa-close" />
           </button>
         </div>
@@ -63,8 +59,7 @@
         :show-search-feed="showSearchFeed"
         :filters="settings.filters"
         @clearsearch="clearSearch"
-        @search="search"
-      />
+        @search="search" />
     </div>
     <div v-if="document" class="collection-document">
       <div class="row">
@@ -74,8 +69,7 @@
             :document-preview="document"
             :page="documentPage"
             :config="config"
-            :defaults="docDefaults"
-          />
+            :defaults="docDefaults" />
         </div>
       </div>
     </div>
@@ -86,16 +80,14 @@
           :key="result.document.id"
           :document="result.document"
           :pages="result.pages"
-          @navigate="navigate"
-        />
+          @navigate="navigate" />
       </template>
       <template v-else>
         <div class="row bg-secondary">
           <div class="col px-0">
             <document-preview-grid
               :documents="searcher.documents"
-              @navigate="navigate"
-            />
+              @navigate="navigate" />
           </div>
         </div>
       </template>
@@ -104,8 +96,7 @@
           <div class="col-auto px-0 pb-5">
             <button
               class="btn btn-secondary my-3"
-              @click="loadMoreSearchResults"
-            >
+              @click="loadMoreSearchResults">
               {{ i18n.loadMore }}
             </button>
           </div>
@@ -120,8 +111,7 @@
               v-if="currentDirectory != null"
               type="button"
               class="list-group-item list-group-item-action list-group-item-dark text-center"
-              @click="selectDirectory()"
-            >
+              @click="selectDirectory()">
               <i class="fa fa-arrow-left float-start" />
               {{ currentDirectory.name }}
             </button>
@@ -130,24 +120,20 @@
               :key="directory.id"
               type="button"
               class="list-group-item list-group-item-action list-group-item-secondary"
-              @click="selectDirectory(directory)"
-            >
+              @click="selectDirectory(directory)">
               {{ directory.name }}
             </button>
           </div>
           <document-preview-grid
             :documents="documents"
             @navigate="navigate"
-            @loadmore="loadMoreDocuments"
-          />
+            @loadmore="loadMoreDocuments" />
           <div
             v-if="shouldPaginate && canPaginate"
-            class="col-auto px-0 pb-5 text-center"
-          >
+            class="col-auto px-0 pb-5 text-center">
             <button
               class="btn btn-secondary my-3"
-              @click.prevent="() => loadMoreDocuments()"
-            >
+              @click.prevent="() => loadMoreDocuments()">
               {{ i18n.loadMore }}
             </button>
           </div>
@@ -158,61 +144,61 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 
-import DocumentPreviewGrid from "./document-preview-grid.vue";
-import DocumentCollectionSearchbar from "./document-collection-searchbar.vue";
-import DocumentCollectionSearchResults from "./document-collection-searchresults.vue";
-import DocumentViewer from "./document-viewer.vue";
+import DocumentPreviewGrid from './document-preview-grid.vue'
+import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
+import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
+import DocumentViewer from './document-viewer.vue'
 
-import { getData } from "../lib/utils.js";
+import { getData } from '../lib/utils.js'
 
-const DOCUMENTS_API_LIMIT = 50;
-const MAX_SCROLL_DOCS = DOCUMENTS_API_LIMIT * 100;
+const DOCUMENTS_API_LIMIT = 50
+const MAX_SCROLL_DOCS = DOCUMENTS_API_LIMIT * 100
 
 function getIDFromURL(s) {
-  const parts = s.split("/");
-  return parseInt(parts[parts.length - 2], 10);
+  const parts = s.split('/')
+  return parseInt(parts[parts.length - 2], 10)
 }
 
 export default {
-  name: "DocumentCollection",
+  name: 'DocumentCollection',
   components: {
     DocumentPreviewGrid,
     DocumentViewer,
     DocumentCollectionSearchbar,
-    DocumentCollectionSearchResults,
+    DocumentCollectionSearchResults
   },
   props: {
     documentCollection: {
       type: Object,
       default: () => ({
         documents: [],
-        directories: [],
-      }),
+        directories: []
+      })
     },
     config: {
       type: Object,
-      default: () => ({}),
-    },
+      default: () => ({})
+    }
   },
   data() {
-    let documents = [];
-    let directories = [];
+    const documents = []
+    const directories = []
     let collection = {
       documents,
-      directories,
-    };
-    if (this.documentCollection) {
-      collection = this.documentCollection;
+      directories
     }
-    let shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS;
-    let settings = collection.settings || {};
-    let preferences = settings.preferences || {};
+    if (this.documentCollection) {
+      collection = this.documentCollection
+    }
+    const shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
+    const settings = collection.settings || {}
+    const preferences = settings.preferences || {}
     return {
       document: null,
-      collection: collection,
-      settings: settings,
+      collection,
+      settings,
       showSearch: preferences.showSearch ?? false,
       allowToggleSearch: preferences.allowToggleSearch ?? true,
       showSearchFeed: preferences.showSearchFeed ?? false,
@@ -225,38 +211,42 @@ export default {
       directories: collection.directories,
       documentOffsets: this.makeOffsets(collection, shouldPaginate),
       lastOffset: 0,
-      documentsUri: collection.documents_uri || null,
-    };
+      documentsUri: collection.documents_uri || null
+    }
   },
   computed: {
     i18n() {
-      return this.config.i18n;
+      return this.config.i18n
     },
     collectionIndex() {
-      const documents = this.documents;
-      const collectionIndex = {};
+      const documents = this.documents
+      const collectionIndex = {}
       documents.forEach((d, i) => {
         if (d !== null) {
-          collectionIndex[d.id] = i;
+          collectionIndex[d.id] = i
         }
-      });
-      return collectionIndex;
+      })
+      return collectionIndex
     },
     docDefaults() {
       return {
-        maxHeight: "90vh",
-      };
+        maxHeight: '90vh'
+      }
     },
     collectionAuth() {
       if (!this.collection.listed && this.collection.uid) {
         return ['uid', this.collection.uid]
       }
+      return undefined
     },
-    canPaginate () {
-      return this.collection.document_directory_count > this.lastOffset + DOCUMENTS_API_LIMIT
+    canPaginate() {
+      return (
+        this.collection.document_directory_count >
+        this.lastOffset + DOCUMENTS_API_LIMIT
+      )
     }
   },
-  created () {
+  created() {
     if (!this.documentCollection.id && this.documentCollection.resource_uri) {
       this.getCollectionData()
     }
@@ -267,19 +257,25 @@ export default {
       this.documents[0] === null &&
       this.documentsUri
     ) {
-      this.loadMoreDocuments(0);
+      this.loadMoreDocuments(0)
     }
   },
   methods: {
-    getCollectionData () {
-      const url = new URL(this.documentCollection.resource_uri, window.location.origin)
+    getCollectionData() {
+      const url = new URL(
+        this.documentCollection.resource_uri,
+        window.location.origin
+      )
       const params = new URLSearchParams(url.search)
 
       if (this.collectionAuth) params.append(...this.collectionAuth)
-      
+
       this.documents = []
       this.directories = []
-      params.append('directory', this.currentDirectory ? this.currentDirectory.id : '')
+      params.append(
+        'directory',
+        this.currentDirectory ? this.currentDirectory.id : ''
+      )
       url.search = params
 
       getData(url).then((docCollection) => {
@@ -289,153 +285,156 @@ export default {
         this.documents = this.makeDocuments(docCollection)
         this.directories = docCollection.directories
         if (!this.settings) {
-          this.settings = docCollection.settings;
+          this.settings = docCollection.settings
         }
-      });
+      })
     },
     makeOffsets(collection) {
-      let offsetSteps = collection.documents.length / DOCUMENTS_API_LIMIT;
-      let documentOffsets = new Set();
-      for (var i = 0; i < offsetSteps; i += 1) {
-        documentOffsets.add(i);
+      const offsetSteps = collection.documents.length / DOCUMENTS_API_LIMIT
+      const documentOffsets = new Set()
+      for (let i = 0; i < offsetSteps; i += 1) {
+        documentOffsets.add(i)
       }
-      return documentOffsets;
+      return documentOffsets
     },
     makeDocuments(collection, shouldPaginate = true) {
       if (this.shouldPaginate || shouldPaginate) {
-        return collection.documents;
+        return collection.documents
       }
-      let colDocs = collection.documents || [];
+      const colDocs = collection.documents || []
       return [
         ...colDocs,
         ...new Array(collection.document_directory_count - colDocs.length).fill(
           null
-        ),
-      ];
+        )
+      ]
     },
     loadMoreDocuments(offset) {
       if (offset === undefined) {
-        offset = this.lastOffset + DOCUMENTS_API_LIMIT;
+        offset = this.lastOffset + DOCUMENTS_API_LIMIT
       }
-      offset = offset - (offset % DOCUMENTS_API_LIMIT);
+      offset = offset - (offset % DOCUMENTS_API_LIMIT)
       if (this.shouldPaginate) {
         if (offset === this.lastOffset) {
-          return;
+          return
         }
-        this.documents = [];
-        this.lastOffset = offset;
-        Vue.nextTick(() => this.goTop());
-        return this.getDocuments(offset);
+        this.documents = []
+        this.lastOffset = offset
+        Vue.nextTick(() => this.goTop())
+        return this.getDocuments(offset)
       }
-      let offsetStep = offset / DOCUMENTS_API_LIMIT;
+      const offsetStep = offset / DOCUMENTS_API_LIMIT
       if (!this.documentOffsets.has(offsetStep)) {
-        this.documentOffsets.add(offsetStep);
-        this.getDocuments(offset);
+        this.documentOffsets.add(offsetStep)
+        this.getDocuments(offset)
       }
     },
     getDocuments(offset) {
       if (this.abortController) {
-        this.documentOffsets.delete(this.lastOffset);
-        this.abortController.abort();
+        this.documentOffsets.delete(this.lastOffset)
+        this.abortController.abort()
       }
-      this.abortController = new AbortController();
+      this.abortController = new AbortController()
       this.lastOffset = offset
-      const url = new URL(this.documentsUri, window.location.origin);
-      const params = new URLSearchParams(url.search);
-      
-      if (this.collectionAuth) params.append(...this.collectionAuth);
+      const url = new URL(this.documentsUri, window.location.origin)
+      const params = new URLSearchParams(url.search)
 
-      params.append('directory', this.currentDirectory ? this.currentDirectory.id : '-')
+      if (this.collectionAuth) params.append(...this.collectionAuth)
+
+      params.append(
+        'directory',
+        this.currentDirectory ? this.currentDirectory.id : '-'
+      )
       params.append('offset', offset)
       params.append('limit', DOCUMENTS_API_LIMIT)
       url.search = params
 
       this.documentOffset = offset + DOCUMENTS_API_LIMIT
-      getData(url, {}, this.abortController.signal).then(result => {
+      getData(url, {}, this.abortController.signal).then((result) => {
         if (!result) {
-          return;
+          return
         }
-        this.abortController = null;
+        this.abortController = null
         if (this.shouldPaginate) {
-          this.documents = result.objects;
+          this.documents = result.objects
         } else {
           this.documents = [
             ...this.documents.slice(0, offset),
             ...result.objects,
-            ...this.documents.slice(offset + result.objects.length),
-          ];
+            ...this.documents.slice(offset + result.objects.length)
+          ]
         }
-      });
+      })
     },
     navigate({ document, page }) {
-      this.document = document;
-      this.documentPage = page || 1;
-      this.goTop();
+      this.document = document
+      this.documentPage = page || 1
+      this.goTop()
     },
     clearDocument() {
-      this.document = null;
-      this.goTop();
+      this.document = null
+      this.goTop()
     },
     goTop() {
-      window.scrollTo(0, this.$refs.toolbar.offsetTop);
+      window.scrollTo(0, this.$refs.toolbar.offsetTop)
     },
     enableSearch() {
-      this.showSearch = true;
-      this.document = null;
+      this.showSearch = true
+      this.document = null
     },
     clearSearch() {
-      this.searcher = null;
+      this.searcher = null
       if (this.allowToggleSearch) {
-        this.showSearch = false;
+        this.showSearch = false
       }
     },
     search({ term, filters }) {
-      this.document = null;
-      console.log("searching for term", term, "with filters", filters);
-      let hasSearch = false;
+      this.document = null
+      console.log('searching for term', term, 'with filters', filters)
+      let hasSearch = false
       if (term) {
-        hasSearch = true;
+        hasSearch = true
       }
-      for (let value of filters.values()) {
+      for (const value of filters.values()) {
         if (value) {
-          hasSearch = true;
+          hasSearch = true
         }
       }
       if (!hasSearch) {
-        this.searcher = null;
-        return;
+        this.searcher = null
+        return
       }
       this.searcher = {
-        term: term,
-        filters: filters,
+        term,
+        filters,
         url: this.getSearchUrl({ term, filters }),
         done: false,
         results: [],
-        documents: [],
-      };
+        documents: []
+      }
       getData(this.searcher.url).then((response) =>
         this.documentsReceived(response)
-      );
+      )
     },
-    getSearchUrl ({ term, filters }) {
+    getSearchUrl({ term, filters }) {
       const baseUrl = this.collection.pages_uri
-      const url = new URL(baseUrl, window.location.origin);
-      const params = new URLSearchParams(url.search);
-      
+      const url = new URL(baseUrl, window.location.origin)
+      const params = new URLSearchParams(url.search)
+
       if (term) {
         params.append('q', term)
       } else {
         params.append('number', '1')
       }
       if (this.currentDirectory) {
-        params.append(directory, this.currentDirectory.id)
+        params.append('directory', this.currentDirectory.id)
       }
-      for (let [key, value] of filters.entries()) {
+      for (const [key, value] of filters.entries()) {
         if (value) {
-          if (typeof value === "object") {
-            for (let urlKey in value) {
+          if (typeof value === 'object') {
+            for (const urlKey in value) {
               if (value[urlKey]) {
-                params.append(urlKey ,value[urlKey])
+                params.append(urlKey, value[urlKey])
               }
             }
           } else {
@@ -448,81 +447,84 @@ export default {
       return url.toString()
     },
     documentsReceived(response) {
-      this.searcher.response = response;
-      let missingDocs = [];
+      this.searcher.response = response
+      const missingDocs = []
       response.objects.forEach((p) => {
-        const docId = getIDFromURL(p.document);
-        let document = this.collection.documents[this.collectionIndex[docId]];
+        const docId = getIDFromURL(p.document)
+        const document = this.collection.documents[this.collectionIndex[docId]]
         if (document === undefined) {
-          missingDocs.push(docId);
+          missingDocs.push(docId)
         }
-      });
+      })
       if (missingDocs.length > 0) {
-        const url = new URL(this.collection.documents_uri, window.location.origin)
+        const url = new URL(
+          this.collection.documents_uri,
+          window.location.origin
+        )
         const params = new URLSearchParams(url.search)
         params.append('ids', missingDocs.join(','))
         url.search = params
-        
+
         getData(url).then((docsResponse) => {
           this.setSearchResults(response.objects, docsResponse.objects)
         })
       } else {
-        this.setSearchResults(response.objects, []);
+        this.setSearchResults(response.objects, [])
       }
     },
     setSearchResults(results, resultDocuments) {
-      const docsWithPages = [];
-      let docs = {};
-      let docCount = 0;
-      let docIndex = {};
-      let searcherDocs = [];
-      resultDocuments.forEach((d, i) => (docIndex[d.id] = i));
+      const docsWithPages = []
+      const docs = {}
+      let docCount = 0
+      const docIndex = {}
+      const searcherDocs = []
+      resultDocuments.forEach((d, i) => (docIndex[d.id] = i))
       results.forEach((p) => {
-        const docId = getIDFromURL(p.document);
-        let docResult = {
-          image: p.image.replace(/\{size\}/, "small"),
+        const docId = getIDFromURL(p.document)
+        const docResult = {
+          image: p.image.replace(/\{size\}/, 'small'),
           number: p.number,
-          query_highlight: p.query_highlight,
-        };
-        if (docs[p.document] === undefined) {
-          let document = this.collection.documents[this.collectionIndex[docId]];
-          if (document === undefined) {
-            document = resultDocuments[docIndex[docId]];
-          }
-          searcherDocs.push(document);
-          docs[p.document] = docCount;
-          docCount += 1;
-          docsWithPages.push({
-            document: document,
-            pages: [docResult],
-          });
-        } else {
-          docsWithPages[docs[p.document]].pages.push(docResult);
+          query_highlight: p.query_highlight
         }
-      });
-      this.searcher.documents = searcherDocs;
-      this.searcher.results = docsWithPages;
-      Vue.set(this.searcher, "docCount", docCount);
-      this.searcher.done = true;
+        if (docs[p.document] === undefined) {
+          let document = this.collection.documents[this.collectionIndex[docId]]
+          if (document === undefined) {
+            document = resultDocuments[docIndex[docId]]
+          }
+          searcherDocs.push(document)
+          docs[p.document] = docCount
+          docCount += 1
+          docsWithPages.push({
+            document,
+            pages: [docResult]
+          })
+        } else {
+          docsWithPages[docs[p.document]].pages.push(docResult)
+        }
+      })
+      this.searcher.documents = searcherDocs
+      this.searcher.results = docsWithPages
+      Vue.set(this.searcher, 'docCount', docCount)
+      this.searcher.done = true
     },
     loadMoreSearchResults() {
-      this.searcher.done = false;
+      this.searcher.done = false
       getData(this.searcher.response.meta.next).then((response) =>
         this.documentsReceived(response)
-      );
+      )
     },
     selectDirectory(directory) {
       if (directory) {
-        this.directoryStack.push(directory);
+        this.directoryStack.push(directory)
       } else {
-        this.directoryStack.pop();
+        this.directoryStack.pop()
       }
       this.currentDirectory =
-        this.directoryStack[this.directoryStack.length - 1] || null;
-      this.getCollectionData();
-    },
-  },
-};
+        this.directoryStack[this.directoryStack.length - 1] || null
+      this.getCollectionData()
+    }
+  }
+}
 </script>
 
 <style lang="scss"></style>

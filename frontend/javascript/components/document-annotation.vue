@@ -5,15 +5,13 @@
     :class="{ current: isCurrent, 'has-rect': hasRect }"
     @mouseover="activateAnnotation"
     @mouseout="deactivateAnnotation"
-    @click="permanentlyActivateAnnotation"
-  >
+    @click="permanentlyActivateAnnotation">
     <h6>
       {{ annotation.title }}
       <button
         v-if="annotation.can_delete"
         class="btn btn-sm btn-danger float-end delete-button"
-        @click="deleteAnnotation"
-      >
+        @click="deleteAnnotation">
         <i class="fa fa-ban"></i>
       </button>
     </h6>
@@ -30,53 +28,53 @@
 
 <script>
 export default {
-  name: "document-page-annotation",
-  props: ["annotation", "currentAnnotation"],
+  name: 'document-page-annotation',
+  props: ['annotation', 'currentAnnotation'],
   data() {
     return {
-      activated: false,
-    };
+      activated: false
+    }
   },
   computed: {
     isCurrent() {
-      return this.annotation.id === this.currentAnnotation;
+      return this.annotation.id === this.currentAnnotation
     },
     hasRect() {
-      return !!this.annotation.left;
+      return !!this.annotation.left
     },
     dtf() {
-      return new Intl.DateTimeFormat("de", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-      });
+      return new Intl.DateTimeFormat('de', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      })
     },
     annotationTime() {
-      const d = new Date(this.annotation.timestamp);
-      return this.dtf.format(d);
-    },
+      const d = new Date(this.annotation.timestamp)
+      return this.dtf.format(d)
+    }
   },
   methods: {
     permanentlyActivateAnnotation() {
-      this.activated = true;
-      this.activateAnnotation();
+      this.activated = true
+      this.activateAnnotation()
     },
     activateAnnotation() {
-      this.$emit("currentannotation", this.annotation.id);
+      this.$emit('currentannotation', this.annotation.id)
     },
     deactivateAnnotation() {
       if (this.activated) {
-        return;
+        return
       }
-      this.$emit("currentannotation", null);
+      this.$emit('currentannotation', null)
     },
     deleteAnnotation() {
-      this.$emit("deleteannotation", this.annotation);
-    },
-  },
-};
+      this.$emit('deleteannotation', this.annotation)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

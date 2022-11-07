@@ -5,63 +5,63 @@
 </template>
 
 <script>
-const TOC_RE = /^(\s*)- \[([^\]]+)\]\(#page-(\d+)\)\s*$/;
+const TOC_RE = /^(\s*)- \[([^\]]+)\]\(#page-(\d+)\)\s*$/
 
 function escapeHTML(s) {
   return s
-    .replace(/&/g, "&amp;")
-    .replace(/"/g, "&quot;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
 
 export default {
-  name: "DocumentOutlineSidebar",
-  props: ["outline", "height"],
+  name: 'DocumentOutlineSidebar',
+  props: ['outline', 'height'],
   computed: {
     outlineHTML() {
       /*
       Converts nested markdown list with links to HTML
       Here be dragons
       */
-      let html = ["<ul>"];
-      let depth = 0;
-      let openLi = false;
+      const html = ['<ul>']
+      let depth = 0
+      let openLi = false
       this.outline.split(/\r?\n/).forEach((line) => {
-        const match = TOC_RE.exec(line);
+        const match = TOC_RE.exec(line)
         if (match === null) {
-          return;
+          return
         }
-        const d = match[1].length / 2;
+        const d = match[1].length / 2
         if (d > depth) {
           for (let i = depth; i < d; i += 1) {
-            html.push("<ul>");
+            html.push('<ul>')
           }
-          openLi = false;
+          openLi = false
         } else if (d < depth) {
           for (let i = depth; i > d; i -= 1) {
-            html.push("</li></ul>");
+            html.push('</li></ul>')
           }
-          openLi = true;
+          openLi = true
         } else {
           if (openLi) {
-            html.push("</li>");
+            html.push('</li>')
           }
-          html.push("<li>");
+          html.push('<li>')
         }
-        if (d != depth) {
-          depth = d;
+        if (d !== depth) {
+          depth = d
           if (openLi) {
-            html.push("</li><li>");
+            html.push('</li><li>')
           } else {
-            html.push("<li>");
+            html.push('<li>')
           }
         }
-        html.push(`<a href="#page-${match[3]}">${escapeHTML(match[2])}</a>`);
-      });
-      html.push("</li></ul>");
-      return html.join("");
-    },
+        html.push(`<a href="#page-${match[3]}">${escapeHTML(match[2])}</a>`)
+      })
+      html.push('</li></ul>')
+      return html.join('')
+    }
   },
   mounted() {
     /* Instead of:
@@ -70,28 +70,28 @@ export default {
     this listens on the parent, catches link clicks and navigates.
     Pretty dumb, but works for now.
     */
-    this.$refs.outline.addEventListener("click", this.outlineClick);
+    this.$refs.outline.addEventListener('click', this.outlineClick)
   },
   beforeDestroy() {
-    this.$refs.outline.removeEventListener("click", this.outlineClick);
+    this.$refs.outline.removeEventListener('click', this.outlineClick)
   },
   methods: {
     outlineClick(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.target.nodeName !== "A") {
-        return;
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.target.nodeName !== 'A') {
+        return
       }
-      this.navigate(parseInt(e.target.attributes.href.value.split("-")[1], 10));
+      this.navigate(parseInt(e.target.attributes.href.value.split('-')[1], 10))
     },
     navigate(number) {
-      this.$emit("navigate", {
+      this.$emit('navigate', {
         number,
-        source: "outline",
-      });
-    },
-  },
-};
+        source: 'outline'
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

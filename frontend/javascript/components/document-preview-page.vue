@@ -5,8 +5,7 @@
         v-for="format in imageFormats"
         :key="format"
         :srcset="imageUrl.replace(/\.png/, '.png.' + format)"
-        :type="'image/' + format"
-      />
+        :type="'image/' + format" />
       <img
         v-if="page.image_url"
         v-show="imageLoaded"
@@ -15,8 +14,7 @@
         alt=""
         class="img-fluid page-image"
         loading="lazy"
-        @load="onImageLoad"
-      />
+        @load="onImageLoad" />
     </picture>
     <div v-if="!imageLoaded" class="spinner-grow" role="status">
       <span class="visually-hidden">{{ i18n.loading }}</span>
@@ -29,58 +27,58 @@
 
 <script>
 export default {
-  name: "DocumentPreviewPage",
+  name: 'DocumentPreviewPage',
   props: {
     page: {
       type: Object,
-      required: true,
+      required: true
     },
     imageFormats: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
-      imageLoaded: false,
-    };
+      imageLoaded: false
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     imageUrl() {
-      return this.page.image_url.replace(/\{size\}/, "small");
+      return this.page.image_url.replace(/\{size\}/, 'small')
     },
     pageAnchor() {
-      return `#page-${this.page.number}`;
+      return `#page-${this.page.number}`
     },
     imageSources() {
       return this.supportedFormats.map((format) => {
-        let srcset = this.imageSrcSet;
-        srcset = srcset.replace(/\.png/g, `.png.${format}`);
+        let srcset = this.imageSrcSet
+        srcset = srcset.replace(/\.png/g, `.png.${format}`)
         return {
-          srcset: srcset,
-          type: `image/${format}`,
-        };
-      });
-    },
+          srcset,
+          type: `image/${format}`
+        }
+      })
+    }
   },
   beforeDestroy() {
     if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
       // Cancel image download on destroy
-      this.$refs.image.setAttribute("src", "");
+      this.$refs.image.setAttribute('src', '')
     }
   },
   methods: {
     onImageLoad() {
-      this.imageLoaded = true;
+      this.imageLoaded = true
     },
     navigate() {
-      this.$emit("navigate", this.page.number);
-    },
-  },
-};
+      this.$emit('navigate', this.page.number)
+    }
+  }
+}
 </script>
 
 <style lang="scss">

@@ -24,68 +24,68 @@ class PDFLinkService {
     externalLinkTarget = null,
     externalLinkRel = null,
     externalLinkEnabled = true,
-    ignoreDestinationZoom = false,
+    ignoreDestinationZoom = false
   } = {}) {
-    this.externalLinkTarget = externalLinkTarget;
-    this.externalLinkRel = externalLinkRel;
-    this.externalLinkEnabled = externalLinkEnabled;
-    this._ignoreDestinationZoom = ignoreDestinationZoom;
+    this.externalLinkTarget = externalLinkTarget
+    this.externalLinkRel = externalLinkRel
+    this.externalLinkEnabled = externalLinkEnabled
+    this._ignoreDestinationZoom = ignoreDestinationZoom
 
-    this.baseUrl = null;
-    this.pdfDocument = null;
-    this.pdfViewer = null;
-    this.pdfHistory = null;
+    this.baseUrl = null
+    this.pdfDocument = null
+    this.pdfViewer = null
+    this.pdfHistory = null
 
-    this._pagesRefCache = null;
+    this._pagesRefCache = null
   }
 
   setDocument(pdfDocument, baseUrl = null) {
-    this.baseUrl = baseUrl;
-    this.pdfDocument = pdfDocument;
-    this._pagesRefCache = Object.create(null);
+    this.baseUrl = baseUrl
+    this.pdfDocument = pdfDocument
+    this._pagesRefCache = Object.create(null)
   }
 
   setViewer(pdfViewer) {
-    this.pdfViewer = pdfViewer;
+    this.pdfViewer = pdfViewer
   }
 
   setHistory(pdfHistory) {
-    this.pdfHistory = pdfHistory;
+    this.pdfHistory = pdfHistory
   }
 
   /**
    * @type {number}
    */
   get pagesCount() {
-    return this.pdfDocument ? this.pdfDocument.numPages : 0;
+    return this.pdfDocument ? this.pdfDocument.numPages : 0
   }
 
   /**
    * @type {number}
    */
   get page() {
-    return this.pdfViewer.currentPageNumber;
+    return this.pdfViewer.currentPageNumber
   }
 
   /**
    * @param {number} value
    */
   set page(value) {
-    this.pdfViewer.currentPageNumber = value;
+    this.pdfViewer.currentPageNumber = value
   }
 
   /**
    * @type {number}
    */
   get rotation() {
-    return this.pdfViewer.pagesRotation;
+    return this.pdfViewer.pagesRotation
   }
 
   /**
    * @param {number} value
    */
   set rotation(value) {
-    this.pdfViewer.pagesRotation = value;
+    this.pdfViewer.pagesRotation = value
   }
 
   /**
@@ -94,11 +94,11 @@ class PDFLinkService {
   navigateTo(dest) {
     const goToDestination = ({ namedDest, explicitDest }) => {
       // Dest array looks like that: <page-ref> </XYZ|/FitXXX> <args..>
-      const destRef = explicitDest[0];
-      let pageNumber;
+      const destRef = explicitDest[0]
+      let pageNumber
 
       if (destRef instanceof Object) {
-        pageNumber = this._cachedPageNumber(destRef);
+        pageNumber = this._cachedPageNumber(destRef)
 
         if (pageNumber === null) {
           // Fetch the page reference if it's not yet available. This could
@@ -106,72 +106,72 @@ class PDFLinkService {
           this.pdfDocument
             .getPageIndex(destRef)
             .then((pageIndex) => {
-              this.cachePageRef(pageIndex + 1, destRef);
-              goToDestination({ namedDest, explicitDest });
+              this.cachePageRef(pageIndex + 1, destRef)
+              goToDestination({ namedDest, explicitDest })
             })
             .catch(() => {
               console.error(
                 `PDFLinkService.navigateTo: "${destRef}" is not ` +
                   `a valid page reference, for dest="${dest}".`
-              );
-            });
-          return;
+              )
+            })
+          return
         }
       } else if (Number.isInteger(destRef)) {
-        pageNumber = destRef + 1;
+        pageNumber = destRef + 1
       } else {
         console.error(
           `PDFLinkService.navigateTo: "${destRef}" is not ` +
             `a valid destination reference, for dest="${dest}".`
-        );
-        return;
+        )
+        return
       }
       if (!pageNumber || pageNumber < 1 || pageNumber > this.pagesCount) {
         console.error(
           `PDFLinkService.navigateTo: "${pageNumber}" is not ` +
             `a valid page number, for dest="${dest}".`
-        );
-        return;
+        )
+        return
       }
 
       if (this.pdfHistory) {
         // Update the browser history before scrolling the new destination into
         // view, to be able to accurately capture the current document position.
-        this.pdfHistory.pushCurrentPosition();
-        this.pdfHistory.push({ namedDest, explicitDest, pageNumber });
+        this.pdfHistory.pushCurrentPosition()
+        this.pdfHistory.push({ namedDest, explicitDest, pageNumber })
       }
 
       this.pdfViewer.scrollPageIntoView({
         pageNumber,
         destArray: explicitDest,
-        ignoreDestinationZoom: this._ignoreDestinationZoom,
-      });
-    };
+        ignoreDestinationZoom: this._ignoreDestinationZoom
+      })
+    }
 
     new Promise((resolve) => {
-      if (typeof dest === "string") {
+      if (typeof dest === 'string') {
         this.pdfDocument.getDestination(dest).then((destArray) => {
           resolve({
             namedDest: dest,
-            explicitDest: destArray,
-          });
-        });
-        return;
+            explicitDest: destArray
+          })
+        })
+        return
       }
       resolve({
-        namedDest: "",
-        explicitDest: dest,
-      });
+        namedDest: '',
+        explicitDest: dest
+      })
     }).then((data) => {
       if (!Array.isArray(data.explicitDest)) {
         console.error(
           `PDFLinkService.navigateTo: "${data.explicitDest}" is` +
             ` not a valid destination array, for dest="${dest}".`
-        );
-        return;
+        )
+        return
       }
-      goToDestination(data);
-    });
+      goToDestination(data)
+    })
   }
 
   /**
@@ -179,14 +179,14 @@ class PDFLinkService {
    * @returns {string} The hyperlink to the PDF object.
    */
   getDestinationHash(dest) {
-    if (typeof dest === "string") {
-      return this.getAnchorUrl("#" + escape(dest));
+    if (typeof dest === 'string') {
+      return this.getAnchorUrl('#' + escape(dest))
     }
     if (Array.isArray(dest)) {
-      const str = JSON.stringify(dest);
-      return this.getAnchorUrl("#" + escape(str));
+      const str = JSON.stringify(dest)
+      return this.getAnchorUrl('#' + escape(str))
     }
-    return this.getAnchorUrl("");
+    return this.getAnchorUrl('')
   }
 
   /**
@@ -196,7 +196,7 @@ class PDFLinkService {
    * @returns {string} The hyperlink to the PDF object.
    */
   getAnchorUrl(anchor) {
-    return (this.baseUrl || "") + anchor;
+    return (this.baseUrl || '') + anchor
   }
 
   /**
@@ -219,24 +219,24 @@ class PDFLinkService {
    */
   cachePageRef(pageNum, pageRef) {
     if (!pageRef) {
-      return;
+      return
     }
     const refStr =
-      pageRef.gen === 0 ? `${pageRef.num}R` : `${pageRef.num}R${pageRef.gen}`;
-    this._pagesRefCache[refStr] = pageNum;
+      pageRef.gen === 0 ? `${pageRef.num}R` : `${pageRef.num}R${pageRef.gen}`
+    this._pagesRefCache[refStr] = pageNum
   }
 
   _cachedPageNumber(pageRef) {
     const refStr =
-      pageRef.gen === 0 ? `${pageRef.num}R` : `${pageRef.num}R${pageRef.gen}`;
-    return (this._pagesRefCache && this._pagesRefCache[refStr]) || null;
+      pageRef.gen === 0 ? `${pageRef.num}R` : `${pageRef.num}R${pageRef.gen}`
+    return (this._pagesRefCache && this._pagesRefCache[refStr]) || null
   }
 
   /**
    * @param {number} pageNumber
    */
   isPageVisible(pageNumber) {
-    return this.pdfViewer.isPageVisible(pageNumber);
+    return this.pdfViewer.isPageVisible(pageNumber)
   }
 }
 
@@ -301,4 +301,4 @@ class PDFLinkService {
 
 class FilingcabinetLinkService extends PDFLinkService {}
 
-export { FilingcabinetLinkService };
+export { FilingcabinetLinkService }
