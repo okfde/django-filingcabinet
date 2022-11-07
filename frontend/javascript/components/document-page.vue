@@ -8,27 +8,24 @@
               v-for="format in supportedFormats"
               :key="format"
               :srcset="previewImageUrl.replace(/\.png/, '.png.' + format)"
-              :type="'image/' + format"
-            />
+              :type="'image/' + format" />
             <img
               :src="previewImageUrl"
               :alt="pageLabel"
               :style="{
                 width: page.zoomedWidth + 'px',
-                height: imageHeight + 'px',
+                height: imageHeight + 'px'
               }"
               class="page-image-placeholder"
               draggable="false"
-              loading="lazy"
-            />
+              loading="lazy" />
           </picture>
           <picture>
             <source
               v-for="pic in imageSources"
               :key="pic.type"
               :srcset="pic.srcset"
-              :type="pic.type"
-            />
+              :type="pic.type" />
             <img
               v-if="page.image_url"
               v-show="imageLoaded"
@@ -40,20 +37,17 @@
               class="page-image"
               draggable="false"
               :class="{ 'annotation-form': showAnnotationForm }"
-              @load="onImageLoad"
-            />
+              @load="onImageLoad" />
           </picture>
           <div class="pdf-layer" :style="imageOverlayStyle">
             <div
               ref="textLayer"
               class="text-layer"
-              :style="imageOverlayStyle"
-            />
+              :style="imageOverlayStyle" />
             <div
               ref="annotationLayer"
               class="annotation-layer"
-              :style="imageOverlayStyle"
-            />
+              :style="imageOverlayStyle" />
           </div>
 
           <div v-if="showText && !showAnnotationForm" class="page-text">
@@ -67,13 +61,11 @@
             :style="imageOverlayStyle"
             @mousedown="mouseDown"
             @mousemove="mouseMove"
-            @mouseup="mouseUp"
-          >
+            @mouseup="mouseUp">
             <div
               v-if="annotationRect"
               :style="annotationRectStyle"
-              class="annotation-rect"
-            />
+              class="annotation-rect" />
           </div>
           <div
             v-if="
@@ -84,16 +76,14 @@
               annotationsWithRect.length
             "
             class="annotation-overlay-container"
-            :style="imageOverlayStyle"
-          >
+            :style="imageOverlayStyle">
             <page-annotation-overlay
               v-for="annotation in annotationsWithRect"
               :key="annotation.id"
               :page="page"
               :annotation="annotation"
               :current-annotation="currentAnnotation"
-              @currentannotation="annotationRectClicked"
-            />
+              @currentannotation="annotationRectClicked" />
           </div>
         </div>
         <p class="page-number">
@@ -111,221 +101,220 @@
         :active-annotation-form="annotationForm"
         @currentannotation="$emit('currentannotation', $event)"
         @activateannotationform="$emit('activateannotationform', $event)"
-        @deleteannotation="$emit('deleteannotation', $event)"
-      />
+        @deleteannotation="$emit('deleteannotation', $event)" />
     </div>
   </div>
 </template>
 
 <script>
-import PageAnnotations from "./document-annotations.vue";
-import PageAnnotationOverlay from "./document-page-annotationoverlay.vue";
+import PageAnnotations from './document-annotations.vue'
+import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
-import { FilingcabinetLinkService } from "../lib/pdfjs-utils.js";
+import { FilingcabinetLinkService } from '../lib/pdfjs-utils.js'
 
 const PAGE_SIZES = {
   small: 180,
   normal: 700,
-  large: 1000,
-};
+  large: 1000
+}
 
 export default {
-  name: "DocumentPage",
+  name: 'DocumentPage',
   components: {
     PageAnnotationOverlay,
-    PageAnnotations,
+    PageAnnotations
   },
   props: {
     page: {
       type: Object,
-      required: true,
+      required: true
     },
     annotations: {
       type: Array,
-      required: true,
+      required: true
     },
     showText: {
       type: Boolean,
-      required: true,
+      required: true
     },
     showAnnotations: {
       type: Boolean,
-      required: true,
+      required: true
     },
     currentAnnotation: {
       type: Object,
-      default: null,
+      default: null
     },
     annotationForm: {
       type: Object,
-      default: null,
+      default: null
     },
     canAnnotate: {
       type: Boolean,
-      default: false,
+      default: false
     },
     pdfDocument: {
       type: Object,
-      default: null,
+      default: null
     },
     supportedFormats: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   data() {
     return {
       imageLoaded: false,
       textLoaded: false,
       annotationRect: null,
-      annotating: false,
-    };
+      annotating: false
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     annotationsWithRect() {
-      return this.annotations.filter((a) => a.left !== null);
+      return this.annotations.filter((a) => a.left !== null)
     },
     imageSize() {
       if (this.page.zoomedWidth <= 700) {
-        return "normal";
+        return 'normal'
       } else if (this.page.zoomedWidth <= 1000) {
-        return "large";
+        return 'large'
       }
-      return "original";
+      return 'original'
     },
     imageSizeRetina() {
       if (this.page.zoomedWidth <= 1400) {
-        return "normal";
+        return 'normal'
       } else if (this.page.zoomedWidth <= 1000) {
-        return "large";
+        return 'large'
       }
-      return "original";
+      return 'original'
     },
     imageUrl() {
-      return this.page.image_url.replace(/\{size\}/, this.imageSize);
+      return this.page.image_url.replace(/\{size\}/, this.imageSize)
     },
     previewImageUrl() {
-      return this.page.image_url.replace(/\{size\}/, "small");
+      return this.page.image_url.replace(/\{size\}/, 'small')
     },
     imageSources() {
       return this.supportedFormats.map((format) => {
-        let srcset = this.imageSrcSet;
-        srcset = srcset.replace(/\.png/g, `.png.${format}`);
+        let srcset = this.imageSrcSet
+        srcset = srcset.replace(/\.png/g, `.png.${format}`)
         return {
-          srcset: srcset,
-          type: `image/${format}`,
-        };
-      });
+          srcset,
+          type: `image/${format}`
+        }
+      })
     },
     imageSrcSet() {
-      let srcset = [];
-      for (let size in PAGE_SIZES) {
+      const srcset = []
+      for (const size in PAGE_SIZES) {
         srcset.push(
           `${this.page.image_url.replace(/\{size\}/, size)} ${
             PAGE_SIZES[size]
           }w`
-        );
+        )
       }
       srcset.push(
-        `${this.page.image_url.replace(/\{size\}/, "original")} ${
+        `${this.page.image_url.replace(/\{size\}/, 'original')} ${
           this.page.width
         }w`
-      );
-      return srcset.join(", ");
+      )
+      return srcset.join(', ')
     },
     pageId() {
-      return `page-${this.page.number}`;
+      return `page-${this.page.number}`
     },
     pageLabel() {
-      return this.page.number;
+      return this.page.number
     },
     showAnnotationForm() {
       if (this.annotationForm === null) {
-        return false;
+        return false
       }
-      return this.annotationForm.number === this.page.number;
+      return this.annotationForm.number === this.page.number
     },
     annotationRectStyle() {
       if (!this.annotationRect) {
-        return {};
+        return {}
       }
       return {
-        left: this.annotationRect.left + "px",
-        top: this.annotationRect.top + "px",
-        width: this.annotationRect.width + "px",
-        height: this.annotationRect.height + "px",
-      };
+        left: this.annotationRect.left + 'px',
+        top: this.annotationRect.top + 'px',
+        width: this.annotationRect.width + 'px',
+        height: this.annotationRect.height + 'px'
+      }
     },
     imageHeight() {
-      return (this.page.height / this.page.width) * this.page.zoomedWidth;
+      return (this.page.height / this.page.width) * this.page.zoomedWidth
     },
     imageDimensions() {
       return {
         width: this.page.zoomedWidth,
-        height: this.imageHeight,
-      };
+        height: this.imageHeight
+      }
     },
     imageOverlayStyle() {
       return {
-        width: this.imageDimensions.width + "px",
-        height: this.imageDimensions.height - 1 + "px",
-      };
+        width: this.imageDimensions.width + 'px',
+        height: this.imageDimensions.height - 1 + 'px'
+      }
     },
     imageInfo() {
       return {
         ratioX: this.page.width / this.imageDimensions.width,
-        ratioY: this.page.height / this.imageDimensions.height,
-      };
+        ratioY: this.page.height / this.imageDimensions.height
+      }
     },
     zoomedWidth() {
-      return this.page.zoomedWidth;
-    },
+      return this.page.zoomedWidth
+    }
   },
   watch: {
     pdfDocument: function (pdfDocument) {
       if (this.textLoaded) {
-        return;
+        return
       }
-      this.loadText(pdfDocument);
+      this.loadText(pdfDocument)
     },
     zoomedWidth: function () {
-      console.log("width changed");
+      console.log('width changed')
       if (this.pdfPage && this.pdfTextContent) {
-        this.renderText(this.pdfPage, this.pdfTextContent, this.pdfAnnotations);
+        this.renderText(this.pdfPage, this.pdfTextContent, this.pdfAnnotations)
       }
-    },
+    }
   },
   mounted() {
-    console.log("mounting", this.page.number);
+    console.log('mounting', this.page.number)
     if (this.pdfDocument) {
       this.$nextTick(function () {
-        this.loadText(this.pdfDocument);
-      });
+        this.loadText(this.pdfDocument)
+      })
     }
   },
   beforeDestroy() {
     if (this.page.image_url && !this.imageLoaded && this.$refs.image) {
       // Cancel image download on destroy
-      this.$refs.image.setAttribute("src", "");
+      this.$refs.image.setAttribute('src', '')
     }
   },
   destroyed() {
-    this.destroyed = true;
+    this.destroyed = true
   },
   methods: {
     onImageLoad() {
-      this.imageLoaded = true;
+      this.imageLoaded = true
     },
     mouseDown(e) {
       if (!this.annotationForm) {
-        return;
+        return
       }
-      this.annotationRect = null;
-      this.annotationRect = this.makeRect(e);
-      this.annotating = true;
+      this.annotationRect = null
+      this.annotationRect = this.makeRect(e)
+      this.annotating = true
     },
     makeRect(e) {
       if (this.annotationRect === null) {
@@ -333,148 +322,146 @@ export default {
           left: e.offsetX,
           top: e.offsetY,
           width: 1,
-          height: 1,
-        };
+          height: 1
+        }
       }
-      let left = e.offsetX;
-      let top = e.offsetY;
-      let width, height;
+      let left = e.offsetX
+      let top = e.offsetY
+      let width, height
       if (left < this.annotationRect.left) {
-        width = this.annotationRect.left - left;
+        width = this.annotationRect.left - left
       } else {
-        width = left - this.annotationRect.left;
-        left = this.annotationRect.left;
+        width = left - this.annotationRect.left
+        left = this.annotationRect.left
       }
       if (top < this.annotationRect.top) {
-        height = this.annotationRect.top - top;
+        height = this.annotationRect.top - top
       } else {
-        height = top - this.annotationRect.top;
-        top = this.annotationRect.top;
+        height = top - this.annotationRect.top
+        top = this.annotationRect.top
       }
       return {
         left,
         top,
         width,
-        height,
-      };
+        height
+      }
     },
     mouseMove(e) {
       if (!this.annotationForm) {
-        return;
+        return
       }
       if (!this.annotating) {
-        return;
+        return
       }
-      this.annotationRect = this.makeRect(e);
+      this.annotationRect = this.makeRect(e)
     },
     mouseUp(e) {
       if (!this.annotationForm) {
-        return;
+        return
       }
       if (!this.annotating) {
-        return;
+        return
       }
-      this.annotating = false;
-      this.annotationRect = this.makeRect(e);
+      this.annotating = false
+      this.annotationRect = this.makeRect(e)
       if (this.annotationRect.width < 5 || this.annotationRect.height < 5) {
-        this.annotationRect = null;
-        this.$emit("activateannotationform", {
+        this.annotationRect = null
+        this.$emit('activateannotationform', {
           left: null,
           top: null,
           width: null,
-          height: null,
-        });
+          height: null
+        })
       } else {
-        this.$emit("activateannotationform", {
+        this.$emit('activateannotationform', {
           left: Math.round(this.annotationRect.left * this.imageInfo.ratioX),
           top: Math.round(this.annotationRect.top * this.imageInfo.ratioY),
           width: Math.round(this.annotationRect.width * this.imageInfo.ratioX),
-          height: Math.round(
-            this.annotationRect.height * this.imageInfo.ratioY
-          ),
-        });
+          height: Math.round(this.annotationRect.height * this.imageInfo.ratioY)
+        })
       }
     },
     annotationRectClicked(annotationId) {
-      this.$emit("currentannotation", annotationId);
+      this.$emit('currentannotation', annotationId)
       if (annotationId) {
-        let el = document.querySelector("#sidebar-annotation-" + annotationId);
+        const el = document.querySelector('#sidebar-annotation-' + annotationId)
         if (el) {
           el.scrollIntoView({
-            behavior: "smooth",
-          });
+            behavior: 'smooth'
+          })
         }
       }
     },
     loadText(pdfDocument) {
-      this.textLoaded = true;
+      this.textLoaded = true
       pdfDocument
         .getPage(this.page.number)
         .then((pdfPage) => {
           if (this.destroyed) {
-            return;
+            return
           }
-          this.pdfPage = pdfPage;
+          this.pdfPage = pdfPage
           Promise.all([
             pdfPage.getTextContent(),
-            pdfPage.getAnnotations({ intent: "display" }),
+            pdfPage.getAnnotations({ intent: 'display' })
           ]).then(([content, annotations]) => {
             if (this.destroyed) {
-              return;
+              return
             }
-            this.pdfAnnotations = annotations;
-            this.pdfTextContent = content;
+            this.pdfAnnotations = annotations
+            this.pdfTextContent = content
             this.renderText(
               this.pdfPage,
               this.pdfTextContent,
               this.pdfAnnotations
-            );
-          });
+            )
+          })
         })
         .catch((err) => {
-          console.error(err);
-        });
+          console.error(err)
+        })
     },
     renderText(pdfPage, pdfTextContent, pdfAnnotations) {
       if (this.destroyed) {
-        return;
+        return
       }
-      let viewport = pdfPage.getViewport({
-        scale: this.page.zoomedWidth / pdfPage.view[2],
-      });
+      const viewport = pdfPage.getViewport({
+        scale: this.page.zoomedWidth / pdfPage.view[2]
+      })
       // Rendering text layer as HTML.
-      this.$refs.textLayer.innerHTML = "";
-      console.log("Rendering content", pdfTextContent);
+      this.$refs.textLayer.innerHTML = ''
+      console.log('Rendering content', pdfTextContent)
       const readableStream = pdfPage.streamTextContent({
         normalizeWhitespace: true,
-        includeMarkedContent: true,
-      });
+        includeMarkedContent: true
+      })
       this.$root.PDFJS.renderTextLayer({
         textContent: pdfTextContent,
         textContentStream: readableStream,
         container: this.$refs.textLayer,
         viewport,
-        enhanceTextSelection: true,
-      });
+        enhanceTextSelection: true
+      })
 
       if (pdfAnnotations.length === 0) {
-        return;
+        return
       }
       const linkService = new FilingcabinetLinkService({
         externalLinkTarget: 2,
-        externalLinkRel: "noopener nofollow noreferrer",
-        externalLinkEnabled: true,
-      });
-      linkService.setDocument(this.pdfDocument);
+        externalLinkRel: 'noopener nofollow noreferrer',
+        externalLinkEnabled: true
+      })
+      linkService.setDocument(this.pdfDocument)
       // Set shim viewer to navigate
       linkService.setViewer({
         scrollPageIntoView: (options) => {
-          this.$emit("navigate", {
+          this.$emit('navigate', {
             number: options.pageNumber,
-            source: "link",
-          });
-        },
-      });
+            source: 'link'
+          })
+        }
+      })
       const parameters = {
         viewport: viewport.clone({ dontFlip: true }),
         div: this.$refs.annotationLayer,
@@ -482,17 +469,17 @@ export default {
         page: this.pdfPage,
         // imageResourcesPath: this.imageResourcesPath,
         renderInteractiveForms: false,
-        linkService: linkService,
+        linkService
         // downloadManager: this.downloadManager,
-      };
-      if (this.$refs.annotationLayer.querySelector("section")) {
-        this.$root.PDFJS.AnnotationLayer.update(parameters);
-      } else {
-        this.$root.PDFJS.AnnotationLayer.render(parameters);
       }
-    },
-  },
-};
+      if (this.$refs.annotationLayer.querySelector('section')) {
+        this.$root.PDFJS.AnnotationLayer.update(parameters)
+      } else {
+        this.$root.PDFJS.AnnotationLayer.render(parameters)
+      }
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -529,7 +516,7 @@ export default {
     font-family: sans-serif;
     background-color: rgba(255, 255, 255, 0.95);
     color: #333;
-    font-family: "Courier New", Courier, monospace;
+    font-family: 'Courier New', Courier, monospace;
   }
 }
 .page-number {

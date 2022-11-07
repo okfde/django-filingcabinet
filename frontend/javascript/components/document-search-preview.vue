@@ -3,14 +3,12 @@
     :href="pageAnchor"
     class="d-flex search-preview-page text-white"
     :class="{ 'bg-dark': isCurrent }"
-    @click.prevent="navigate"
-  >
+    @click.prevent="navigate">
     <img
       :src="imageUrl"
       alt=""
       class="flex-shrink-0 img-fluid"
-      style="height: 90px"
-    />
+      style="height: 90px" />
     <div class="flex-grow-1 ms-2">
       <h6>
         {{ i18n.page }} {{ page.number }} -
@@ -30,28 +28,28 @@
 
 <script>
 export default {
-  name: "DocumentSearchPreview",
-  props: ["page", "matches", "currentPage"],
+  name: 'DocumentSearchPreview',
+  props: ['page', 'matches', 'currentPage'],
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     imageUrl() {
-      return this.page.image_url.replace(/\{size\}/, "small");
+      return this.page.image_url.replace(/\{size\}/, 'small')
     },
     pageAnchor() {
-      return `#page-${this.page.number}`;
+      return `#page-${this.page.number}`
     },
     isCurrent() {
-      return this.page.number === this.currentPage;
-    },
+      return this.page.number === this.currentPage
+    }
   },
   methods: {
     navigate() {
-      this.$emit("navigate", this.page.number);
-    },
-  },
-};
+      this.$emit('navigate', this.page.number)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

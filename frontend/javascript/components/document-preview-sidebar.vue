@@ -6,72 +6,70 @@
       :items="pages"
       key-field="number"
       size-field="smallSize"
-      :emit-update="true"
-    >
+      :emit-update="true">
       <document-preview-page
         :key="item.number"
         :page="item"
         :image-formats="imageFormats"
-        @navigate="navigate"
-      />
+        @navigate="navigate" />
     </RecycleScroller>
   </div>
 </template>
 
 <script>
-import "intersection-observer";
+import 'intersection-observer'
 
-import { RecycleScroller } from "vue-virtual-scroller";
+import { RecycleScroller } from 'vue-virtual-scroller'
 
-import DocumentPreviewPage from "./document-preview-page.vue";
+import DocumentPreviewPage from './document-preview-page.vue'
 
 export default {
-  name: "DocumentPreviewSidebar",
+  name: 'DocumentPreviewSidebar',
   components: {
     RecycleScroller,
-    DocumentPreviewPage,
+    DocumentPreviewPage
   },
   props: {
     pages: {
       type: Array,
-      required: true,
+      required: true
     },
     imageFormats: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     height: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   computed: {
     i18n() {
-      return this.config.i18n;
-    },
+      return this.config.i18n
+    }
   },
   mounted() {
-    this.initialNav = false;
+    this.initialNav = false
   },
   updated() {
     if (!this.initialNav) {
-      this.initialNav = true;
-      this.$emit("navigatesidebar");
+      this.initialNav = true
+      this.$emit('navigatesidebar')
     }
   },
   methods: {
     navigate(number) {
-      this.$emit("navigate", {
+      this.$emit('navigate', {
         number,
-        source: "sidebar",
-      });
-    },
-  },
-};
+        source: 'sidebar'
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss">
-@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+@import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 .document-preview-pages {
   padding: 0.5rem 0;

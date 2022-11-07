@@ -20,8 +20,7 @@
           @showinfo="
             preferences.showDocumentProperties =
               !preferences.showDocumentProperties
-          "
-        />
+          " />
         <transition name="slidedown">
           <document-searchbar
             v-if="preferences.showSearchbar"
@@ -31,13 +30,11 @@
             :is-small-screen="isSmallScreen"
             :default-search="preferences.defaultSearch"
             @search="search"
-            @movesearchindex="moveSearchIndex"
-          />
+            @movesearchindex="moveSearchIndex" />
           <document-properties
             v-if="preferences.showDocumentProperties"
             :document="document"
-            @close="preferences.showDocumentProperties = false"
-          />
+            @close="preferences.showDocumentProperties = false" />
         </transition>
       </div>
       <transition v-if="isSmallScreen" name="slidedown">
@@ -46,23 +43,20 @@
           class="row toolbar-extended"
           :class="{
             'bg-dark': !preferences.showSearchResults,
-            'bg-secondary': !!preferences.showSearchResults,
-          }"
-        >
+            'bg-secondary': !!preferences.showSearchResults
+          }">
           <document-search-sidebar
             v-if="preferences.showSearchResults"
             :document-pages="document.pages"
             :pages="pagesWithMatches"
             :current-page="currentPage"
             :height="sidebarContentHeight"
-            @navigate="navigate"
-          />
+            @navigate="navigate" />
           <document-outline-sidebar
             v-else-if="preferences.showOutline"
             :outline="document.outline"
             :height="sidebarContentHeight"
-            @navigate="navigate"
-          />
+            @navigate="navigate" />
         </div>
       </transition>
     </div>
@@ -73,17 +67,15 @@
         class="sidebar-container col-md-3 col-2 px-0"
         :class="{
           'bg-dark': !preferences.showSearchResults,
-          'bg-secondary': !!preferences.showSearchResults,
-        }"
-      >
+          'bg-secondary': !!preferences.showSearchResults
+        }">
         <div
           class="sidebar"
           :class="{
             preview: !preferences.showSearchResults,
-            search: !!preferences.showSearchResults,
+            search: !!preferences.showSearchResults
           }"
-          :style="sidebarStyle"
-        >
+          :style="sidebarStyle">
           <div class="sidebar-content" :style="sidebarContentStyle">
             <document-search-sidebar
               v-if="preferences.showSearchResults"
@@ -91,22 +83,19 @@
               :pages="pagesWithMatches"
               :current-page="currentPage"
               :height="sidebarContentHeight"
-              @navigate="navigate"
-            />
+              @navigate="navigate" />
             <document-outline-sidebar
               v-else-if="preferences.showOutline"
               :outline="document.outline"
               :height="sidebarContentHeight"
-              @navigate="navigate"
-            />
+              @navigate="navigate" />
             <document-preview-sidebar
               v-else
               :pages="document.pages"
               :image-formats="supportedImageFormats"
               :height="sidebarContentHeight"
               @navigate="navigate"
-              @navigatesidebar="navigateSidebar(currentPage)"
-            />
+              @navigatesidebar="navigateSidebar(currentPage)" />
           </div>
         </div>
       </div>
@@ -115,9 +104,8 @@
         class="col document-pages-container bg-light"
         :class="{
           'annotations-hidden': !preferences.showAnnotations,
-          '-sm': isSmallScreen,
-        }"
-      >
+          '-sm': isSmallScreen
+        }">
         <document-pages
           :document="document"
           :pages="document.pages"
@@ -131,63 +119,62 @@
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
-          @navigate="navigate"
-        />
+          @navigate="navigate" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 
-import PDFJSWorkerUrl from "pdfjs-dist/build/pdf.worker.js?url";
+import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.js?url'
 
-import DocumentPages from "./document-pages.vue";
-import DocumentPreviewSidebar from "./document-preview-sidebar.vue";
-import DocumentOutlineSidebar from "./document-outline-sidebar.vue";
-import DocumentSearchSidebar from "./document-search-sidebar.vue";
-import DocumentToolbar from "./document-toolbar.vue";
-import DocumentSearchbar from "./document-searchbar.vue";
-import DocumentProperties from "./document-properties.vue";
+import DocumentPages from './document-pages.vue'
+import DocumentPreviewSidebar from './document-preview-sidebar.vue'
+import DocumentOutlineSidebar from './document-outline-sidebar.vue'
+import DocumentSearchSidebar from './document-search-sidebar.vue'
+import DocumentToolbar from './document-toolbar.vue'
+import DocumentSearchbar from './document-searchbar.vue'
+import DocumentProperties from './document-properties.vue'
 
-import { getData, postData, findPageByOffset } from "../lib/utils.js";
+import { getData, postData, findPageByOffset } from '../lib/utils.js'
 
-const BOOTSTRAP_MD = 768;
-const BOOTSTRAP_LG = 992;
-const GUTTER = 30;
-const MAX_PDF_SIZE = 1024 * 1024 * 5;
+const BOOTSTRAP_MD = 768
+const BOOTSTRAP_LG = 992
+const GUTTER = 30
+const MAX_PDF_SIZE = 1024 * 1024 * 5
 
 function range(size, startAt = 0) {
-  return [...Array(size).keys()].map((i) => i + startAt);
+  return [...Array(size).keys()].map((i) => i + startAt)
 }
 
 function getPageRange(pageRangeStr) {
   if (!pageRangeStr) {
-    return null;
+    return null
   }
-  let parts = pageRangeStr.split(",");
-  let pages = [];
+  const parts = pageRangeStr.split(',')
+  let pages = []
   parts.forEach((part) => {
-    part = part.trim();
-    if (part.indexOf("-") !== -1) {
-      let startStop = part.split("-");
-      let start = parseInt(startStop[0], 10);
-      let stop = parseInt(startStop[1], 10);
-      pages = [...pages, ...range(stop - start + 1, start)];
+    part = part.trim()
+    if (part.indexOf('-') !== -1) {
+      const startStop = part.split('-')
+      const start = parseInt(startStop[0], 10)
+      const stop = parseInt(startStop[1], 10)
+      pages = [...pages, ...range(stop - start + 1, start)]
     } else {
-      pages.push(parseInt(part, 10));
+      pages.push(parseInt(part, 10))
     }
-  });
-  return pages;
+  })
+  return pages
 }
 
 function getScroll(d) {
-  return d.querySelector(".document-pages .scroller");
+  return d.querySelector('.document-pages .scroller')
 }
 
 export default {
-  name: "DocumentViewer",
+  name: 'DocumentViewer',
   components: {
     DocumentToolbar,
     DocumentSearchbar,
@@ -195,50 +182,50 @@ export default {
     DocumentPreviewSidebar,
     DocumentSearchSidebar,
     DocumentOutlineSidebar,
-    DocumentProperties,
+    DocumentProperties
   },
   props: {
     documentUrl: {
       type: String,
-      required: true,
+      required: true
     },
     documentPreview: {
       type: Object,
-      default: null,
+      default: null
     },
     page: {
       type: Number,
-      default: 1,
+      default: 1
     },
     config: {
       type: Object,
-      default: () => ({}),
+      default: () => ({})
     },
     defaults: {
       type: Object,
-      default: () => ({}),
-    },
+      default: () => ({})
+    }
   },
   data() {
-    let doc = this.documentPreview;
-    let sidebarVisibleDefault = true;
+    const doc = this.documentPreview
+    let sidebarVisibleDefault = true
     if (doc !== null) {
-      this.pageTemplate = decodeURI(this.documentPreview.page_template);
-      doc.pages = doc.pages || [];
-      if (doc.pages.length != doc.num_pages) {
-        let head = [];
-        let tail = [];
+      this.pageTemplate = decodeURI(this.documentPreview.page_template)
+      doc.pages = doc.pages || []
+      if (doc.pages.length !== doc.num_pages) {
+        let head = []
+        let tail = []
         if (doc.pages.length > 0) {
-          head = Array(doc.pages[0].number - 1);
-          tail = Array(doc.num_pages - doc.pages[doc.pages.length - 1].number);
+          head = Array(doc.pages[0].number - 1)
+          tail = Array(doc.num_pages - doc.pages[doc.pages.length - 1].number)
         }
-        doc.pages = [...head, ...doc.pages, ...tail];
+        doc.pages = [...head, ...doc.pages, ...tail]
       }
       if (doc.num_pages === 1) {
-        sidebarVisibleDefault = false;
+        sidebarVisibleDefault = false
       }
     }
-    let preferences = {
+    const preferences = {
       showToolbar: true,
       showTextToggle: true,
       showZoom: true,
@@ -257,23 +244,23 @@ export default {
       showSearchbar: false,
       showSearchResults: false,
       showPageNumberInput: true,
-      showDocumentProperties: false,
-    };
-    Object.assign(preferences, this.defaults);
-    let pageRange = getPageRange(preferences.pageRange);
+      showDocumentProperties: false
+    }
+    Object.assign(preferences, this.defaults)
+    const pageRange = getPageRange(preferences.pageRange)
     if (pageRange) {
-      preferences.showPageNumberInput = false;
+      preferences.showPageNumberInput = false
     }
     return {
       annotationCount: 0,
-      preferences: preferences,
+      preferences,
       zoom: preferences.defaultZoom,
       document: doc,
       pdfDocument: null,
       searcher: null,
       searchIndex: null,
       currentPage: 1,
-      pageRange: pageRange,
+      pageRange,
       targetPage: this.getLocationHashPage() || this.page || 1,
       annotations: {},
       hasAnnotations: false,
@@ -285,557 +272,557 @@ export default {
       documentHeight: null,
       toolbarHeight: null,
       isSmallScreen: true,
-      isMediumScreen: true,
-    };
+      isMediumScreen: true
+    }
   },
   computed: {
     i18n() {
-      return this.config.i18n;
+      return this.config.i18n
     },
     processedPages() {
-      return this.document.pages; // = this.processPages(this.document.pages)
+      return this.document.pages // = this.processPages(this.document.pages)
     },
     pagesWithMatches() {
       if (this.searcher === null) {
-        return [];
+        return []
       }
-      var resultPages = [];
-      var lastPage = null;
+      const resultPages = []
+      let lastPage = null
       this.searcher.results.forEach((r) => {
         if (lastPage !== null && r.number === lastPage.number) {
-          lastPage.count += 1;
-          lastPage.results.push(r);
+          lastPage.count += 1
+          lastPage.results.push(r)
         } else {
           lastPage = {
             number: r.number,
             count: 1,
-            results: [r],
-          };
-          resultPages.push(lastPage);
+            results: [r]
+          }
+          resultPages.push(lastPage)
         }
-      });
-      return resultPages;
+      })
+      return resultPages
     },
     docAuth() {
       if (!this.document.listed) {
-        return `uid=${this.document.uid}`;
+        return `uid=${this.document.uid}`
       }
-      return "";
+      return ''
     },
     isFramed() {
-      return !!this.preferences.maxHeight;
+      return !!this.preferences.maxHeight
     },
     canAnnotate() {
       return (
         this.$root.csrfToken &&
         (this.config.settings.canWrite || this.document.allow_annotation)
-      );
+      )
     },
     showAnnotations() {
-      return this.hasAnnotations || this.canAnnotate;
+      return this.hasAnnotations || this.canAnnotate
     },
     documentStyle() {
       if (this.isFramed) {
         return {
           height: this.preferences.maxHeight,
-          overflow: "auto",
-          padding: "0 calc(.5 * var(--bs-gutter-x))",
-        };
+          overflow: 'auto',
+          padding: '0 calc(.5 * var(--bs-gutter-x))'
+        }
       }
-      return {};
+      return {}
     },
     sidebarStyle() {
       return {
-        top: (this.toolbarHeight || 0) + "px",
-      };
+        top: (this.toolbarHeight || 0) + 'px'
+      }
     },
     sidebarContentStyle() {
       if (this.isFramed) {
         if (this.toolbarHeight) {
           return {
-            height: this.documentViewHeight,
-          };
+            height: this.documentViewHeight
+          }
         }
       } else {
         if (this.toolbarHeight) {
           return {
-            height: window.innerHeight - this.toolbarHeight + "px",
-          };
+            height: window.innerHeight - this.toolbarHeight + 'px'
+          }
         }
       }
       return {
-        height: "90vh",
-      };
+        height: '90vh'
+      }
     },
     sidebarVisible() {
       return (
         this.preferences.showSidebar ||
         this.preferences.showOutline ||
         this.preferences.showSearchResults
-      );
+      )
     },
     sidebarContentHeight() {
-      return this.sidebarContentStyle.height;
+      return this.sidebarContentStyle.height
     },
     documentViewHeight() {
       if (this.isFramed) {
-        return this.viewPortHeight + "px";
+        return this.viewPortHeight + 'px'
       }
-      return null;
+      return null
     },
     viewPortHeight() {
       if (this.isFramed) {
-        return this.documentHeight - this.toolbarHeight;
+        return this.documentHeight - this.toolbarHeight
       } else {
-        return window.innerHeight - this.toolbarHeight;
+        return window.innerHeight - this.toolbarHeight
       }
     },
     supportedImageFormats() {
       if (this.document.properties && this.document.properties._format_webp) {
-        return ["webp"];
+        return ['webp']
       }
-      return [];
-    },
+      return []
+    }
   },
   created() {
-    let el = document.querySelector("[name=csrfmiddlewaretoken]");
+    const el = document.querySelector('[name=csrfmiddlewaretoken]')
     if (el !== null) {
-      this.$root.csrfToken = el.value;
+      this.$root.csrfToken = el.value
     }
-    this.document.pages = this.processPages(this.document.pages);
-    this.resizing = true;
-    let url = this.documentUrl;
+    this.document.pages = this.processPages(this.document.pages)
+    this.resizing = true
+    let url = this.documentUrl
     if (this.documentPreview) {
       if (!this.documentPreview.listed) {
-        if (url.indexOf("?") == -1) {
-          url += `?uid=${this.documentPreview.uid}`;
+        if (url.indexOf('?') === -1) {
+          url += `?uid=${this.documentPreview.uid}`
         } else {
-          url += `&uid=${this.documentPreview.uid}`;
+          url += `&uid=${this.documentPreview.uid}`
         }
       }
     }
     getData(url).then((doc) => {
-      this.pageTemplate = decodeURI(doc.page_template);
-      this.document = doc;
-      this.document.loaded = true;
-      Vue.set(this.document, "pages", this.processPages(doc.pages, true));
-      this.willResize();
-      const forceLoadPDF = this.document.properties._force_load_pdf;
-      const forceLoadPDFSet = typeof forceLoadPDF !== "undefined";
+      this.pageTemplate = decodeURI(doc.page_template)
+      this.document = doc
+      this.document.loaded = true
+      Vue.set(this.document, 'pages', this.processPages(doc.pages, true))
+      this.willResize()
+      const forceLoadPDF = this.document.properties._force_load_pdf
+      const forceLoadPDFSet = typeof forceLoadPDF !== 'undefined'
       if (
         (!forceLoadPDFSet && this.document.file_size <= MAX_PDF_SIZE) ||
         forceLoadPDF
       ) {
-        this.loadPDF();
+        this.loadPDF()
       }
-      Vue.nextTick(() => this.pagesInitialized());
-    });
+      Vue.nextTick(() => this.pagesInitialized())
+    })
     getData(
       `${this.config.urls.pageAnnotationApiUrl}?document=${this.document.id}&${this.docAuth}`
     ).then((results) => {
-      let annotations = {};
+      const annotations = {}
       results.objects.forEach((a) => {
         if (annotations[a.number] === undefined) {
-          annotations[a.number] = [];
+          annotations[a.number] = []
         }
-        annotations[a.number].push(a);
-        this.hasAnnotations = true;
-      });
-      this.annotationCount = results.objects.length;
-      this.annotations = annotations;
+        annotations[a.number].push(a)
+        this.hasAnnotations = true
+      })
+      this.annotationCount = results.objects.length
+      this.annotations = annotations
       if (this.preferences.showAnnotationsToggle === null) {
         // Only show annotation toggle if explicitly set (non-null)
         // and we either have annotations or can annotate
         Vue.set(
           this.preferences,
-          "showAnnotationsToggle",
+          'showAnnotationsToggle',
           this.hasAnnotations || this.canAnnotate
-        );
+        )
       }
-    });
+    })
   },
   mounted() {
-    this.calcResponsive();
-    window.addEventListener("resize", () => {
-      console.log("resize");
-      this.resize();
-    });
+    this.calcResponsive()
+    window.addEventListener('resize', () => {
+      console.log('resize')
+      this.resize()
+    })
     if (this.preferences.defaultSearch) {
-      this.search(this.preferences.defaultSearch);
+      this.search(this.preferences.defaultSearch)
     }
   },
   methods: {
     resize(scrollRatio) {
-      console.log("resize called", scrollRatio);
+      console.log('resize called', scrollRatio)
       if (!this.document) {
-        return;
+        return
       }
-      this.resizing = true;
+      this.resizing = true
       Vue.nextTick(() => {
-        this.calcResponsive();
-        Vue.set(this.document, "pages", this.processPages(this.document.pages));
+        this.calcResponsive()
+        Vue.set(this.document, 'pages', this.processPages(this.document.pages))
         Vue.nextTick(() => {
           if (scrollRatio) {
-            console.log("scrolling to ", scrollRatio);
+            console.log('scrolling to ', scrollRatio)
             if (this.isFramed) {
-              let d = getScroll(this.$refs.document);
-              d.scrollTo(0, Math.round(d.scrollHeight * scrollRatio));
+              const d = getScroll(this.$refs.document)
+              d.scrollTo(0, Math.round(d.scrollHeight * scrollRatio))
             } else {
               window.scrollTo(
                 0,
                 Math.round(document.documentElement.scrollHeight * scrollRatio)
-              );
+              )
             }
           }
-          this.resizing = false;
-        });
-      });
+          this.resizing = false
+        })
+      })
     },
     pagesInitialized() {
       if (this.targetPage !== this.currentPage) {
         this.navigate({
           number: this.targetPage,
-          source: "mounted",
-          force: true,
-        });
+          source: 'mounted',
+          force: true
+        })
       }
     },
     calcResponsive() {
       if (this.$refs.document) {
-        const documentWidth = this.$refs.document.clientWidth + GUTTER;
-        this.isMediumScreen = documentWidth < BOOTSTRAP_LG;
-        this.isSmallScreen = documentWidth < BOOTSTRAP_MD;
+        const documentWidth = this.$refs.document.clientWidth + GUTTER
+        this.isMediumScreen = documentWidth < BOOTSTRAP_LG
+        this.isSmallScreen = documentWidth < BOOTSTRAP_MD
       }
       if (this.$refs.documentContainer) {
         this.documentContainerWidth =
-          this.$refs.documentContainer.clientWidth - 30; // - padding
+          this.$refs.documentContainer.clientWidth - 30 // - padding
       }
       if (this.$refs.sidebarContainer) {
-        this.sidebarContainerWidth = this.$refs.sidebarContainer.clientWidth;
+        this.sidebarContainerWidth = this.$refs.sidebarContainer.clientWidth
       }
       if (this.$refs.toolbarBars) {
-        this.toolbarHeight = this.$refs.toolbarBars.clientHeight;
+        this.toolbarHeight = this.$refs.toolbarBars.clientHeight
       }
       if (this.$refs.document) {
-        this.documentHeight = this.$refs.document.clientHeight;
+        this.documentHeight = this.$refs.document.clientHeight
       }
       if (this.isSmallScreen) {
-        this.preferences.showSidebar = false;
-        this.preferences.showSidebarToggle = false;
+        this.preferences.showSidebar = false
+        this.preferences.showSidebarToggle = false
       }
     },
     getLocationHashPage() {
-      let match = document.location.hash.match(/page-(\d+)/);
+      const match = document.location.hash.match(/page-(\d+)/)
       if (match !== null) {
-        return parseInt(match[1], 10);
+        return parseInt(match[1], 10)
       }
-      return null;
+      return null
     },
     processPages(pages, rerun) {
-      let normalWidth = 700;
+      let normalWidth = 700
       if (this.documentContainerWidth) {
-        let pageAvailableWidth = this.documentContainerWidth;
+        let pageAvailableWidth = this.documentContainerWidth
         if (this.preferences.showAnnotations) {
-          pageAvailableWidth = (pageAvailableWidth / 12) * 7;
+          pageAvailableWidth = (pageAvailableWidth / 12) * 7
         }
-        normalWidth = Math.min(pageAvailableWidth, normalWidth);
+        normalWidth = Math.min(pageAvailableWidth, normalWidth)
       }
-      let zoomedWidth = normalWidth * this.zoom;
+      const zoomedWidth = normalWidth * this.zoom
       if (!rerun && this.lastZoomedWidth === zoomedWidth) {
-        return pages;
+        return pages
       }
-      this.lastZoomedWidth = zoomedWidth;
-      console.log("Setting page width to", zoomedWidth, "normal:", normalWidth);
-      let smallWidth = 180;
+      this.lastZoomedWidth = zoomedWidth
+      console.log('Setting page width to', zoomedWidth, 'normal:', normalWidth)
+      let smallWidth = 180
       if (this.sidebarContainerWidth) {
-        smallWidth = Math.min(this.sidebarContainerWidth, smallWidth);
+        smallWidth = Math.min(this.sidebarContainerWidth, smallWidth)
       }
-      let offset = 0;
-      let processedPages = pages.map((p, index) => {
+      let offset = 0
+      const processedPages = pages.map((p, index) => {
         if (p === undefined || p.width === undefined) {
           return {
-            zoomedWidth: zoomedWidth,
+            zoomedWidth,
             normalSize: 1000,
             offset: 0,
             smallSize: 255,
-            number: index + 1,
-          };
+            number: index + 1
+          }
         }
-        p.image_url = this.pageTemplate.replace(/\{page\}/, p.number);
-        let ratio = p.height / p.width;
-        let normalSize = Math.ceil(zoomedWidth * ratio) + 60;
-        offset += normalSize;
-        p.offset = offset;
-        Vue.set(p, "zoomedWidth", zoomedWidth);
-        Vue.set(p, "normalSize", normalSize);
-        Vue.set(p, "smallSize", Math.ceil(smallWidth * ratio) + 40);
+        p.image_url = this.pageTemplate.replace(/\{page\}/, p.number)
+        const ratio = p.height / p.width
+        const normalSize = Math.ceil(zoomedWidth * ratio) + 60
+        offset += normalSize
+        p.offset = offset
+        Vue.set(p, 'zoomedWidth', zoomedWidth)
+        Vue.set(p, 'normalSize', normalSize)
+        Vue.set(p, 'smallSize', Math.ceil(smallWidth * ratio) + 40)
 
-        return p;
-      });
+        return p
+      })
       if (this.pageRange === null) {
-        return processedPages;
+        return processedPages
       }
-      let pageMap = {};
-      this.pageRange.forEach((p) => (pageMap[p] = true));
-      return processedPages.filter((p) => !!pageMap[p.number]);
+      const pageMap = {}
+      this.pageRange.forEach((p) => (pageMap[p] = true))
+      return processedPages.filter((p) => !!pageMap[p.number])
     },
     navigateSidebar(number) {
       if (this.preferences.showSearchResults) {
-        return;
+        return
       }
-      let offset = this.processedPages
+      const offset = this.processedPages
         .filter((p) => p.number < number)
         .map((p) => p.smallSize)
-        .reduce((a, v) => a + v, 0);
+        .reduce((a, v) => a + v, 0)
 
-      let sidebarContainer = this.$refs.sidebarContainer;
+      const sidebarContainer = this.$refs.sidebarContainer
       if (!sidebarContainer) {
-        return;
+        return
       }
       const sidebar = sidebarContainer.querySelector(
-        ".document-preview-pages .scroller"
-      );
+        '.document-preview-pages .scroller'
+      )
       if (sidebar) {
-        sidebar.scrollTo(0, offset);
+        sidebar.scrollTo(0, offset)
       }
     },
     navigate({ number, source, searchIndex, force }) {
       if (!this.isSmallScreen && number === this.currentPage && !force) {
-        console.log("Not Navigate", this.currentPage, number, source);
-        return;
+        console.log('Not Navigate', this.currentPage, number, source)
+        return
       }
       console.log(
-        "Navigate from",
+        'Navigate from',
         this.currentPage,
-        "to",
+        'to',
         number,
         source,
         force
-      );
-      let offset = this.processedPages
+      )
+      const offset = this.processedPages
         .filter((p) => p.number < number)
         .map((p) => p.normalSize)
-        .reduce((a, v) => a + v, 0);
+        .reduce((a, v) => a + v, 0)
 
       if (this.isFramed) {
-        getScroll(this.$refs.document).scrollTo(0, offset);
+        getScroll(this.$refs.document).scrollTo(0, offset)
       } else {
-        const top = this.$refs.documentContainer.offsetTop;
-        const barHeight = this.$refs.toolbarBars.clientHeight;
-        window.scrollTo(0, top + offset - barHeight);
+        const top = this.$refs.documentContainer.offsetTop
+        const barHeight = this.$refs.toolbarBars.clientHeight
+        window.scrollTo(0, top + offset - barHeight)
       }
-      this.currentPage = number;
-      console.log("navigate scroll", offset);
-      if (source === "toolbar") {
-        this.navigateSidebar(number);
+      this.currentPage = number
+      console.log('navigate scroll', offset)
+      if (source === 'toolbar') {
+        this.navigateSidebar(number)
       }
       if (this.isSmallScreen) {
-        if (source === "outline") {
-          this.preferences.showOutline = false;
-        } else if (source === "search") {
-          this.preferences.showSearchResults = false;
+        if (source === 'outline') {
+          this.preferences.showOutline = false
+        } else if (source === 'search') {
+          this.preferences.showSearchResults = false
         }
       }
       if (searchIndex !== undefined) {
-        this.searchIndex = searchIndex;
+        this.searchIndex = searchIndex
       }
     },
     search(term) {
-      console.log("searching for term", term);
+      console.log('searching for term', term)
       if (this.isMediumScreen && this.preferences.showAnnotations) {
-        Vue.set(this.preferences, "showAnnotations", false);
+        Vue.set(this.preferences, 'showAnnotations', false)
       }
       if (this.searcher && this.searcher.term === term) {
-        this.preferences.showSearchResults = true;
-        return;
+        this.preferences.showSearchResults = true
+        return
       }
       this.searcher = {
-        term: term,
+        term,
         done: false,
-        results: [],
-      };
-      this.preferences.showSearchResults = true;
-      let searchUrl = `${this.document.pages_uri}${
-        this.document.pages_uri.includes("?") ? "&" : "?"
-      }q=${encodeURIComponent(term)}&${this.docAuth}`;
+        results: []
+      }
+      this.preferences.showSearchResults = true
+      const searchUrl = `${this.document.pages_uri}${
+        this.document.pages_uri.includes('?') ? '&' : '?'
+      }q=${encodeURIComponent(term)}&${this.docAuth}`
       getData(searchUrl).then((response) => {
-        this.searcher.response = response;
-        this.searcher.done = true;
-        this.searcher.results = response.objects;
+        this.searcher.response = response
+        this.searcher.done = true
+        this.searcher.results = response.objects
         if (this.searcher.results.length > 0) {
-          this.searchIndex = 0;
+          this.searchIndex = 0
           if (!this.isSmallScreen) {
             this.navigate({
               number: this.searcher.results[0].number,
-              source: "search",
-            });
+              source: 'search'
+            })
           }
         }
-        let pages = {};
-        let pageCount = 0;
+        const pages = {}
+        let pageCount = 0
         response.objects.forEach((p) => {
           if (pages[p.number] === undefined) {
-            pages[p.number] = true;
-            pageCount += 1;
+            pages[p.number] = true
+            pageCount += 1
           }
-        });
-        this.searcher.pageCount = pageCount;
-      });
-      this.willResize();
+        })
+        this.searcher.pageCount = pageCount
+      })
+      this.willResize()
     },
     moveSearchIndex(move) {
-      this.searchIndex += move;
-      let page = this.pagesWithMatches[this.searchIndex];
+      this.searchIndex += move
+      const page = this.pagesWithMatches[this.searchIndex]
       this.navigate({
         number: page.number,
-        source: "search",
-      });
+        source: 'search'
+      })
     },
     clearSearch() {
-      this.searcher = null;
-      this.preferences.showSearchResults = false;
-      this.preferences.showSearchbar = false;
-      this.willResize();
+      this.searcher = null
+      this.preferences.showSearchResults = false
+      this.preferences.showSearchbar = false
+      this.willResize()
     },
     zoomIn() {
-      this.zoom = Math.min(3, this.zoom + 0.5);
-      this.willResize(true);
+      this.zoom = Math.min(3, this.zoom + 0.5)
+      this.willResize(true)
     },
     zoomOut() {
-      this.zoom = Math.max(1, this.zoom - 0.5);
-      this.willResize(true);
+      this.zoom = Math.max(1, this.zoom - 0.5)
+      this.willResize(true)
     },
     updatePreferences(update) {
-      for (let key in update) {
-        Vue.set(this.preferences, key, update[key]);
+      for (const key in update) {
+        Vue.set(this.preferences, key, update[key])
       }
       if (this.isMediumScreen) {
         if (update.showSidebar && this.preferences.showAnnotations) {
-          Vue.set(this.preferences, "showAnnotations", false);
+          Vue.set(this.preferences, 'showAnnotations', false)
         } else if (update.showAnnotations && this.preferences.showSidebar) {
-          Vue.set(this.preferences, "showSidebar", false);
+          Vue.set(this.preferences, 'showSidebar', false)
         }
       }
       if (
         update.showSidebar !== undefined ||
         update.showAnnotations !== undefined
       ) {
-        this.willResize(true);
+        this.willResize(true)
       }
     },
     willResize(preserveScroll) {
-      this.resizing = true;
-      let scrollRatio = null;
+      this.resizing = true
+      let scrollRatio = null
       if (preserveScroll) {
         if (this.isFramed) {
-          let d = getScroll(this.$refs.document);
+          const d = getScroll(this.$refs.document)
           if (d) {
-            scrollRatio = d.scrollTop / d.scrollHeight;
+            scrollRatio = d.scrollTop / d.scrollHeight
           }
         } else {
-          let h = document.documentElement,
-            b = document.body,
-            st = "scrollTop",
-            sh = "scrollHeight";
+          const h = document.documentElement
+          const b = document.body
+          const st = 'scrollTop'
+          const sh = 'scrollHeight'
 
-          scrollRatio = (h[st] || b[st]) / (h[sh] || b[sh]);
+          scrollRatio = (h[st] || b[st]) / (h[sh] || b[sh])
         }
       }
-      this.resize(scrollRatio);
+      this.resize(scrollRatio)
     },
     getDocumentScrollTop() {
       if (this.isFramed) {
-        return getScroll(this.$refs.document).scrollTop;
+        return getScroll(this.$refs.document).scrollTop
       } else {
         return (
           document.documentElement.scrollTop -
           this.$refs.documentContainer.offsetTop
-        );
+        )
       }
     },
     updateCurrentPage() {
       if (this.resizing || !this.document.loaded) {
-        return;
+        return
       }
-      const top = this.getDocumentScrollTop();
+      const top = this.getDocumentScrollTop()
       const page = findPageByOffset(
         this.processedPages,
         top,
         this.viewPortHeight
-      );
+      )
       if (page !== this.currentPage) {
-        this.currentPage = page;
-        this.navigateSidebar(this.currentPage);
+        this.currentPage = page
+        this.navigateSidebar(this.currentPage)
       }
     },
     updateCurrentAnnotation(annotationId) {
-      this.currentAnnotation = annotationId;
+      this.currentAnnotation = annotationId
     },
     activateAnnotationForm(info) {
       if (info === null) {
-        this.activeAnnotationForm = null;
-        return;
+        this.activeAnnotationForm = null
+        return
       }
-      let obj = this.activeAnnotationForm || {};
-      Object.assign(obj, info);
-      this.activeAnnotationForm = obj;
+      const obj = this.activeAnnotationForm || {}
+      Object.assign(obj, info)
+      this.activeAnnotationForm = obj
       if (!this.activeAnnotationForm.ready) {
-        return;
+        return
       }
       postData(
         this.config.urls.pageAnnotationApiUrl,
         {
           document: this.document.id,
           page_number: this.activeAnnotationForm.number,
-          ...this.activeAnnotationForm,
+          ...this.activeAnnotationForm
         },
         this.$root.csrfToken
       ).then((data) => {
-        if (data.status === "success") {
-          let annotation = data.annotation;
+        if (data.status === 'success') {
+          const annotation = data.annotation
           Vue.set(this.annotations, annotation.number, [
             ...(this.annotations[annotation.number] || []),
-            annotation,
-          ]);
-          this.currentAnnotation = annotation.id;
+            annotation
+          ])
+          this.currentAnnotation = annotation.id
         }
-      });
+      })
     },
     deleteAnnotation(annotation) {
       if (window.confirm(this.i18n.deleteAnnotation)) {
-        let pageAnnotations = this.annotations[annotation.number].filter(
+        const pageAnnotations = this.annotations[annotation.number].filter(
           (a) => a.id !== annotation.id
-        );
-        Vue.set(this.annotations, annotation.number, pageAnnotations);
-        let url = `${this.config.urls.pageAnnotationApiUrl}${annotation.id}/?document=${this.document.id}`;
-        postData(url, {}, this.$root.csrfToken, "DELETE");
+        )
+        Vue.set(this.annotations, annotation.number, pageAnnotations)
+        const url = `${this.config.urls.pageAnnotationApiUrl}${annotation.id}/?document=${this.document.id}`
+        postData(url, {}, this.$root.csrfToken, 'DELETE')
       }
     },
     loadPDF() {
-      import("pdfjs-dist")
+      import('pdfjs-dist')
         .then((PDFJS) => {
-          this.$root.PDFJS = PDFJS;
-          this.$root.PDFJS.GlobalWorkerOptions.workerSrc = PDFJSWorkerUrl;
-          console.log("Loaded PDFJS", PDFJSWorkerUrl, this.$root.PDFJS);
-          console.log("Loading PDF", this.document.file_url);
-          let loadingTask = this.$root.PDFJS.getDocument({
+          this.$root.PDFJS = PDFJS
+          this.$root.PDFJS.GlobalWorkerOptions.workerSrc = PDFJSWorkerUrl
+          console.log('Loaded PDFJS', PDFJSWorkerUrl, this.$root.PDFJS)
+          console.log('Loading PDF', this.document.file_url)
+          const loadingTask = this.$root.PDFJS.getDocument({
             url: this.document.file_url,
-            isEvalSupported: false,
-          });
+            isEvalSupported: false
+          })
           loadingTask.promise
             .then((pdfDocument) => {
-              this.pdfDocument = pdfDocument;
+              this.pdfDocument = pdfDocument
             })
             .catch((err) => {
-              console.warn(err);
-            });
+              console.warn(err)
+            })
         })
         .catch((err) => {
-          console.warn(err);
-        });
-    },
-  },
-};
+          console.warn(err)
+        })
+    }
+  }
+}
 </script>
 
 <style lang="scss">

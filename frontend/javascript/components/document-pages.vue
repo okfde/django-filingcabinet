@@ -9,8 +9,7 @@
       size-field="normalSize"
       :emit-update="true"
       :buffer="buffer"
-      @update="updateCurrentPage"
-    >
+      @update="updateCurrentPage">
       <document-page
         :key="item.number"
         :page="item"
@@ -25,99 +24,98 @@
         @currentannotation="$emit('currentannotation', $event)"
         @activateannotationform="$emit('activateannotationform', $event)"
         @deleteannotation="$emit('deleteannotation', $event)"
-        @navigate="$emit('navigate', $event)"
-      />
+        @navigate="$emit('navigate', $event)" />
     </RecycleScroller>
   </div>
 </template>
 
 <script>
-import "intersection-observer";
+import 'intersection-observer'
 
-import { RecycleScroller } from "vue-virtual-scroller";
+import { RecycleScroller } from 'vue-virtual-scroller'
 
-import DocumentPage from "./document-page.vue";
+import DocumentPage from './document-page.vue'
 
 export default {
-  name: "DocumentPages",
+  name: 'DocumentPages',
   components: {
     RecycleScroller,
-    DocumentPage,
+    DocumentPage
   },
   props: {
     document: {
       type: Object,
-      required: true,
+      required: true
     },
     pages: {
       type: Array,
-      required: true,
+      required: true
     },
     preferences: {
       type: Object,
-      required: true,
+      required: true
     },
     annotations: {
       type: Object,
-      required: true,
+      required: true
     },
     currentAnnotation: {
       type: Object,
-      default: null,
+      default: null
     },
     activeAnnotationForm: {
       type: Object,
-      default: null,
+      default: null
     },
     height: {
       type: String,
-      default: null,
+      default: null
     },
     canAnnotate: {
       type: Boolean,
-      default: false,
+      default: false
     },
     pdfDocument: {
       type: Object,
-      default: null,
-    },
+      default: null
+    }
   },
   computed: {
     showText() {
-      return this.preferences.showText;
+      return this.preferences.showText
     },
     showAnnotations() {
-      return this.preferences.showAnnotations;
+      return this.preferences.showAnnotations
     },
     isPageMode() {
-      return !this.preferences.maxHeight;
+      return !this.preferences.maxHeight
     },
     supportedFormats() {
       if (this.document.properties && this.document.properties._format_webp) {
-        return ["webp"];
+        return ['webp']
       }
-      return [];
+      return []
     },
     buffer() {
       if (this.height) {
-        return Math.round(parseInt(this.height.replace("px", "")) * 0.7);
+        return Math.round(parseInt(this.height.replace('px', '')) * 0.7)
       }
       if (this.pages.length > 0) {
-        return Math.round(this.pages[0].normalSize * 0.7);
+        return Math.round(this.pages[0].normalSize * 0.7)
       }
-      return 200;
-    },
+      return 200
+    }
   },
   methods: {
     updateCurrentPage(startIndex, endIndex) {
-      this.$emit("currentpage", { start: startIndex, end: endIndex });
-    },
-  },
-};
+      this.$emit('currentpage', { start: startIndex, end: endIndex })
+    }
+  }
+}
 </script>
 
 <style lang="scss">
-@import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
+@import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 
 .scroller {
   height: 100%;

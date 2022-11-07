@@ -5,8 +5,7 @@
       <button
         v-if="value"
         class="btn btn-sm btn-link text-white"
-        @click="$emit('select', '')"
-      >
+        @click="$emit('select', '')">
         <span class="visually-hidden">{{ i18n.clear }}</span>
         <i class="fa fa-close" />
       </button>
@@ -16,8 +15,7 @@
         <a
           v-if="!facet.selected"
           href="#"
-          @click.prevent="selectFacetValue(facet.value)"
-        >
+          @click.prevent="selectFacetValue(facet.value)">
           {{ facet.label }} ({{ facet.count }} {{ i18n.pages }})
         </a>
         <span v-else>
@@ -29,58 +27,58 @@
 </template>
 
 <script>
-const DEFAULT_LANG = "en";
+const DEFAULT_LANG = 'en'
 
 const equal = (a, b) => {
   // Really simple edge-case ignoring equality
-  if (typeof a === "object") {
-    for (let k of Object.keys(a)) {
+  if (typeof a === 'object') {
+    for (const k of Object.keys(a)) {
       if (a[k] !== b[k]) {
-        return false;
+        return false
       }
     }
-    return true;
+    return true
   }
-  return a === b;
-};
+  return a === b
+}
 
 export default {
-  name: "DocumentFacet",
+  name: 'DocumentFacet',
   props: {
     filter: {
       type: Object,
-      required: true,
+      required: true
     },
     values: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     // eslint-disable-next-line vue/require-prop-types
     value: {
-      default: "",
-    },
+      default: ''
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     lang() {
-      return document.documentElement.lang;
+      return document.documentElement.lang
     },
     label() {
-      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG];
+      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG]
     },
     filterChoiceLabelMap() {
-      let labelMap = new Map();
+      const labelMap = new Map()
       if (this.filter.choices) {
         this.filter.choices.forEach((choice) => {
           labelMap.set(
             choice.value,
             (choice.label && choice.label[this.lang]) || choice.value
-          );
-        });
+          )
+        })
       }
-      return labelMap;
+      return labelMap
     },
     facetList() {
       return this.values.map(([facetValue, facetCount]) => {
@@ -88,42 +86,42 @@ export default {
           selected: this.checkSelected(facetValue),
           value: facetValue,
           count: facetCount,
-          label: this.getFacetLabel(facetValue),
-        };
-      });
-    },
+          label: this.getFacetLabel(facetValue)
+        }
+      })
+    }
   },
   methods: {
     checkSelected(facetValue) {
-      let val = this.getFacetValue(facetValue);
-      return equal(val, this.value);
+      const val = this.getFacetValue(facetValue)
+      return equal(val, this.value)
     },
     getFacetLabel(value) {
       if (this.filter.choices) {
-        return this.filterChoiceLabelMap.get(value) || value;
+        return this.filterChoiceLabelMap.get(value) || value
       }
-      if (this.filter.facet_config?.type === "date_histogram") {
-        let date = new Date(value);
-        return date.getFullYear();
+      if (this.filter.facet_config?.type === 'date_histogram') {
+        const date = new Date(value)
+        return date.getFullYear()
       }
     },
     getFacetValue(value) {
-      if (this.filter.facet_config?.type === "date_histogram") {
-        let date = new Date(value);
-        let before = `${date.getFullYear()}-12-31`;
+      if (this.filter.facet_config?.type === 'date_histogram') {
+        const date = new Date(value)
+        const before = `${date.getFullYear()}-12-31`
         return {
-          [`${this.filter.key}_after`]: date.toISOString().split("T")[0],
-          [`${this.filter.key}_before`]: before,
-        };
+          [`${this.filter.key}_after`]: date.toISOString().split('T')[0],
+          [`${this.filter.key}_before`]: before
+        }
       } else {
-        return value;
+        return value
       }
     },
     selectFacetValue(value) {
-      this.$emit("select", this.getFacetValue(value));
-    },
-  },
-};
+      this.$emit('select', this.getFacetValue(value))
+    }
+  }
+}
 </script>
 
 <style scoped>

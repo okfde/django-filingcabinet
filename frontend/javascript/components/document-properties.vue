@@ -38,27 +38,27 @@
 
 <script>
 export default {
-  name: "DocumentProperties",
+  name: 'DocumentProperties',
   props: {
     document: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     publishedAt() {
       if (this.document.published_at) {
         return new Intl.DateTimeFormat().format(
           new Date(this.document.published_at)
-        );
+        )
       }
-      return null;
-    },
-  },
-};
+      return null
+    }
+  }
+}
 </script>
 
 <style scoped>

@@ -9,14 +9,12 @@
           :id="filter.id"
           :value="value"
           class="form-control"
-          @input="updateFilter($event.target.value)"
-        >
+          @input="updateFilter($event.target.value)">
           <option value="">---</option>
           <option
             v-for="opt in filter.choices"
             :key="opt.value"
-            :value="opt.value"
-          >
+            :value="opt.value">
             {{ opt.label ? opt.label[lang] : opt.value }}
           </option>
         </select>
@@ -27,45 +25,44 @@
         <document-date-range-filter
           :value="value || {}"
           :filter="filter"
-          @input="updateFilter"
-        />
+          @input="updateFilter" />
       </div>
     </template>
   </div>
 </template>
 
 <script>
-const DEFAULT_LANG = "en";
+import DocumentDateRangeFilter from './document-daterangefilter.vue'
 
-import DocumentDateRangeFilter from "./document-daterangefilter.vue";
+const DEFAULT_LANG = 'en'
 
 export default {
-  name: "DocumentFilter",
+  name: 'DocumentFilter',
   components: {
-    DocumentDateRangeFilter,
+    DocumentDateRangeFilter
   },
   props: {
     filter: {
       type: Object,
-      required: true,
+      required: true
     },
     // eslint-disable-next-line vue/require-prop-types
     value: {
-      default: "",
-    },
+      default: ''
+    }
   },
   computed: {
     lang() {
-      return document.documentElement.lang;
+      return document.documentElement.lang
     },
     label() {
-      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG];
-    },
+      return this.filter.label[this.lang] || this.filter.label[DEFAULT_LANG]
+    }
   },
   methods: {
     updateFilter(value) {
-      this.$emit("input", { key: this.filter.key, value });
-    },
-  },
-};
+      this.$emit('input', { key: this.filter.key, value })
+    }
+  }
+}
 </script>

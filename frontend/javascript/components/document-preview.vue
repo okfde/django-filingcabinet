@@ -4,8 +4,7 @@
       :href="documentUrl"
       class="preview-doc"
       target="_blank"
-      @click="navigate"
-    >
+      @click="navigate">
       <img
         v-if="imageUrl"
         v-show="imageLoaded"
@@ -13,8 +12,7 @@
         :src="imageUrl"
         alt=""
         class="img-fluid page-image"
-        @load="onImageLoad"
-      />
+        @load="onImageLoad" />
       <div v-if="!imageLoaded" class="spinner-grow" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
@@ -33,67 +31,67 @@
 
 <script>
 export default {
-  name: "DocumentPreview",
+  name: 'DocumentPreview',
   props: {
     document: {
       type: Object,
-      required: true,
+      required: true
     },
     page: {
       type: Number,
-      default: 1,
+      default: 1
     },
     highlight: {
       type: String,
-      default: null,
+      default: null
     },
     image: {
       type: String,
-      default: null,
-    },
+      default: null
+    }
   },
   data() {
     return {
-      imageLoaded: false,
-    };
+      imageLoaded: false
+    }
   },
   computed: {
     i18n() {
-      return this.$root.config.i18n;
+      return this.$root.config.i18n
     },
     imageUrl() {
       return decodeURI(this.image || this.document.cover_image).replace(
         /\{size\}/,
-        "small"
-      );
+        'small'
+      )
     },
     documentUrl() {
-      let url = this.document.site_url;
+      let url = this.document.site_url
       if (this.page) {
-        url += `?page=${this.page}`;
+        url += `?page=${this.page}`
       }
-      return url;
-    },
+      return url
+    }
   },
   beforeDestroy() {
     if (this.document.cover_image && !this.imageLoaded) {
       // Cancel image download on destroy
-      this.$refs.image.setAttribute("src", "");
+      this.$refs.image.setAttribute('src', '')
     }
   },
   methods: {
     onImageLoad() {
-      this.imageLoaded = true;
+      this.imageLoaded = true
     },
     navigate(e) {
-      e.preventDefault();
-      this.$emit("navigate", {
+      e.preventDefault()
+      this.$emit('navigate', {
         document: this.document,
-        page: this.page,
-      });
-    },
-  },
-};
+        page: this.page
+      })
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

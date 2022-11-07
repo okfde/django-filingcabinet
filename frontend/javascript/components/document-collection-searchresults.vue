@@ -17,43 +17,42 @@
           :page="page.number"
           :highlight="page.query_highlight"
           :image="page.image"
-          @navigate="navigate"
-        />
+          @navigate="navigate" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import "intersection-observer";
+import 'intersection-observer'
 
-import DocumentPreview from "./document-preview.vue";
+import DocumentPreview from './document-preview.vue'
 
 export default {
-  name: "DocumentCollectionSearchresult",
+  name: 'DocumentCollectionSearchresult',
   components: {
-    DocumentPreview,
+    DocumentPreview
   },
-  props: ["document", "pages"],
+  props: ['document', 'pages'],
   computed: {
     i18n() {
-      return this.config.i18n;
+      return this.config.i18n
     },
     documentPublicationDate() {
       if (!this.document.published_at) {
-        return null;
+        return null
       }
       return new Intl.DateTimeFormat().format(
         new Date(this.document.published_at)
-      );
-    },
+      )
+    }
   },
   methods: {
     navigate(docAndPage) {
-      this.$emit("navigate", docAndPage);
-    },
-  },
-};
+      this.$emit('navigate', docAndPage)
+    }
+  }
+}
 </script>
 
 <style lang="scss"></style>

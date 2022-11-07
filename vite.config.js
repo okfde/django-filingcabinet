@@ -18,7 +18,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        entry: 'frontend/javascript/entry.js',
+        entry: 'frontend/javascript/entry.js'
       },
       output: {
         sourcemap: true,
