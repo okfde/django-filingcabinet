@@ -1,18 +1,25 @@
 {
   "parserOptions": {
     "sourceType": "module",
-    "parser": "@babel/eslint-parser",
     "project": ["./jsconfig.json"]
   },
   "extends": [
-    "prettier",
-    "plugin:vue/essential"
+    "plugin:vue/essential",
+    "standard"
   ],
-  "plugins": ["prettier", "vue"],
+  "plugins": ["prettier", "html"],
   "rules": {
     "indent": "off",
     "vue/component-tags-order": "off",
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ]
   },
-  "ignorePatterns": ["node_modules/**"]
+  "ignorePatterns": ["node_modules/**", "**/static/**"]
 }
