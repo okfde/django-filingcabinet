@@ -490,6 +490,11 @@ export default {
           let document = this.collection.documents[this.collectionIndex[docId]]
           if (document === undefined) {
             document = resultDocuments[docIndex[docId]]
+            if (document === undefined) {
+              // Ignore documents that are not or no longer in the collection
+              // but somewhow still in the search index
+              return
+            }
           }
           searcherDocs.push(document)
           docs[p.document] = docCount
