@@ -5,14 +5,6 @@ from contextlib import contextmanager
 from django.core.files.storage import default_storage
 
 
-def estimate_time(filesize, page_count=None):
-    """
-    Estimate processing time as
-    one minute + 5 seconds per megabyte timeout
-    """
-    return int(60 + 5 * filesize / (1024 * 1024))
-
-
 @contextmanager
 def get_local_file(path, storage=default_storage):
     _, extension = os.path.splitext(path)

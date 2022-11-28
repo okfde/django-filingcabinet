@@ -25,9 +25,8 @@ from .models import (
     get_page_filename,
 )
 from .pdf_utils import PDFProcessor, crop_image, detect_tables, draw_highlights
-from .settings import TESSERACT_DATA_PATH
+from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT, TESSERACT_DATA_PATH
 from .tasks import convert_images_to_webp_task, process_document_task
-from .utils import estimate_time
 
 Document = get_document_model()
 
@@ -105,7 +104,7 @@ def queue_missing_pages(doc):
     process_pages_task.apply_async(
         args=[doc.id],
         kwargs={"page_numbers": missing_pages, "task_page_limit": 10},
-        time_limit=max(60 + estimate_time(doc.file_size), 5 * 60),
+        time_limit=FILINGCABINET_PAGE_PROCESSING_TIMEOUT + 60,
     )
 
 
@@ -128,7 +127,7 @@ def process_pages(doc, page_numbers=None, task_page_limit=None):
     logger.info("Processing %s pages of doc %s", process_page_numbers, doc.id)
     pdf = get_pdf_processor(doc)
 
-    timeout = estimate_time(doc.file_size)
+    timeout = FILINGCABINET_PAGE_PROCESSING_TIMEOUT
 
     for page_number, image in pdf.get_images(
         pages=process_page_numbers, timeout=timeout

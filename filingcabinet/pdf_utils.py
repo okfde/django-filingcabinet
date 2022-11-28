@@ -27,7 +27,7 @@ try:
 except ImportError:
     pdflib = None
 
-from .utils import estimate_time
+from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +85,7 @@ def try_reading_pdf(pdf_file, password=None):
 
 def get_readable_pdf(pdf_file, copy_func, password=None):
     tries = 0
-    filesize = os.path.getsize(pdf_file)
-    timeout = estimate_time(filesize)
+    timeout = FILINGCABINET_PAGE_PROCESSING_TIMEOUT
     while True:
         try:
             pdf_reader = try_reading_pdf(pdf_file, password=password)
