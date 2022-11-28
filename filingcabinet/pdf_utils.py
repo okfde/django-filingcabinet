@@ -189,7 +189,13 @@ class PDFProcessor(object):
         self.config = config or {}
 
     def get_meta(self):
-        doc_info = self.pdf_reader.metadata
+        try:
+            doc_info = self.pdf_reader.metadata
+        except PdfReadError:
+            logger.warning(
+                "Could not read metadata for pdf %s:", self.filename, exc_info=True
+            )
+            doc_info = None
         if doc_info is None:
             return {}
         return {
