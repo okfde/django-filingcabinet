@@ -396,7 +396,7 @@ def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
     return None
 
 
-def shell_call(arguments, outpath, output_file=None, timeout=50):
+def shell_call(arguments, outpath, output_file=None, timeout=50, raise_timeout=False):
     env = dict(os.environ)
     env.update({"HOME": outpath})
 
@@ -409,10 +409,12 @@ def shell_call(arguments, outpath, output_file=None, timeout=50):
         )
 
         out, err = p.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as e:
         if p is not None:
             p.kill()
             out, err = p.communicate()
+        if raise_timeout:
+            raise e
     finally:
         if p is not None and p.returncode is None:
             p.kill()
