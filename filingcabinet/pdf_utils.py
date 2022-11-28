@@ -27,7 +27,7 @@ try:
 except ImportError:
     pdflib = None
 
-from .utils import chunks, estimate_time
+from .utils import estimate_time
 
 logger = logging.getLogger(__name__)
 
@@ -210,12 +210,16 @@ class PDFProcessor(object):
         with PikePDFProcessor(self.filename) as pike_pdf:
             return pike_pdf.get_markdown_outline()
 
-    def get_images(self, pages=None, resolution=300, chunk_size=20, timeout=5 * 60):
+    def get_images(self, pages=None, resolution=300, timeout=5 * 60):
         white = wand.color.Color("#fff")
         if pages is None:
             pages = list(range(1, self.num_pages + 1))
-        images = get_images_from_pdf_chunked(
-            self.filename, pages, chunk_size, dpi=resolution, timeout=timeout
+        images = get_images_from_pdf(
+            self.pdf_reader,
+            self.filename,
+            pages,
+            max_dpi=resolution,
+            timeout=timeout,
         )
         for page_number, image_filename in images:
             logger.info("Generated page %s: %s", page_number, image_filename)
@@ -523,55 +527,74 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     return writer.getvalue()
 
 
-def get_images_from_pdf_chunked(filename, pages, chunk_size, dpi=300, timeout=5 * 60):
-    for page_chunks in chunks(pages, chunk_size):
-        with get_images_from_pdf(
-            filename, pages=page_chunks, dpi=dpi, timeout=timeout
-        ) as images:
-            yield from images
+def get_images_from_pdf(
+    pdf_reader,
+    filename,
+    pages,
+    max_dpi=300,
+    max_resolution=MAX_HEIGHT_A4,
+    timeout=5 * 60,
+):
+    for page in pages:
+        with get_image_from_pdf_page(
+            pdf_reader,
+            filename,
+            page=page,
+            max_dpi=max_dpi,
+            max_resolution=max_resolution,
+            timeout=timeout,
+        ) as image:
+            if image is not None:
+                yield image
 
 
 @contextlib.contextmanager
-def get_images_from_pdf(filename, pages=None, dpi=300, timeout=5 * 60):
+def get_image_from_pdf_page(
+    pdf_reader, filename, page, max_dpi, max_resolution, timeout
+):
     try:
         temp_dir = tempfile.mkdtemp()
-        yield run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout)
+        yield page_to_png(
+            pdf_reader=pdf_reader,
+            filename=filename,
+            temp_dir=temp_dir,
+            page=page,
+            max_dpi=max_dpi,
+            max_resolution=max_resolution,
+            timeout=timeout,
+        )
     except Exception as err:
         logger.error("Error during command overwrite %s", err)
         logger.exception(err)
+        yield None
     finally:
         # Delete all temporary files
         shutil.rmtree(temp_dir)
 
 
-def run_pdfto_ppm_on_pages(filename, temp_dir, pages, dpi, timeout):
+def page_to_png(pdf_reader, filename, temp_dir, page, max_dpi, max_resolution, timeout):
     temp_out = os.path.join(temp_dir, "image")
 
-    base_arguments = [
+    page_size = pdf_reader.pages[page - 1].mediabox
+    max_x_dpi = max_resolution / (page_size.getWidth() / 72)
+    max_y_dpi = max_resolution / (page_size.getHeight() / 72)
+    dpi = min(max_dpi, max_x_dpi, max_y_dpi)
+
+    command = [
         "pdftoppm",
         "-png",
         "-r",
         str(dpi),
+        "-singlefile",
+        "-f",
+        str(page),
+        filename,
+        temp_out,
     ]
+    shell_call(command, temp_dir, output_file=None, timeout=timeout, raise_timeout=True)
 
-    if pages is not None:
-        pages = list(pages)
-        pages.sort()
-        page_iterator = get_continuous_pages(pages)
-    else:
-        page_iterator = ((None, None) for _ in (None,))
-
-    for first, last in page_iterator:
-        arguments = list(base_arguments)
-        if first is not None:
-            arguments.extend(["-f", str(first), "-l", str(last)])
-
-        arguments.extend([filename, temp_out])
-        shell_call(arguments, temp_dir, output_file=None, timeout=timeout)
-
-    images = glob.glob(temp_out + "-*.png")
-    images.sort()
-    return [(get_page_number(filename), filename) for filename in images]
+    out_filename = glob.glob(temp_out + "*")[0]
+    return (page, out_filename)
 
 
 def get_page_number(filename):

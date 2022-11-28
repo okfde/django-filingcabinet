@@ -5,11 +5,6 @@ from contextlib import contextmanager
 from django.core.files.storage import default_storage
 
 
-def chunks(li, n):
-    n = max(1, n)
-    return (li[i : i + n] for i in range(0, len(li), n))
-
-
 def estimate_time(filesize, page_count=None):
     """
     Estimate processing time as
