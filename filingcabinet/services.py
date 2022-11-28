@@ -69,7 +69,10 @@ def process_document(doc):
         doc.slug = slugify(doc.title)[:250]
 
     if not doc.outline:
-        doc.outline = pdf.get_markdown_outline()
+        try:
+            doc.outline = pdf.get_markdown_outline()
+        except Exception:
+            logging.warning("Failed to generate markdown outline:", exc_info=True)
 
     detect_tables_on_doc(doc, save=False)
 
