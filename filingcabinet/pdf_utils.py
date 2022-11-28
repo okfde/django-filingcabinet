@@ -395,7 +395,16 @@ def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
     return None
 
 
-def shell_call(arguments, outpath, output_file=None, timeout=50, raise_timeout=False):
+def shell_call(
+    arguments,
+    outpath,
+    output_file=None,
+    timeout=50,
+    raise_timeout=False,
+    successful_returncodes=None,
+):
+    if successful_returncodes is None:
+        successful_returncodes = [0]
     env = dict(os.environ)
     env.update({"HOME": outpath})
 
@@ -418,7 +427,7 @@ def shell_call(arguments, outpath, output_file=None, timeout=50, raise_timeout=F
         if p is not None and p.returncode is None:
             p.kill()
             out, err = p.communicate()
-    if p is not None and p.returncode == 0:
+    if p is not None and p.returncode in successful_returncodes:
         if output_file is not None and os.path.exists(output_file):
             with open(output_file, "rb") as f:
                 return f.read()
@@ -426,12 +435,20 @@ def shell_call(arguments, outpath, output_file=None, timeout=50, raise_timeout=F
         raise Exception(err)
 
 
-def run_command_overwrite(filename, argument_func, timeout=50):
+def run_command_overwrite(
+    filename, argument_func, timeout=50, successful_returncodes=None
+):
     try:
         temp_dir = tempfile.mkdtemp()
         temp_out = os.path.join(temp_dir, "gs_pdf_out.pdf")
         arguments, temp_out = argument_func(filename, temp_dir)
-        output_bytes = shell_call(arguments, temp_dir, temp_out, timeout=timeout)
+        output_bytes = shell_call(
+            arguments,
+            temp_dir,
+            temp_out,
+            timeout=timeout,
+            successful_returncodes=successful_returncodes,
+        )
 
         with open(filename, "wb") as f:
             f.write(output_bytes)
@@ -456,7 +473,12 @@ def decrypt_pdf_in_place(filename, password=None, timeout=50):
         arguments.extend([filename, temp_out])
         return arguments, temp_out
 
-    return run_command_overwrite(filename, argument_func, timeout=timeout)
+    return run_command_overwrite(
+        filename,
+        argument_func,
+        timeout=timeout,
+        successful_returncodes=[0, 3],  # qpdf returns 0 on success and 3 on warning
+    )
 
 
 def rewrite_pdf_in_place(filename, password=None, timeout=50):
