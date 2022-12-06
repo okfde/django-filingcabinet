@@ -141,6 +141,6 @@
   </div>
 {% else %}
   <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
-    <iframe src="{% get_pdf_viewer object.get_authorized_file_url page_number %}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
+    <iframe src="{{ object.get_authorized_file_url }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
   </div>
 {% endif %}
