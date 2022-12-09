@@ -83,6 +83,7 @@ def get_js_config(request, obj=None):
             "creator": _("Creator"),
             "producer": _("producer"),
             "url": _("URL"),
+            "copyDocumentLink": _("Copy document URL"),
         },
     }
 

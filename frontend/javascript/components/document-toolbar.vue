@@ -71,6 +71,13 @@
           <i class="fa fa-download" />
           <span class="visually-hidden">{{ i18n.downloadPDF }}</span>
         </a>
+        <button
+          rel="noopener"
+          class="btn btn-sm btn-secondary"
+          @click="copyDocumentLink">
+          <i class="fa fa-link" />
+          <span class="visually-hidden">{{ i18n.copyDocumentLink }}</span>
+        </button>
       </div>
     </div>
     <div v-if="preferences.showZoom" class="col col-md-auto px-1 px-sm-2">
@@ -129,6 +136,7 @@
 
 <script>
 import { triggerDownload } from '../lib/utils.js'
+import { Tooltip } from 'bootstrap'
 
 export default {
   name: 'DocumentToolbar',
@@ -239,6 +247,20 @@ export default {
       } else {
         this.downloadByUrl(filename)
       }
+    },
+    copyDocumentLink(e) {
+      const showPopup = (text) => {
+        const tooltip = new Tooltip(e.target, {
+          title: text,
+          trigger: 'manual'
+        })
+        tooltip.show()
+        setTimeout(() => tooltip.hide(), 2000)
+      }
+      navigator.clipboard.writeText(this.document.site_url).then(
+        () => showPopup('Copied!'),
+        () => showPopup('Failed to copy!')
+      )
     },
     downloadByUrl(filename) {
       triggerDownload(this.document.file_url, filename)
