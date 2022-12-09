@@ -19,6 +19,7 @@ from . import get_document_model
 from .models import (
     CollectionDirectory,
     CollectionDocument,
+    DocumentCollection,
     Page,
     PageAnnotation,
     get_page_annotation_filename,
@@ -299,7 +300,7 @@ class DocumentStorer:
                 return
 
             doc_paths = remove_common_root_path(zip_paths)
-            directories = {}
+            directories = get_existing_directories(self.collection)
             for doc_path, zip_path in zip(doc_paths, zip_paths):
                 self.ensure_directory_exists(doc_path, directories)
                 directory = directories.get(doc_path.parent)
@@ -323,6 +324,16 @@ class DocumentStorer:
                 else:
                     directory = parent_parent_dir.add_child(instance=directory)
                 directories[parent_path] = directory
+
+
+def get_existing_directories(collection: DocumentCollection):
+    directories = {}
+    dirs = CollectionDirectory.objects.filter(collection=collection)
+    for dir in dirs:
+        tree_to_root = list(dir.get_ancestors()) + [dir]
+        path = PurePath("/".join([x.name for x in tree_to_root]))
+        directories[path] = dir
+    return directories
 
 
 def remove_common_root_path(paths):
