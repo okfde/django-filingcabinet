@@ -58,7 +58,7 @@ setup(
     install_requires=[
         "Django",
         "wand",
-        "pypdf2",
+        "pypdf2>=2.11.2",
         "PyCryptodome",
         "pikepdf",
         "Pillow",
