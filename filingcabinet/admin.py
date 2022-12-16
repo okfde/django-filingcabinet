@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count, JSONField, Q
+from django.db.models import Case, Count, F, FloatField, JSONField, Q, When
+from django.db.models.functions import Cast
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils import timezone
@@ -130,12 +131,22 @@ class DocumentBaseAdmin(admin.ModelAdmin):
     def get_changelist(self, request):
         return DocumentChangeList
 
-    def processed_pages_percentage(self, obj):
-        if not obj.num_pages:
-            return "-"
-        return "{:.2f}%".format(obj.ready_page_count / obj.num_pages * 100)
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            ready_page_count=Count("pages", filter=Q(pages__pending=False)),
+            processed_pages_percentage=Case(
+                When(num_pages=0, then=0),
+                default=(F("ready_page_count") / Cast(F("num_pages"), FloatField()))
+                * 100.0,
+                output_field=FloatField(),
+            ),
+        )
 
-    processed_pages_percentage.admin_order_field = "ready_page_count"
+    def processed_pages_percentage(self, obj):
+        return "{:.2f}%".format(obj.processed_pages_percentage)
+
+    processed_pages_percentage.admin_order_field = "processed_pages_percentage"
     processed_pages_percentage.short_description = _("Processed")
 
     def get_inline_instances(self, request, obj=None):
