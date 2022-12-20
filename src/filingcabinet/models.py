@@ -731,6 +731,16 @@ class AbstractDocumentCollection(models.Model):
     def __str__(self):
         return self.title
 
+    def get_zip_download_url(self):
+        if self.slug:
+            return reverse(
+                "filingcabinet:document-collection_zip",
+                kwargs={"pk": self.pk, "slug": self.slug},
+            )
+        return reverse(
+            "filingcabinet:document-collection_zip_short", kwargs={"pk": self.pk}
+        )
+
     @property
     def ordered_documents(self):
         if not hasattr(self, "_ordered_documents"):

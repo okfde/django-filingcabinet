@@ -11,6 +11,16 @@
               {{ i18n.backToCollection }}
             </button>
           </div>
+          <div
+            v-else-if="
+              collection.zip_download_url && currentDirectory === null
+            ">
+            <a
+              :href="collection.zip_download_url"
+              class="btn btn-sm btn-secondary"
+              ><i class="fa fa-download"
+            /></a>
+          </div>
         </div>
         <div class="col-auto order-md-3 ms-auto">
           <span class="text-muted d-inline-block text-truncate">

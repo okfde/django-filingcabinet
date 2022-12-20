@@ -17,6 +17,7 @@ dependencies = [
     "reportlab",
     "celery",
     "feedgen",
+    "zipstream",
 ]
 readme = "README.md"
 requires-python = ">=3.8"
