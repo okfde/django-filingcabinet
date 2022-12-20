@@ -1,15 +1,17 @@
 import json
 
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import Http404, get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, TemplateView
 
+import zipstream
+
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
 from .forms import get_viewer_preferences
-from .models import DocumentPortal
+from .models import CollectionDocument, DocumentPortal
 from .settings import FILINGCABINET_ENABLE_WEBP, FILINGCABINET_MEDIA_PRIVATE_INTERNAL
 
 Document = get_document_model()
@@ -176,6 +178,50 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
 
         context.update(get_document_collection_context(self.object, self.request))
         return context
+
+
+class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
+    model = DocumentCollection
+    redirect_url_name = "filingcabinet:document-collection_zip"
+    redirect_short_url_name = "filingcabinet:document-collection_zip_short"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(get_document_collection_context(self.object, self.request))
+        return context
+
+    def render_to_response(self, context):
+        archive_stream = zipstream.ZipFile(mode="w")
+        coll_docs = CollectionDocument.objects.filter(collection=self.object)
+        directory_dirname_map = {}
+        for doc in coll_docs:
+            if doc.directory is not None:
+                if doc.directory.pk not in directory_dirname_map:
+                    path_to_root = [
+                        *(x.name for x in doc.directory.get_ancestors()),
+                        doc.directory.name,
+                    ]
+                    dirname = "/".join(path_to_root)
+                    directory_dirname_map[doc.directory.pk] = dirname
+                else:
+                    dirname = directory_dirname_map[doc.directory.pk]
+                filename = "/".join(
+                    [
+                        dirname,
+                        doc.document.get_document_filename(),
+                    ]
+                )
+            else:
+                filename = doc.document.get_document_filename()
+            archive_stream.write(doc.document.get_file_path(), arcname=filename)
+
+        resp = StreamingHttpResponse(
+            archive_stream,
+            content_type="application/zip",
+        )
+        resp["Content-Disposition"] = f'attachment; filename="{self.object.title}.zip"'
+        return resp
 
 
 class DocumentCollectionEmbedView(DocumentCollectionView):

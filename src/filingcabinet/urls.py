@@ -5,6 +5,7 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from .views import (
     DocumentCollectionEmbedView,
     DocumentCollectionView,
+    DocumentCollectionZipDownloadView,
     DocumentEmbedView,
     DocumentListEmbedView,
     DocumentListView,
@@ -72,6 +73,16 @@ fc_urlpatterns = [
         "<int:pk>/embed/",
         xframe_options_exempt(DocumentEmbedView.as_view()),
         name="document-detail_embed_short",
+    ),
+    path(
+        pgettext_lazy("url part", "collection/<int:pk>/zip/"),
+        DocumentCollectionZipDownloadView.as_view(),
+        name="document-collection_zip_short",
+    ),
+    path(
+        pgettext_lazy("url part", "collection/<int:pk>-<slug:slug>/zip/"),
+        DocumentCollectionZipDownloadView.as_view(),
+        name="document-collection_zip",
     ),
 ]
 

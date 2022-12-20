@@ -125,6 +125,9 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     resource_uri = serializers.HyperlinkedIdentityField(
         view_name="api:documentcollection-detail", lookup_field="pk"
     )
+    zip_download_url = serializers.CharField(
+        source="get_zip_download_url", read_only=True
+    )
     site_url = serializers.CharField(source="get_absolute_domain_url", read_only=True)
     cover_image = serializers.CharField(source="get_cover_image")
     document_count = serializers.SerializerMethodField()
@@ -155,6 +158,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             "documents_uri",
             "pages_uri",
             "settings",
+            "zip_download_url",
         )
 
     def get_document_count(self, obj):

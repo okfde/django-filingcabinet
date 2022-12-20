@@ -21,3 +21,4 @@ fcdocs
 gunicorn
 celery[redis]
 whitenoise
+zipstream
