@@ -225,7 +225,7 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
             archive_stream,
             content_type="application/zip",
         )
-        resp["Content-Disposition"] = f'attachment; filename="{self.object.title}.zip"'
+        resp["Content-Disposition"] = f'attachment; filename="{self.object.slug}.zip"'
         return resp
 
 
