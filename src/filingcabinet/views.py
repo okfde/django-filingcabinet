@@ -1,4 +1,7 @@
 import json
+import os.path
+from collections import defaultdict
+from pathlib import Path
 
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import Http404, get_object_or_404, redirect
@@ -195,6 +198,7 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
         archive_stream = zipstream.ZipFile(mode="w")
         coll_docs = CollectionDocument.objects.filter(collection=self.object)
         directory_dirname_map = {}
+        filename_counter = defaultdict(int)
         for doc in coll_docs:
             if doc.directory is not None:
                 if doc.directory.pk not in directory_dirname_map:
@@ -202,19 +206,20 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
                         *(x.name for x in doc.directory.get_ancestors()),
                         doc.directory.name,
                     ]
-                    dirname = "/".join(path_to_root)
+                    dirname = os.path.join(*path_to_root)
                     directory_dirname_map[doc.directory.pk] = dirname
                 else:
                     dirname = directory_dirname_map[doc.directory.pk]
-                filename = "/".join(
-                    [
-                        dirname,
-                        doc.document.get_document_filename(),
-                    ]
+                filename = os.path.join(
+                    dirname,
+                    doc.document.get_document_filename(),
                 )
             else:
                 filename = doc.document.get_document_filename()
-            archive_stream.write(doc.document.get_file_path(), arcname=filename)
+            archive_stream.write(
+                doc.document.get_file_path(),
+                arcname=ensure_unique_filename(filename_counter, filename),
+            )
 
         resp = StreamingHttpResponse(
             archive_stream,
@@ -222,6 +227,22 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
         )
         resp["Content-Disposition"] = f'attachment; filename="{self.object.title}.zip"'
         return resp
+
+
+def ensure_unique_filename(filename_counter: defaultdict, filename: str):
+    if filename_counter[filename] > 0:
+        original_path = Path(filename)
+        original_filename = filename
+        while filename_counter[filename] > 0:
+            filename = str(
+                original_path.with_stem(
+                    original_path.stem + "-" + str(filename_counter[original_filename])
+                )
+            )
+            filename_counter[original_filename] += 1
+
+    filename_counter[filename] += 1
+    return filename
 
 
 class DocumentCollectionEmbedView(DocumentCollectionView):
