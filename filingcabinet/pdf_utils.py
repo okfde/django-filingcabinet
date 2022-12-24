@@ -599,8 +599,8 @@ def page_to_png(pdf_reader, filename, temp_dir, page, max_dpi, max_resolution, t
     temp_out = os.path.join(temp_dir, "image")
 
     page_size = pdf_reader.pages[page - 1].cropbox
-    max_x_dpi = max_resolution / (page_size.getWidth() / 72)
-    max_y_dpi = max_resolution / (page_size.getHeight() / 72)
+    max_x_dpi = max_resolution / (page_size.width / 72)
+    max_y_dpi = max_resolution / (page_size.height / 72)
     dpi = min(max_dpi, max_x_dpi, max_y_dpi)
 
     command = [
