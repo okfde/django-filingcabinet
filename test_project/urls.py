@@ -1,1 +1,1 @@
-from fc_project.urls import urlpatterns  # noqa
+from fc_project.base_urls import urlpatterns  # noqa
