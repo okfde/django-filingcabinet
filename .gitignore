@@ -15,6 +15,7 @@ fc-env/
 .DS_Store
 data/
 static/
+!src/filingcabinet/static
 .venv/
 build
 .coverage
