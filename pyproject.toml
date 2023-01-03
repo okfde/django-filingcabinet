@@ -65,11 +65,11 @@ sections = "FUTURE,STDLIB,DJANGO,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 [tool.coverage.run]
 branch = true
-source = "filingcabinet"
+source = ["src/filingcabinet"]
 omit = ["*/migrations/*", "*/wsgi.py"]
-plugins = "django_coverage_plugin"
+plugins = ["django_coverage_plugin"]
 
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
-exclude_lines = "pragma: no cover"
+exclude_lines = ["pragma: no cover"]
