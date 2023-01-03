@@ -27,7 +27,7 @@ jobs:
             v0-${{ runner.os }}-pip-
       - name: Install dependencies
         run: |
-          pip install ".[test]"
+          pip install -e ".[test]"
           yarn install
       - name: Run flake8
         run: flake8 src tests test_project --statistics
