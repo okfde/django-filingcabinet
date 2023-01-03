@@ -30,11 +30,11 @@ jobs:
           pip install ".[test]"
           yarn install
       - name: Run flake8
-        run: flake8 filingcabinet --statistics
+        run: flake8 src tests test_project --statistics
       - name: Run black
-        run: black --check filingcabinet
+        run: black --check src tests test_project
       - name: Run isort
-        run: isort --check filingcabinet
+        run: isort --check src tests test_project
       - name: Run eslint
         run: yarn lint
 
