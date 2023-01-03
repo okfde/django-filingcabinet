@@ -4,10 +4,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, re_path
 
-try:
-    from fcdocs_annotate.annotation.api import FeatureViewSet
-except ImportError:
-    FeatureViewSet = None
 from rest_framework.routers import DefaultRouter
 
 from filingcabinet.api_views import (
@@ -18,7 +14,7 @@ from filingcabinet.api_views import (
 )
 from filingcabinet.views import DocumentFileDetailView
 
-from . import admin as fc_admin  # noqa
+from . import base_admin  # noqa
 
 api_router = DefaultRouter()
 
@@ -28,25 +24,13 @@ api_router.register(
 )
 api_router.register(r"page", PageViewSet, basename="page")
 api_router.register(r"pageannotation", PageAnnotationViewSet, basename="pageannotation")
-if FeatureViewSet:
-    api_router.register(r"feature", FeatureViewSet, basename="feature")
 
 
-urlpatterns = (
-    [
-        path("admin/", admin.site.urls),
-        path("documents/", include("filingcabinet.urls")),
-    ]
-    + (
-        [path("documents/features/", include("fcdocs_annotate.annotation.urls"))]
-        if FeatureViewSet
-        else []
-    )
-    + [
-        path("api/", include((api_router.urls, "api"))),
-    ]
-    + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-)
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("documents/", include("filingcabinet.urls")),
+    path("api/", include((api_router.urls, "api"))),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if not settings.DEBUG:
     MEDIA_PATH = settings.MEDIA_URL

@@ -1,0 +1,75 @@
+[project]
+name = "django-filingcabinet"
+version = "0.0.1"
+dependencies = [
+    "Django",
+    "wand",
+    "pypdf2",
+    "PyCryptodome",
+    "pikepdf",
+    "Pillow",
+    "django-filter",
+    "django-json-widget",
+    "jsonschema",
+    "django-taggit>=2",
+    "django-treebeard",
+    "djangorestframework",
+    "reportlab",
+    "celery",
+    "feedgen",
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+tabledetection = ["camelot-py[cv]"]
+ocr = ["pytesseract"]
+webp = ["webp"]
+annotate = ["fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"]
+test = [
+    "black",
+    "coverage[toml]",
+    "django-coverage-plugin",
+    "django-stubs",
+    "djangorestframework-stubs",
+    "factory_boy",
+    "flake8-bugbear",
+    "flake8",
+    "isort",
+    "monkeytype",
+    "mypy-extensions",
+    "mypy",
+    "pre-commit",
+    "pycodestyle",
+    "pytest-django",
+    "pytest-factoryboy",
+    "pytest-playwright",
+    "pytest",
+]
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["filingcabinet"]
+default_section = "THIRDPARTY"
+known_first_party = "filingcabinet"
+known_django = "django"
+sections = "FUTURE,STDLIB,DJANGO,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+
+[tool.coverage.run]
+branch = true
+source = ["src/filingcabinet"]
+omit = ["*/migrations/*", "*/wsgi.py"]
+plugins = ["django_coverage_plugin"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = ["pragma: no cover"]
