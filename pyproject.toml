@@ -27,7 +27,7 @@ tabledetection = ["camelot-py[cv]"]
 ocr = ["pytesseract"]
 webp = ["webp"]
 annotate = ["fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"]
-tests = [
+test = [
     "black",
     "coverage[toml]",
     "django-coverage-plugin",
