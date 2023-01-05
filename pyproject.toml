@@ -48,6 +48,13 @@ test = [
     "pytest",
 ]
 
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+DJANGO_SETTINGS_MODULE = "test_project.settings"
+python_files = "tests.py test_*.py"
+markers = "slow: marks tests as slow"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
