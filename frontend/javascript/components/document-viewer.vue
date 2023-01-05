@@ -315,7 +315,7 @@ export default {
     canAnnotate() {
       return (
         this.$root.csrfToken &&
-        (this.config.settings.canWrite || this.document.allow_annotation)
+        (this.config.settings?.canWrite || this.document.allow_annotation)
       )
     },
     showAnnotations() {
