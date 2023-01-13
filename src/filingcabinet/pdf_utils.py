@@ -242,7 +242,10 @@ class PDFProcessor(object):
                 self.pdflib_pages = list(pdflib_doc)
         if hasattr(self, "pdflib_pages"):
             page = self.pdflib_pages[page_no - 1]
-            return " ".join(page.lines).strip()
+            try:
+                return " ".join(page.lines).strip()
+            except Exception as err:
+                logger.exception(err)
         page = self.pdf_reader.pages[page_no - 1]
         return page.extract_text()
 
