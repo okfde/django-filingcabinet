@@ -235,8 +235,11 @@ def ensure_unique_filename(filename_counter: defaultdict, filename: str):
         original_filename = filename
         while filename_counter[filename] > 0:
             filename = str(
-                original_path.with_stem(
-                    original_path.stem + "-" + str(filename_counter[original_filename])
+                original_path.with_name(
+                    original_path.stem
+                    + "-"
+                    + str(filename_counter[original_filename])
+                    + original_path.suffix
                 )
             )
             filename_counter[original_filename] += 1
