@@ -200,6 +200,13 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
         directory_dirname_map = {}
         filename_counter = defaultdict(int)
         for doc in coll_docs:
+            _, doc_ext = os.path.splitext(doc.document.get_file_path())
+            doc_filename_stem = (
+                doc.document.title.replace("/", "_").replace("\\", "_").strip()
+            )
+            if not doc_filename_stem:
+                doc_filename_stem = "unnamed"
+            doc_filename = doc_filename_stem + doc_ext
             if doc.directory is not None:
                 if doc.directory.pk not in directory_dirname_map:
                     path_to_root = [
@@ -212,10 +219,10 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
                     dirname = directory_dirname_map[doc.directory.pk]
                 filename = os.path.join(
                     dirname,
-                    doc.document.get_document_filename(),
+                    doc_filename,
                 )
             else:
-                filename = doc.document.get_document_filename()
+                filename = doc_filename
             archive_stream.write(
                 doc.document.get_file_path(),
                 arcname=ensure_unique_filename(filename_counter, filename),
