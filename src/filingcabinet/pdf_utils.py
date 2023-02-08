@@ -23,9 +23,9 @@ try:
 except ImportError:
     pytesseract = None
 try:
-    import pdflib
+    import poppler
 except ImportError:
-    pdflib = None
+    poppler = None
 
 from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT
 
@@ -236,16 +236,10 @@ class PDFProcessor(object):
         return text.strip()
 
     def _get_text_for_page(self, page_no):
-        if not hasattr(self, "pdflib_pages"):
-            if pdflib is not None:
-                pdflib_doc = pdflib.Document(self.filename)
-                self.pdflib_pages = list(pdflib_doc)
-        if hasattr(self, "pdflib_pages"):
-            page = self.pdflib_pages[page_no - 1]
-            try:
-                return " ".join(page.lines).strip()
-            except Exception as err:
-                logger.exception(err)
+        if not hasattr(self, "poppler_doc") and poppler is not None:
+            self.poppler_doc = poppler.load_from_file(self.filename)
+        if hasattr(self, "poppler_doc"):
+            return self.poppler_doc.create_page(page_no - 1).text().strip()
         page = self.pdf_reader.pages[page_no - 1]
         return page.extract_text()
 

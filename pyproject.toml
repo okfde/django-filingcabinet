@@ -18,6 +18,7 @@ dependencies = [
     "celery",
     "feedgen",
     "zipstream",
+    "python-poppler",
 ]
 readme = "README.md"
 requires-python = ">=3.8"
