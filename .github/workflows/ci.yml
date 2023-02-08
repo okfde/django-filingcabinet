@@ -25,6 +25,8 @@ jobs:
           restore-keys: |
             v0-${{ runner.os }}-pip-lint-
             v0-${{ runner.os }}-pip-
+      - name: Install system-level dependencies
+        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
       - name: Install dependencies
         run: |
           pip install -e ".[test]"
@@ -49,7 +51,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install system-level dependencies
-        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils
+        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
       - name: Install dependencies
         run: |
           pip install -e ".[test]"
