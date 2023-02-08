@@ -30,7 +30,7 @@ ocr = ["pytesseract"]
 webp = ["webp"]
 annotate = ["fcdocs-annotate @ https://github.com/okfde/fcdocs-annotate/archive/refs/heads/main.zip"]
 test = [
-    "black",
+    "black==22.*",
     "coverage[toml]",
     "django-coverage-plugin",
     "django-stubs",
