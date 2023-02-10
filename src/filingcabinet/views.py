@@ -196,7 +196,9 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
 
     def render_to_response(self, context):
         archive_stream = zipstream.ZipFile(mode="w")
-        coll_docs = CollectionDocument.objects.filter(collection=self.object)
+        coll_docs = CollectionDocument.objects.filter(
+            collection=self.object, document__pending=False
+        )
         directory_dirname_map = {}
         filename_counter = defaultdict(int)
         for doc in coll_docs:
