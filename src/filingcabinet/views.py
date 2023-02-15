@@ -72,7 +72,7 @@ def get_js_config(request, obj=None):
             "found": _("found"),
             "clearSearch": _("clear search"),
             "searchingInDirectory": _("searched in directory"),
-            "show_text": _("Show/hide Text"),
+            "showText": _("Show/hide Text"),
             "title": _("Title"),
             "description": _("Description"),
             "cancel": _("Cancel"),
@@ -89,6 +89,12 @@ def get_js_config(request, obj=None):
             "producer": _("producer"),
             "url": _("URL"),
             "copyDocumentLink": _("Copy document URL"),
+            "zoomIn": _("Zoom in"),
+            "zoomOut": _("Zoom out"),
+            "annotations": _("Annotations"),
+            "showSearchbar": _("Show Searchbar"),
+            "showAnnotations": _("Show Annotations"),
+            "hideAnnotations": _("Hide Annotations"),
         },
     }
 
