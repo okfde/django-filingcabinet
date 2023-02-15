@@ -61,7 +61,7 @@
           :class="{ 'btn-light': preferences.showText }"
           @click="toggleShowText">
           <i class="fa fa-file-text" />
-          <span class="visually-hidden">{{ i18n.show_text }}</span>
+          <span class="visually-hidden">{{ i18n.showText }}</span>
         </button>
         <a
           :href="document.file_url"
@@ -88,6 +88,7 @@
           :disabled="!canZoomOut"
           @click="$emit('zoomout')">
           <i class="fa fa-search-minus" />
+          <span class="visually-hidden">{{ i18n.zoomOut }}</span>
         </button>
         <button
           type="button"
@@ -95,6 +96,7 @@
           :disabled="!canZoomIn"
           @click="$emit('zoomin')">
           <i class="fa fa-search-plus" />
+          <span class="visually-hidden">{{ i18n.zoomIn }}</span>
         </button>
       </div>
     </div>
@@ -107,6 +109,7 @@
         :class="{ 'btn-light': preferences.showSearchbar }"
         @click="toggleShowSearchbar">
         <i class="fa fa-search" />
+        <span class="visually-hidden">{{ i18n.showSearchbar }}</span>
       </button>
     </div>
     <div
@@ -127,7 +130,12 @@
             "
             class="badge text-bg-light rounded-pill bg-annotation-count">
             {{ annotationCount }}
+            <span class="visually-hidden">{{ i18n.annotations }}</span>
           </span>
+          <span class="visually-hidden" v-if="!preferences.showAnnotations">{{
+            i18n.showAnnotations
+          }}</span>
+          <span class="visually-hidden" v-else>{{ i18n.hideAnnotations }}</span>
         </button>
       </div>
     </div>
