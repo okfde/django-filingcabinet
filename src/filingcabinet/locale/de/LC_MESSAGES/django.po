@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-15 18:07+0100\n"
-"PO-Revision-Date: 2023-02-15 17:17+0000\n"
+"PO-Revision-Date: 2023-02-15 17:38+0000\n"
 "Last-Translator: Karl Engelhardt <karl.engelhardt@okfn.de>\n"
 "Language-Team: German <https://weblate.frag-den-staat.de/projects/froide/"
 "django-filingcabinet/de/>\n"
@@ -185,12 +185,12 @@ msgstr "Importiere %(name)s"
 #: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html
 #: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html:15
 msgid "Annotation"
-msgstr "Anmerkung"
+msgstr "Annotation"
 
 #: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html
 #: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html:23
 msgid "Make annotation"
-msgstr "Anmerkung schreiben"
+msgstr "Annotation schreiben"
 
 #: src/filingcabinet/templates/filingcabinet/_document_viewer.html
 #: src/filingcabinet/templates/filingcabinet/_document_viewer.html:9
@@ -392,7 +392,7 @@ msgstr "Verkleinern"
 
 #: src/filingcabinet/views.py
 msgid "Annotations"
-msgstr "Anmerkungen"
+msgstr "Annotationen"
 
 #: src/filingcabinet/views.py
 msgid "Show Searchbar"
@@ -400,11 +400,11 @@ msgstr "Suchleiste anzeigen"
 
 #: src/filingcabinet/views.py
 msgid "Show Annotations"
-msgstr "Anmerkungen anzeigen"
+msgstr "Annotationen anzeigen"
 
 #: src/filingcabinet/views.py
 msgid "Hide Annotations"
-msgstr "Anmerkungen verstecken"
+msgstr "Annotationen verstecken"
 
 #: src/filingcabinet/views.py src/filingcabinet/views.py:302
 msgid "All documents"
