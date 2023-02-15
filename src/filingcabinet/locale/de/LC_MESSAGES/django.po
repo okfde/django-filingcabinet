@@ -8,15 +8,16 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-15 18:07+0100\n"
-"PO-Revision-Date: 2022-06-17 11:53+0200\n"
-"Last-Translator: Stefan Wehrmeyer <stefan.wehrmeyer@okfn.de>\n"
-"Language-Team: \n"
+"PO-Revision-Date: 2023-02-15 17:17+0000\n"
+"Last-Translator: Karl Engelhardt <karl.engelhardt@okfn.de>\n"
+"Language-Team: German <https://weblate.frag-den-staat.de/projects/froide/"
+"django-filingcabinet/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.14.2\n"
 
 #: src/filingcabinet/admin.py src/filingcabinet/admin.py:56
 #: src/filingcabinet/admin.py:351
@@ -383,31 +384,27 @@ msgstr "Dokumenten-URL kopieren"
 
 #: src/filingcabinet/views.py
 msgid "Zoom in"
-msgstr ""
+msgstr "Vergrößern"
 
 #: src/filingcabinet/views.py
 msgid "Zoom out"
-msgstr ""
+msgstr "Verkleinern"
 
 #: src/filingcabinet/views.py
-#, fuzzy
 msgid "Annotations"
-msgstr "Anmerkung"
+msgstr "Anmerkungen"
 
 #: src/filingcabinet/views.py
-#, fuzzy
 msgid "Show Searchbar"
-msgstr "Suchen"
+msgstr "Suchleiste anzeigen"
 
 #: src/filingcabinet/views.py
-#, fuzzy
 msgid "Show Annotations"
-msgstr "Anmerkung"
+msgstr "Anmerkungen anzeigen"
 
 #: src/filingcabinet/views.py
-#, fuzzy
 msgid "Hide Annotations"
-msgstr "Anmerkung"
+msgstr "Anmerkungen verstecken"
 
 #: src/filingcabinet/views.py src/filingcabinet/views.py:302
 msgid "All documents"
