@@ -448,7 +448,7 @@ export default {
               }
             }
           } else {
-            params.push(key, value)
+            params.append(key, value)
           }
         }
       }
