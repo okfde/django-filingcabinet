@@ -75,10 +75,11 @@ class DocumentViewSet(
             return DocumentSerializer
 
     def can_read_unlisted_via_collection(self):
+        query = self.request.GET.get("collection")
+        if query and not query.isdigit():
+            return False
         try:
-            collection = DocumentCollection.objects.get(
-                id=self.request.GET.get("collection")
-            )
+            collection = DocumentCollection.objects.get(id=query)
         except DocumentCollection.DoesNotExist:
             return False
         return collection.can_read(self.request)
