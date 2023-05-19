@@ -201,7 +201,7 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
         return context
 
     def render_to_response(self, context):
-        archive_stream = zipstream.ZipFile(mode="w")
+        archive_stream = zipstream.ZipFile(mode="w", allowZip64=True)
         coll_docs = CollectionDocument.objects.filter(
             collection=self.object, document__pending=False
         )
