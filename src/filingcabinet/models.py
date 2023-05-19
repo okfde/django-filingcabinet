@@ -109,7 +109,7 @@ class OEmbedMixin:
                 )
                 .get(id=pk)
             )
-        except models.Model.DoesNotExist:
+        except self.__class__.DoesNotExist:
             return None
 
 
