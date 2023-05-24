@@ -89,7 +89,7 @@ class AuthQuerysetMixin:
         return qs.filter(cond)
 
 
-class OEmbedMixin:
+class OEmbedManagerMixin:
     def get_public_via_url(self, url):
         result = urllib.parse.urlparse(url)
         try:
@@ -109,11 +109,11 @@ class OEmbedMixin:
                 )
                 .get(id=pk)
             )
-        except self.__class__.DoesNotExist:
+        except self.model.DoesNotExist:
             return None
 
 
-class DocumentManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
+class DocumentManager(OEmbedManagerMixin, AuthQuerysetMixin, models.Manager):
     pass
 
 
@@ -683,7 +683,7 @@ class CollectionDocument(models.Model):
         ]
 
 
-class DocumentCollectionManager(OEmbedMixin, AuthQuerysetMixin, models.Manager):
+class DocumentCollectionManager(OEmbedManagerMixin, AuthQuerysetMixin, models.Manager):
     pass
 
 
