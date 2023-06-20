@@ -18,7 +18,7 @@
 
 {% if not object.pending %}
   <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
-    <div class="document"
+    <div
       data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}{% if object.unlisted %}?uid={{ object.uid }}{% endif %}"
       data-fcdocument="{{ document_data }}"
       data-fcpage="{{ page_number }}"
