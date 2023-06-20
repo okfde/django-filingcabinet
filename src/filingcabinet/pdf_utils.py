@@ -1,11 +1,14 @@
 import contextlib
 import glob
+import hashlib
 import io
 import logging
 import os
 import shutil
 import subprocess
 import tempfile
+from pathlib import Path
+from typing import BinaryIO, Union
 
 import pikepdf
 import wand
@@ -650,3 +653,20 @@ def detect_tables(filename):
     except Exception:
         # Camelot may fail on bad pdfs, just ignore
         return []
+
+
+def calculate_content_hash(filename: Union[str, Path]):
+    with open(filename, "rb") as f:
+        return calculcate_content_hash_from_file(f)
+
+
+def calculcate_content_hash_from_file(file_object: BinaryIO):
+    h = hashlib.sha1()
+    file_object.seek(0)
+    while True:
+        chunk = file_object.read(h.block_size)
+        if not chunk:
+            break
+        h.update(chunk)
+    file_object.seek(0)
+    return h.hexdigest()

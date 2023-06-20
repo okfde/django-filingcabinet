@@ -4,15 +4,12 @@ import json
 import os
 from datetime import datetime
 
-from django.conf import settings
-from django.core.files.base import File
 from django.core.management.base import BaseCommand
-from django.template.defaultfilters import slugify
 from django.utils import timezone
 
 from ... import get_document_model, get_documentcollection_model
-from ...models import CollectionDocument, DocumentPortal
-from ...tasks import process_document_task
+from ...api import import_document
+from ...models import DocumentPortal
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -61,55 +58,25 @@ class Command(BaseCommand):
         else:
             metadata = {"title": ""}
 
-        content_hash = metadata.get("content_hash")
-        if content_hash is None:
-            content_hash = self.get_content_hash(pdf_filename)
+        metadata["filename"] = os.path.basename(pdf_filename)
 
-        published_at = None
         if metadata.get("published_at"):
-            published_at = parse_date(metadata["published_at"])
+            metadata["published_at"] = parse_date(metadata["published_at"])
+        else:
+            metadata["published_at"] = None
 
-        portal = None
         if metadata.get("portal"):
-            portal = self.get_portal(metadata["portal"])
+            metadata["portal"] = self.get_portal(metadata["portal"])
+        else:
+            metadata["portal"] = None
 
-        collection = None
         if metadata.get("collection"):
-            collection = self.get_collection(metadata["collection"])
+            metadata["collection"] = self.get_collection(metadata["collection"])
+        else:
+            metadata["collection"] = None
 
-        doc, created = Document.objects.get_or_create(
-            content_hash=content_hash,
-            defaults={
-                "title": metadata["title"],
-                "slug": slugify(metadata["title"][:250])[:250],
-                "description": metadata.get("description", ""),
-                "published_at": published_at,
-                "language": metadata.get("language", settings.LANGUAGE_CODE),
-                "public": metadata.get("public", True),
-                "pending": metadata.get("pending", True),
-                "listed": metadata.get("listed", True),
-                "allow_annotation": metadata.get("allow_annotation", False),
-                "properties": metadata.get("properties", {}),
-                "data": metadata.get("data", {}),
-                "outline": metadata.get("outline", ""),
-                "portal": portal,
-            },
-        )
-        if metadata.get("tags"):
-            doc.tags.add(*metadata["tags"])
-
-        if collection is not None:
-            CollectionDocument.objects.get_or_create(
-                collection=collection,
-                document=doc,
-            )
-
-        if created and not doc.pdf_file:
-            with open(pdf_filename, "rb") as file_obj:
-                doc.pdf_file.save(
-                    os.path.basename(pdf_filename), File(file_obj), save=True
-                )
-            process_document_task.delay(doc.pk)
+        with open(pdf_filename, "rb") as pdf_fileobj:
+            import_document(pdf_fileobj, metadata)
 
     def get_portal(self, portal_slug):
         if portal_slug not in self.portals:
