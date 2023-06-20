@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from ... import get_document_model, get_documentcollection_model
-from ...api import import_document
+from ...api import create_document
 from ...models import DocumentPortal
 
 Document = get_document_model()
@@ -76,7 +76,7 @@ class Command(BaseCommand):
             metadata["collection"] = None
 
         with open(pdf_filename, "rb") as pdf_fileobj:
-            import_document(pdf_fileobj, metadata)
+            create_document(pdf_fileobj, metadata)
 
     def get_portal(self, portal_slug):
         if portal_slug not in self.portals:
