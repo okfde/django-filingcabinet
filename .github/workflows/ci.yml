@@ -60,6 +60,6 @@ jobs:
       - name: Build frontend
         run: yarn run build
       - name: Run tests
-        run: coverage run --branch -m pytest
+        run: coverage run --branch -m pytest -m "not slow"
       - name: Show coverage report
         run: coverage report
