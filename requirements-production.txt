@@ -82,10 +82,6 @@ django==4.1.1
     #   django-taggit
     #   django-treebeard
     #   djangorestframework
-django-filingcabinet==0.0.1
-    # via
-    #   fcdocs
-    #   fcdocs-annotate
 django-filter==22.1
     # via -r requirements-production.in
 django-json-widget==1.1.1
