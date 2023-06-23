@@ -23,7 +23,8 @@ COPY requirements-production.txt .
 RUN pip install -r requirements-production.txt
 
 # copy the whole project except what is in .dockerignore
-COPY . .
+COPY src .
+COPY manage.py .
 COPY --from=jsbuilder /usr/src/js/build /project/build
 
 USER appuser

@@ -29,7 +29,7 @@ Upload documents at: http://localhost:8080/admin/filingcabinet/document/
 
 ## Integrate into a Django project
 
-See the `fc_project` dir for an example of a Django project that uses `django-filingcabinet` and the feature prediction in `fcdocs-annotate`.
+See the `src/fc_project` dir for an example of a Django project that uses `django-filingcabinet` and the feature prediction in `fcdocs-annotate`.
 
 ## Management command to import directory of PDFs
 
@@ -127,10 +127,13 @@ yarn run build
 ```
 
 To run the tests, use:
+
 ```bash
 pytest
 ```
+
 or to run the tests and see the end-to-end tests running in the browser, use:
+
 ```bash
 pytest --headed
 ```
