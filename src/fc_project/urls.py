@@ -7,14 +7,14 @@ except ImportError:
     FeatureViewSet = None
 
 from .base_urls import api_router
-from .base_urls import url_patterns as base_url_patterns
+from .base_urls import urlpatterns as base_urlpatterns
 
 if FeatureViewSet:
     api_router.register(r"feature", FeatureViewSet, basename="feature")
 
 
 urlpatterns = (
-    base_url_patterns
+    base_urlpatterns
     + [path("documents/features/", include("fcdocs_annotate.annotation.urls"))]
     if FeatureViewSet
     else []
