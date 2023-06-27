@@ -310,7 +310,7 @@ def get_document_list_context(request):
             "title": _("All documents"),
         }
     }
-    objs = Document.objects.filter(pending=False)
+    objs = Document.objects.filter(pending=False, public=True)
     context["documents"] = objs
     context["documentcollection_data"] = json.dumps(
         {
