@@ -2,7 +2,7 @@
   <div class="annotation-container" :style="style">
     <div v-if="!showAnnotationForm && canAnnotate" class="text-end mb-2">
       <button
-        class="btn btn-sm btn-light text-muted"
+        class="btn btn-sm btn-light text-body-secondary"
         @click="activateForm(false)">
         {{ i18n.addAnnotation }}
       </button>

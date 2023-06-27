@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="col-auto order-md-3 ms-auto">
-          <span class="text-muted d-inline-block text-truncate">
+          <span class="text-body-secondary d-inline-block text-truncate">
             <template v-if="document">
               {{ collection.title }}
             </template>

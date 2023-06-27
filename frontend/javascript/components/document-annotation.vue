@@ -20,7 +20,7 @@
     </p>
     <time
       :datetime="annotation.timestamp"
-      class="d-block small text-end text-muted"
+      class="d-block small text-end text-body-secondary"
       >{{ annotationTime }}</time
     >
   </div>
