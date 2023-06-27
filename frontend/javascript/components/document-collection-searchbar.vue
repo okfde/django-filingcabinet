@@ -104,8 +104,8 @@
 </template>
 
 <script>
-import DocumentFilter from './document-filter.vue'
 import DocumentFacet from './document-facet.vue'
+import DocumentFilter from './document-filter.vue'
 
 export default {
   name: 'DocumentCollectionSearchbar',
@@ -179,6 +179,11 @@ export default {
         return this.searcher.response.meta.total_count
       }
       return 0
+    },
+    pageCountFormatted() {
+      return new Intl.NumberFormat(document.documentElement.lang, {
+        style: 'decimal'
+      }).format(this.pageCount)
     },
     resultCount() {
       if (this.searcher !== null) {

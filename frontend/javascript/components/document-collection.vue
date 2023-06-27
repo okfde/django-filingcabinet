@@ -28,7 +28,7 @@
               {{ collection.title }}
             </template>
             <template v-else>
-              {{ collection.document_count }} {{ i18n.documents }}
+              {{ documentCount }} {{ i18n.documents }}
             </template>
           </span>
         </div>
@@ -156,9 +156,9 @@
 <script>
 import Vue from 'vue'
 
-import DocumentPreviewGrid from './document-preview-grid.vue'
 import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
 import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
+import DocumentPreviewGrid from './document-preview-grid.vue'
 import DocumentViewer from './document-viewer.vue'
 
 import { getData } from '../lib/utils.js'
@@ -254,6 +254,11 @@ export default {
         this.collection.document_directory_count >
         this.lastOffset + DOCUMENTS_API_LIMIT
       )
+    },
+    documentCount() {
+      return new Intl.NumberFormat(document.documentElement.lang, {
+        style: 'decimal'
+      }).format(this.collection.document_count)
     }
   },
   created() {
