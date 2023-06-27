@@ -8,7 +8,6 @@ from .views import (
     DocumentCollectionZipDownloadView,
     DocumentEmbedView,
     DocumentListEmbedView,
-    DocumentListView,
     DocumentPortalEmbedView,
     DocumentPortalView,
     DocumentView,
@@ -17,7 +16,6 @@ from .views import (
 app_name = "filingcabinet"
 
 fc_urlpatterns = [
-    path("", DocumentListView.as_view(), name="document-list"),
     path(
         pgettext_lazy("url part", "embed/"),
         xframe_options_exempt(DocumentListEmbedView.as_view()),
