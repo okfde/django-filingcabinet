@@ -55,13 +55,29 @@ export default {
   components: {
     PageAnnotation
   },
-  props: [
-    'page',
-    'annotations',
-    'currentAnnotation',
-    'canAnnotate',
-    'activeAnnotationForm'
-  ],
+  props: {
+    page: {
+      type: Object,
+      required: true
+    },
+    annotations: {
+      type: Array,
+      required: true
+    },
+    currentAnnotation: {
+      type: Number,
+      default: null
+    },
+    canAnnotate: {
+      type: Boolean,
+      default: false
+    },
+    activeAnnotationForm: {
+      type: Object,
+      default: null
+    }
+  },
+  emits: ['deleteannotation', 'currentannotation', 'activateannotationform'],
   data() {
     return {
       title: '',

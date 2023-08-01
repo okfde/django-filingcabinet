@@ -29,6 +29,7 @@ export default {
       required: true
     }
   },
+  emits: ['input'],
   data() {
     return {
       currentMin: this.value[`${this.filter.key}_after`],

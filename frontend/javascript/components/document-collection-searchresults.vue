@@ -33,7 +33,17 @@ export default {
   components: {
     DocumentPreview
   },
-  props: ['document', 'pages'],
+  props: {
+    document: {
+      type: Object,
+      required: true
+    },
+    pages: {
+      type: Array,
+      required: true
+    }
+  },
+  emits: ['navigate'],
   computed: {
     i18n() {
       return this.config.i18n

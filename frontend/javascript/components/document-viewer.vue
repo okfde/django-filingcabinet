@@ -31,6 +31,8 @@
             :default-search="preferences.defaultSearch"
             @search="search"
             @movesearchindex="moveSearchIndex" />
+        </transition>
+        <transition name="slidedown">
           <document-properties
             v-if="preferences.showDocumentProperties"
             :document="document"
@@ -119,6 +121,7 @@
           @currentpage="updateCurrentPage"
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
+          @deleteannotation="deleteAnnotation"
           @navigate="navigate" />
       </div>
     </div>

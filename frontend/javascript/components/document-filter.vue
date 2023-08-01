@@ -51,6 +51,7 @@ export default {
       default: ''
     }
   },
+  emits: ['input'],
   computed: {
     lang() {
       return document.documentElement.lang

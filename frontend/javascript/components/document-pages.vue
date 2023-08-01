@@ -60,7 +60,7 @@ export default {
       required: true
     },
     currentAnnotation: {
-      type: Object,
+      type: Number,
       default: null
     },
     activeAnnotationForm: {
@@ -80,6 +80,13 @@ export default {
       default: null
     }
   },
+  emits: [
+    'currentannotation',
+    'activateannotationform',
+    'deleteannotation',
+    'navigate',
+    'currentpage'
+  ],
   computed: {
     showText() {
       return this.preferences.showText

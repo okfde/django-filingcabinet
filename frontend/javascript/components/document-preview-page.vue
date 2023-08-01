@@ -37,6 +37,7 @@ export default {
       default: () => []
     }
   },
+  emits: ['navigate'],
   data() {
     return {
       imageLoaded: false

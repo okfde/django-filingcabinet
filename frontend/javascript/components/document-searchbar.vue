@@ -46,7 +46,29 @@
 <script>
 export default {
   name: 'DocumentSearchbar',
-  props: ['searcher', 'searchIndex', 'pages', 'defaultSearch', 'isSmallScreen'],
+  props: {
+    searcher: {
+      type: Object,
+      default: null
+    },
+    searchIndex: {
+      type: Number,
+      default: null
+    },
+    pages: {
+      type: Array,
+      default: () => []
+    },
+    defaultSearch: {
+      type: String,
+      default: null
+    },
+    isSmallScreen: {
+      type: Boolean,
+      default: true
+    }
+  },
+  emits: ['search', 'movesearchindex', 'clearsearch'],
   data() {
     return {
       search: this.defaultSearch || ''

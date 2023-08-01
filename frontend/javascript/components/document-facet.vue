@@ -58,6 +58,7 @@ export default {
       default: ''
     }
   },
+  emits: ['select'],
   computed: {
     i18n() {
       return this.$root.config.i18n

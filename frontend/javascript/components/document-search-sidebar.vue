@@ -31,7 +31,25 @@ export default {
     DocumentSearchPreview,
     RecycleScroller
   },
-  props: ['documentPages', 'pages', 'currentPage', 'height'],
+  props: {
+    documentPages: {
+      type: Array,
+      required: true
+    },
+    pages: {
+      type: Array,
+      required: true
+    },
+    currentPage: {
+      type: Number,
+      required: true
+    },
+    height: {
+      type: String,
+      required: true
+    }
+  },
+  emits: ['navigate'],
   computed: {},
   methods: {
     navigate(item) {

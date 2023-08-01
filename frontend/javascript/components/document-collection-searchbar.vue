@@ -131,6 +131,7 @@ export default {
       default: () => []
     }
   },
+  emits: ['search', 'clearsearch'],
   data() {
     return {
       search: this.searcher?.term || '',

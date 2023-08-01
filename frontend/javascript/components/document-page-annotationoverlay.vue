@@ -11,7 +11,21 @@
 <script>
 export default {
   name: 'DocumentPageAnnotationoverlay',
-  props: ['annotation', 'page', 'currentAnnotation'],
+  props: {
+    annotation: {
+      type: Object,
+      required: true
+    },
+    page: {
+      type: Object,
+      required: true
+    },
+    currentAnnotation: {
+      type: Number,
+      default: null
+    }
+  },
+  emits: ['currentannotation'],
   data() {
     return {}
   },

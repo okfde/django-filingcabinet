@@ -24,6 +24,7 @@
       </p>
     </a>
     <div v-if="highlight" class="query-highlight mb-5">
+      <!-- eslint-disable-next-line vue/no-v-html -->
       <span v-html="highlight" />
     </div>
   </div>
@@ -50,6 +51,7 @@ export default {
       default: null
     }
   },
+  emits: ['navigate'],
   data() {
     return {
       imageLoaded: false

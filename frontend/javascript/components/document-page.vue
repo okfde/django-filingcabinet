@@ -142,7 +142,7 @@ export default {
       required: true
     },
     currentAnnotation: {
-      type: Object,
+      type: Number,
       default: null
     },
     annotationForm: {
@@ -162,6 +162,12 @@ export default {
       default: () => []
     }
   },
+  emits: [
+    'currentannotation',
+    'activateannotationform',
+    'deleteannotation',
+    'navigate'
+  ],
   data() {
     return {
       imageLoaded: false,
