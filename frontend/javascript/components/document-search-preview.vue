@@ -21,6 +21,7 @@
         <template
           v-for="result in matches.results"
           :key="result.query_highlight">
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <span v-html="result.query_highlight" />
         </template>
       </div>
@@ -31,7 +32,21 @@
 <script>
 export default {
   name: 'DocumentSearchPreview',
-  props: ['page', 'matches', 'currentPage'],
+  props: {
+    page: {
+      type: Object,
+      required: true
+    },
+    matches: {
+      type: Object,
+      required: true
+    },
+    currentPage: {
+      type: Number,
+      required: true
+    }
+  },
+  emits: ['navigate'],
   computed: {
     i18n() {
       return this.$root.config.i18n

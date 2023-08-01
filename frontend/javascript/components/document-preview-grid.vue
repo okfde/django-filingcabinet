@@ -24,8 +24,8 @@
 <script>
 import 'intersection-observer'
 
-import DocumentPreview from './document-preview.vue'
 import { RecycleScroller } from 'vue-virtual-scroller'
+import DocumentPreview from './document-preview.vue'
 
 const BS_LG = 992
 const BS_MD = 768
@@ -44,6 +44,7 @@ export default {
       required: true
     }
   },
+  emits: ['loadmore', 'navigate'],
   data() {
     return {
       width: null

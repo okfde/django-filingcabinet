@@ -1,5 +1,6 @@
 <template>
   <div class="outline-wrapper" :style="{ height: height }">
+    <!-- eslint-disable-next-line vue/no-v-html -->
     <div ref="outline" class="document-outline" v-html="outlineHTML" />
   </div>
 </template>
@@ -17,7 +18,17 @@ function escapeHTML(s) {
 
 export default {
   name: 'DocumentOutlineSidebar',
-  props: ['outline', 'height'],
+  props: {
+    outline: {
+      type: String,
+      required: true
+    },
+    height: {
+      type: String,
+      default: '100%'
+    }
+  },
+  emits: ['navigate'],
   computed: {
     outlineHTML() {
       /*

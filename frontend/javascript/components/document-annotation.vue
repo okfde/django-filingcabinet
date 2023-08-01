@@ -29,7 +29,17 @@
 <script>
 export default {
   name: 'DocumentPageAnnotation',
-  props: ['annotation', 'currentAnnotation'],
+  props: {
+    annotation: {
+      type: Object,
+      required: true
+    },
+    currentAnnotation: {
+      type: Number,
+      default: null
+    }
+  },
+  emits: ['deleteannotation', 'currentannotation'],
   data() {
     return {
       activated: false

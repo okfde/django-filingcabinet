@@ -143,20 +143,52 @@
 </template>
 
 <script>
-import { triggerDownload } from '../lib/utils.js'
 import { Tooltip } from 'bootstrap'
+import { triggerDownload } from '../lib/utils.js'
 
 export default {
   name: 'DocumentToolbar',
-  props: [
-    'document',
-    'searcher',
-    'preferences',
-    'currentPage',
-    'zoom',
-    'isSmallScreen',
-    'annotationCount',
-    'pdfDocument'
+  props: {
+    document: {
+      type: Object,
+      required: true
+    },
+    searcher: {
+      type: Object,
+      default: null
+    },
+    preferences: {
+      type: Object,
+      required: true
+    },
+    currentPage: {
+      type: Number,
+      required: true
+    },
+    zoom: {
+      type: Number,
+      required: true
+    },
+    isSmallScreen: {
+      type: Boolean,
+      default: true
+    },
+    annotationCount: {
+      type: Number,
+      default: 0
+    },
+    pdfDocument: {
+      type: Object,
+      default: null
+    }
+  },
+  emits: [
+    'clearsearch',
+    'navigate',
+    'showinfo',
+    'updatepreferences',
+    'zoomin',
+    'zoomout'
   ],
   data() {
     return {

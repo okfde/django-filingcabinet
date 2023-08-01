@@ -43,6 +43,7 @@ export default {
       required: true
     }
   },
+  emits: ['navigatesidebar', 'navigate'],
   computed: {
     i18n() {
       return this.config.i18n
