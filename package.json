@@ -1,6 +1,6 @@
 {
   "name": "@okfde/filingcabinet",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "main": "frontend/javascript/entry.js",
   "repository": "git@github.com:okfde/django-filingcabinet.git",
   "author": "Stefan Wehrmeyer <mail@stefanwehrmeyer.com>",
