@@ -192,10 +192,10 @@ pydantic==1.8.2
     #   thinc
 pygments==2.15.1
     # via rich
+pypdf==3.14.0
+    # via -r requirements-production.in
 pypdf2==3.0.1
-    # via
-    #   -r requirements-production.in
-    #   django-filingcabinet
+    # via django-filingcabinet
 pyproject-hooks==1.0.0
     # via build
 pyrsistent==0.19.3
