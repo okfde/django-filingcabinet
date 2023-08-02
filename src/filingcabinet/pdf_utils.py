@@ -13,8 +13,8 @@ from typing import BinaryIO, Union
 import pikepdf
 import wand
 from PIL import Image as PILImage
-from PyPDF2 import PdfReader
-from PyPDF2.errors import PdfReadError
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
@@ -79,7 +79,7 @@ def try_reading_pdf(pdf_file, password=None):
         raise PDFException(e, "rewrite")
     except ValueError as e:  # catch invalid literal for int() with base 10
         raise PDFException(e, "rewrite")
-    except RecursionError as e:  # catch RecursionError in PyPDF2
+    except RecursionError as e:  # catch RecursionError in pypdf
         raise PDFException(e, "rewrite")
     except PdfReadError as e:
         raise PDFException(e, "decrypt")

@@ -1,6 +1,6 @@
 Django
 wand
-pypdf2>=2.11.2
+pypdf>=3
 PyCryptodome
 pikepdf
 Pillow
