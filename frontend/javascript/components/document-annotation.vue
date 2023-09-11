@@ -53,7 +53,7 @@ export default {
       return !!this.annotation.left
     },
     dtf() {
-      return new Intl.DateTimeFormat('de', {
+      return new Intl.DateTimeFormat(document.documentElement.lang, {
         year: 'numeric',
         month: 'numeric',
         day: 'numeric',

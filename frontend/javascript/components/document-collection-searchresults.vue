@@ -48,13 +48,20 @@ export default {
     i18n() {
       return this.config.i18n
     },
+    dtf() {
+      return new Intl.DateTimeFormat(document.documentElement.lang, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric'
+      })
+    },
     documentPublicationDate() {
       if (!this.document.published_at) {
         return null
       }
-      return new Intl.DateTimeFormat().format(
-        new Date(this.document.published_at)
-      )
+      return this.dtf.format(new Date(this.document.published_at))
     }
   },
   methods: {
