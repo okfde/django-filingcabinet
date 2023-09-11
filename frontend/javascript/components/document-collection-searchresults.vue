@@ -52,9 +52,7 @@ export default {
       return new Intl.DateTimeFormat(document.documentElement.lang, {
         year: 'numeric',
         month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric'
+        day: 'numeric'
       })
     },
     documentPublicationDate() {
