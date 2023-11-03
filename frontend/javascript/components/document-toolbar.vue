@@ -64,7 +64,7 @@
           <span class="visually-hidden">{{ i18n.showText }}</span>
         </button>
         <a
-          v-if="!document.properties.hide_download"
+          v-if="!document.properties._hide_download"
           :href="document.file_url"
           rel="noopener"
           class="btn btn-sm btn-secondary"
