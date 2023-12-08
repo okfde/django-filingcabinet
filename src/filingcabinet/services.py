@@ -288,8 +288,10 @@ class DocumentStorer:
         with zipfile.ZipFile(file_obj, "r") as zf:
             zip_paths = []
             # step one collect files
-            for filepath in zf.namelist():
-                path = PurePath(filepath)
+            for zip_info in zip.infolist():
+                if zip_info.is_dir():
+                    continue
+                path = PurePath(zip_info.filename)
                 parts = path.parts
                 if parts[0] in self.ZIP_BLOCK_LIST:
                     continue
