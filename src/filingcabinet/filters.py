@@ -14,7 +14,7 @@ NULL_VALUE = "-"
 
 class DocumentFilter(filters.FilterSet):
     directory = filters.ModelChoiceFilter(
-        queryset=(CollectionDirectory.objects.all().select_related("collection")),
+        queryset=CollectionDirectory.objects.all().select_related("collection"),
         null_label="",
         null_value=NULL_VALUE,
         method="filter_directory",
@@ -75,6 +75,8 @@ class DocumentFilter(filters.FilterSet):
     def filter_portal(self, qs, name, portal):
         qs = qs.filter(portal=portal)
         qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
+        # Portals have documents with publication dates
+        qs = qs.order_by("-published_at", "title")
         return qs
 
     def filter_tag(self, qs, name, value):
@@ -204,6 +206,8 @@ class PageDocumentFilterset(filters.FilterSet):
     def filter_portal(self, qs, name, portal):
         qs = qs.filter(document__portal=portal)
         qs = self.apply_data_filters(qs, portal.settings.get("filters", []))
+        # Portals have documents with publication dates
+        qs = qs.order_by("-document__published_at", "document__title")
         return qs
 
     def filter_number(self, qs, name, value):
