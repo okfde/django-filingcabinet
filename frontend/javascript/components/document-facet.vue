@@ -105,6 +105,7 @@ export default {
         const date = new Date(value)
         return date.getFullYear()
       }
+      return value
     },
     getFacetValue(value) {
       if (this.filter.facet_config?.type === 'date_histogram') {
