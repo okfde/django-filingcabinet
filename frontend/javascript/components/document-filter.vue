@@ -9,6 +9,7 @@
           :id="filter.id"
           :value="value"
           class="form-control"
+          @keyup.enter="submit"
           @input="updateFilter($event.target.value)">
           <option value="">---</option>
           <option
@@ -25,6 +26,7 @@
         <document-date-range-filter
           :value="value || {}"
           :filter="filter"
+          @submit="submit"
           @input="updateFilter" />
       </div>
     </template>
@@ -51,7 +53,7 @@ export default {
       default: ''
     }
   },
-  emits: ['input'],
+  emits: ['input', 'submit'],
   computed: {
     lang() {
       return document.documentElement.lang
@@ -61,6 +63,9 @@ export default {
     }
   },
   methods: {
+    submit() {
+      this.$emit('submit')
+    },
     updateFilter(value) {
       this.$emit('input', { key: this.filter.key, value })
     }

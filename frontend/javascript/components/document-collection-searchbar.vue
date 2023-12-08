@@ -23,7 +23,8 @@
             :key="filter.id"
             :filter="filter"
             :value="filterValues.get(filter.key) || ''"
-            @input="updateFilter" />
+            @input="updateFilter"
+            @submit="runSearch" />
         </div>
       </div>
       <div class="row mb-2">

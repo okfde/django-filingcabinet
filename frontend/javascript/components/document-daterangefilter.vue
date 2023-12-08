@@ -5,14 +5,16 @@
       type="date"
       class="form-control"
       @input="updateMin($event.target.value)"
-      @change="updateMin($event.target.value)" />
+      @change="updateMin($event.target.value)"
+      @keyup.enter="submit" />
     <span class="input-group-text">-</span>
     <input
       :value="max"
       type="date"
       class="form-control"
       @input="updateMax($event.target.value)"
-      @change="updateMax($event.target.value)" />
+      @change="updateMax($event.target.value)"
+      @keyup.enter="submit" />
   </div>
 </template>
 
@@ -29,7 +31,7 @@ export default {
       required: true
     }
   },
-  emits: ['input'],
+  emits: ['input', 'submit'],
   data() {
     return {
       currentMin: this.value[`${this.filter.key}_after`],
@@ -45,6 +47,9 @@ export default {
     }
   },
   methods: {
+    submit() {
+      this.$emit('submit')
+    },
     updateMin(min) {
       this.currentMin = min
       this.updateValue()
