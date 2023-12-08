@@ -288,7 +288,7 @@ class DocumentStorer:
         with zipfile.ZipFile(file_obj, "r") as zf:
             zip_paths = []
             # step one collect files
-            for zip_info in zip.infolist():
+            for zip_info in zf.infolist():
                 if zip_info.is_dir():
                     continue
                 path = PurePath(zip_info.filename)
