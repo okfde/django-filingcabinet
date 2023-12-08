@@ -3,6 +3,20 @@
     <label :for="filter.id" class="col-sm-3 col-md-2 col-form-label">
       {{ label }}
     </label>
+    <template v-if="filter.type == 'number'">
+      <div class="col-sm-3">
+        <input
+          :id="filter.id"
+          :value="value"
+          type="number"
+          class="form-control"
+          inputmode="numeric"
+          :min="filter.min"
+          :max="filter.max"
+          @keyup.enter="submit"
+          @input="updateFilter($event.target.value)" />
+      </div>
+    </template>
     <template v-if="filter.type == 'choice'">
       <div class="col-sm-9 col-md-10">
         <select

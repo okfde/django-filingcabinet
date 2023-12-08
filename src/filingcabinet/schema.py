@@ -27,7 +27,9 @@ SETTINGS_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "id": {"type": "string"},
-                    "type": {"type": "string", "pattern": "choice|daterange"},
+                    "type": {"type": "string", "pattern": "choice|daterange|number"},
+                    "max": {"type": "number"},
+                    "min": {"type": "number"},
                     "key": {"type": "string"},
                     "facet": {"type": "boolean"},
                     "facet_config": {
@@ -44,7 +46,7 @@ SETTINGS_SCHEMA = {
                         "propertyNames": {"pattern": "^[a-z]{2}$"},
                         "patternProperties": {"^[a-z]{2}$": {"type": "string"}},
                     },
-                    "datatype": {"type": "string"},
+                    "datatype": {"type": "string", "pattern": "int|str"},
                     "choices": {
                         "type": "array",
                         "items": {
