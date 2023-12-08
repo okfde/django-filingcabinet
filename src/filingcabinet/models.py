@@ -58,7 +58,9 @@ class DocumentPortal(models.Model):
     def documents(self):
         from . import get_document_model
 
-        return get_document_model().objects.filter(portal=self)
+        return (
+            get_document_model().objects.filter(portal=self).order_by("-published_at")
+        )
 
     @property
     def ordered_documents(self):
