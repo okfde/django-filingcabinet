@@ -384,11 +384,11 @@ export default {
     navigate({ document, page }) {
       this.document = document
       this.documentPage = page || 1
-      this.goTop()
+      nextTick(() => this.goTop())
     },
     clearDocument() {
       this.document = null
-      this.goTop()
+      nextTick(() => this.goTop())
     },
     goTop() {
       window.scrollTo(0, this.$refs.toolbar.offsetTop)
