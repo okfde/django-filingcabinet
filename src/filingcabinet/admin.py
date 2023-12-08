@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import PermissionDenied
-from django.db.models import Case, Count, F, FloatField, JSONField, Q, When
+from django.db.models import Case, Count, F, FloatField, JSONField, Q, Sum, When
 from django.db.models.functions import Cast
 from django.shortcuts import redirect
 from django.urls import path, reverse
@@ -28,6 +28,7 @@ class DocumentPortalAdmin(admin.ModelAdmin):
         "public",
         "get_document_count",
         "processed_documents_percentage",
+        "get_pages_count",
     )
     list_filter = ("public",)
     formfield_overrides = {
@@ -46,6 +47,7 @@ class DocumentPortalAdmin(admin.ModelAdmin):
             ready_document_count=Count(
                 "document", filter=Q(document__pending=False, document__num_pages__gt=0)
             ),
+            pages_count=Sum("document__num_pages"),
         )
         return qs
 
@@ -62,6 +64,10 @@ class DocumentPortalAdmin(admin.ModelAdmin):
 
     processed_documents_percentage.admin_order_field = "ready_document_count"
     processed_documents_percentage.short_description = _("Processed")
+
+    @admin.display(description=_("Pages"))
+    def get_pages_count(self, obj):
+        return obj.pages_count
 
 
 class PageInline(admin.StackedInline):
