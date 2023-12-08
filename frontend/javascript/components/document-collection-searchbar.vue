@@ -6,10 +6,10 @@
           <div class="mb-3 row">
             <label
               for="document-collection-search"
-              class="col-sm-2 col-form-label">
+              class="col-sm-3 col-md-2 col-form-label">
               {{ i18n.searchTerm }}
             </label>
-            <div class="col-sm-10">
+            <div class="col-sm-9 col-md-10">
               <input
                 id="document-collection-search"
                 v-model="search"
@@ -61,7 +61,7 @@
             <a
               v-if="showSearchFeed"
               :href="rssUrl"
-              class="text-white"
+              class="text-white ms-2"
               target="_blank">
               <i class="fa fa-rss" aria-hidden="true" />
             </a>

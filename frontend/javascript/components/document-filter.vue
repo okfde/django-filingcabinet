@@ -1,10 +1,10 @@
 <template>
   <div class="mb-3 row">
-    <label :for="filter.id" class="col-sm-2 col-form-label">
+    <label :for="filter.id" class="col-sm-3 col-md-2 col-form-label">
       {{ label }}
     </label>
     <template v-if="filter.type == 'choice'">
-      <div class="col-sm-10">
+      <div class="col-sm-9 col-md-10">
         <select
           :id="filter.id"
           :value="value"
@@ -22,7 +22,7 @@
       </div>
     </template>
     <template v-if="filter.type == 'daterange'">
-      <div class="col-sm-10">
+      <div class="col-sm-9 col-md-10">
         <document-date-range-filter
           :value="value || {}"
           :filter="filter"
