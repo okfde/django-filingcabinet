@@ -30,15 +30,17 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("directory", type=str)
+        parser.add_argument("--update", action="store_true")
 
     def handle(self, *args, **options):
         directory = options["directory"]
+        update = options["update"]
         self.portals = {}
         self.collections = {}
         pdf_files = glob.glob(os.path.join(directory, "*.pdf"))
         for pdf_file in pdf_files:
             self.stdout.write("Importing %s" % pdf_file)
-            self.import_pdf(pdf_file)
+            self.import_pdf(pdf_file, update=update)
 
     def get_content_hash(self, pdf_filename):
         h = hashlib.sha1()
@@ -50,7 +52,7 @@ class Command(BaseCommand):
                 h.update(chunk)
         return h.hexdigest()
 
-    def import_pdf(self, pdf_filename):
+    def import_pdf(self, pdf_filename, update=False):
         metadata_filename = pdf_filename.replace(".pdf", ".json")
         if os.path.exists(metadata_filename):
             with open(metadata_filename) as f:
@@ -76,7 +78,7 @@ class Command(BaseCommand):
             metadata["collection"] = None
 
         with open(pdf_filename, "rb") as pdf_fileobj:
-            create_document(pdf_fileobj, metadata)
+            create_document(pdf_fileobj, metadata, update=update)
 
     def get_portal(self, portal_slug):
         if portal_slug not in self.portals:
