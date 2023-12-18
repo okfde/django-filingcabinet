@@ -191,7 +191,9 @@ class AbstractDocument(models.Model):
     )
 
     created_at = models.DateTimeField(default=timezone.now, null=True)
-    updated_at = models.DateTimeField(default=timezone.now, null=True)
+    updated_at = models.DateTimeField(
+        auto_now=True, null=True
+    )  # Allow null for old values
     published_at = models.DateTimeField(default=None, null=True, blank=True)
 
     num_pages = models.PositiveIntegerField(default=0)
@@ -459,6 +461,12 @@ class AbstractDocument(models.Model):
 
     def has_format_webp(self):
         return self.has_format("webp")
+
+    def save(self, *args, **kwargs):
+        if "update_fields" in kwargs:
+            kwargs["update_fields"] = {"last_modified_at"}.union("update_fields")
+
+        super().save(*args, **kwargs)
 
 
 class Document(AbstractDocument):
