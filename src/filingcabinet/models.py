@@ -464,7 +464,7 @@ class AbstractDocument(models.Model):
 
     def save(self, *args, **kwargs):
         if "update_fields" in kwargs:
-            kwargs["update_fields"] = {"last_modified_at"}.union("update_fields")
+            kwargs["update_fields"] = {"updated_at"}.union(kwargs["update_fields"])
 
         super().save(*args, **kwargs)
 
