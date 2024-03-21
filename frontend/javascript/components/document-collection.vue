@@ -312,7 +312,7 @@ export default {
       }
       return documentOffsets
     },
-    makeDocuments(collection, shouldPaginate = true) {
+    makeDocuments(collection, shouldPaginate = false) {
       if (this.shouldPaginate || shouldPaginate) {
         return collection.documents
       }
