@@ -121,7 +121,7 @@ msgstr "Hat Wert"
 
 #: src/filingcabinet/admin_utils.py
 msgid "None"
-msgstr "Kein Wert"
+msgstr "Nichts"
 
 #: src/filingcabinet/api_renderers.py
 msgid "Document feed"
