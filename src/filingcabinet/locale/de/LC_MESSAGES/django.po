@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-13 17:41+0200\n"
-"PO-Revision-Date: 2023-02-15 17:38+0000\n"
+"POT-Creation-Date: 2024-05-21 14:45+0200\n"
+"PO-Revision-Date: 2024-05-21 14:46+0200\n"
 "Last-Translator: Karl Engelhardt <karl.engelhardt@okfn.de>\n"
 "Language-Team: German <https://weblate.frag-den-staat.de/projects/froide/"
 "django-filingcabinet/de/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.2\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: src/filingcabinet/admin.py
 msgid "Documents"
@@ -26,6 +26,10 @@ msgstr "Dokumente"
 #: src/filingcabinet/admin.py
 msgid "Processed"
 msgstr "Verarbeitet"
+
+#: src/filingcabinet/admin.py
+msgid "Pages"
+msgstr "Seiten"
 
 #: src/filingcabinet/admin.py
 msgid "has detected tables"
@@ -94,6 +98,22 @@ msgstr "Tabellen erkennen"
 #: src/filingcabinet/admin.py
 msgid "Set to pending"
 msgstr "Auf unverarbeitet setzen"
+
+#: src/filingcabinet/admin.py
+msgid "Rotate 90 degrees clockwise"
+msgstr "Drehe um 90 Grad im Uhrzeigersinn"
+
+#: src/filingcabinet/admin.py
+msgid "Rotate 180 degrees"
+msgstr "Drehe um 180 Grad"
+
+#: src/filingcabinet/admin.py
+msgid "Rotate 90 degrees counter-clockwise"
+msgstr "Drehe um 90 Grad gegen den Uhrzeigersinn"
+
+#: src/filingcabinet/admin.py
+msgid "Rotating pages tasks started..."
+msgstr "Seitendrehungs-Task wurde gestartet…"
 
 #: src/filingcabinet/admin_utils.py
 msgid "Has value"

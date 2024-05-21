@@ -88,3 +88,15 @@ def convert_images_to_webp_task(doc_pk):
 
     doc.properties[webp_marker] = True
     doc.save(update_fields=["properties"])
+
+
+@shared_task
+def rotate_page_task(doc_pk, page_numbers, angle):
+    from .services import rotate_pages
+
+    try:
+        doc = Document.objects.get(pk=doc_pk)
+    except Document.DoesNotExist:
+        return None
+
+    rotate_pages(doc, page_numbers, angle)

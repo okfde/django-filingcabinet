@@ -670,3 +670,11 @@ def calculcate_content_hash_from_file(file_object: BinaryIO):
         h.update(chunk)
     file_object.seek(0)
     return h.hexdigest()
+
+
+def rotate_pages_on_pdf(input_fh, output_fh, page_numbers, angle):
+    with pikepdf.Pdf.open(input_fh) as pdf:
+        for page_num in page_numbers:
+            page = pdf.pages[page_num - 1]
+            page.rotate(angle, relative=True)
+        pdf.save(output_fh)

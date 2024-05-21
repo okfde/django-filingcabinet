@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from django.contrib import admin
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import PermissionDenied
@@ -267,7 +269,7 @@ class PageAdmin(admin.ModelAdmin):
     )
     list_display = ("show_title", "number", "pending", "corrected")
 
-    actions = ["set_pending"]
+    actions = ["set_pending", "rotate_90", "rotate_180", "rotate_270"]
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -277,10 +279,34 @@ class PageAdmin(admin.ModelAdmin):
     def show_title(self, obj):
         return obj.document.title
 
+    @admin.action(description=_("Set to pending"))
     def set_pending(self, request, queryset):
         queryset.update(pending=True)
 
-    set_pending.short_description = _("Set to pending")
+    @admin.action(description=_("Rotate 90 degrees clockwise"))
+    def rotate_90(self, request, queryset):
+        self._rotate(request, queryset, 90)
+
+    @admin.action(description=_("Rotate 180 degrees"))
+    def rotate_180(self, request, queryset):
+        self._rotate(request, queryset, 180)
+
+    @admin.action(description=_("Rotate 90 degrees counter-clockwise"))
+    def rotate_270(self, request, queryset):
+        self._rotate(request, queryset, 270)
+
+    def _rotate(self, request, queryset, angle):
+        from .tasks import rotate_page_task
+
+        docs = defaultdict(list)
+
+        for page in queryset:
+            docs[page.document_id].append(page.number)
+
+        for doc_id, page_numbers in docs.items():
+            rotate_page_task.delay(doc_id, page_numbers, angle)
+
+        self.message_user(request, _("Rotating pages tasks started..."))
 
 
 class PageAnnotationAdmin(admin.ModelAdmin):
