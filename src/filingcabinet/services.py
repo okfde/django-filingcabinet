@@ -25,7 +25,13 @@ from .models import (
     get_page_annotation_filename,
     get_page_filename,
 )
-from .pdf_utils import PDFProcessor, crop_image, detect_tables, draw_highlights
+from .pdf_utils import (
+    PDFProcessor,
+    crop_image,
+    detect_tables,
+    draw_highlights,
+    rotate_pages_on_pdf,
+)
 from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT, TESSERACT_DATA_PATH
 from .tasks import convert_images_to_webp_task, process_document_task
 
@@ -410,3 +416,57 @@ def create_documents_from_files(user, file_objs):
     for file_obj in file_objs:
         filename = os.path.basename(file_obj.name)
         storer.create_from_file(file_obj, filename)
+
+
+def rotate_pages(doc, page_numbers, angle):
+    file_obj = doc.get_file()
+    if file_obj is not None:
+        output_fh = BytesIO()
+
+        with doc.get_local_file() as local_file_path:
+            rotate_pages_on_pdf(local_file_path, output_fh, page_numbers, angle)
+        file_obj.save(
+            doc.get_document_filename(), ContentFile(output_fh.getvalue()), save=True
+        )
+
+    pages = Page.objects.filter(document=doc, number__in=page_numbers)
+    for page in pages:
+        rotate_page_image(page, angle)
+
+
+def get_pil_bytes(image: PILImage.Image) -> bytes:
+    buf = BytesIO()
+    image.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def rotate_page_image(page: Page, angle: int):
+    if not page.image:
+        return
+    if angle == 0:
+        return
+    if angle % 90 != 0:
+        raise ValueError("Invalid angle: {}".format(angle))
+
+    # Pillow's rotate method is counter-clockwise
+    if angle == 90:
+        op = PILImage.Transpose.ROTATE_270
+    elif angle == 270:
+        op = PILImage.Transpose.ROTATE_90
+    else:
+        op = PILImage.Transpose.ROTATE_180
+
+    image = PILImage.open(page.image)
+    image = image.transpose(op)
+    page.image.save("page.png", ContentFile(get_pil_bytes(image)), save=False)
+    page.width, page.height = image.size
+    ratio = page.height / page.width
+    for size_name, width in Page.SIZES:
+        smaller_image = image.resize((width, int(width * ratio)))
+        field_file = getattr(page, "image_%s" % size_name)
+        field_file.save(
+            "page.png", ContentFile(get_pil_bytes(smaller_image)), save=False
+        )
+
+    page.save()
+    convert_page_to_webp(page)

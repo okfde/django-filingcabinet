@@ -284,6 +284,15 @@ class AbstractDocument(models.Model):
             return int(pages_done / self.num_pages * 100)
         return None
 
+    def get_file(self):
+        if self.pdf_file:
+            return self.pdf_file
+        if self.has_original:
+            if hasattr(self.original, "get_file"):
+                return self.original.get_file()
+            return self.original.file
+        return None
+
     def get_file_path(self):
         if self.pdf_file:
             return self.pdf_file.path
