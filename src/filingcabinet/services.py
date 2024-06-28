@@ -345,7 +345,8 @@ def get_existing_directories(collection: DocumentCollection):
 
 
 def remove_common_root_path(paths):
-    assert len(paths) > 1
+    if not paths:
+        return paths
     while True:
         common_root = None
         for path in paths:
