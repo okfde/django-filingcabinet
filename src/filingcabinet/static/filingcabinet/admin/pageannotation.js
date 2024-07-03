@@ -6,10 +6,15 @@ window.django.jQuery(function () {
   var image = $('#page_image')
   var naturalWidth = image[0].naturalWidth
   var naturalHeight = image[0].naturalHeight
-  image.on('load', function () {
+  function loaded() {
     naturalWidth = image[0].naturalWidth
     naturalHeight = image[0].naturalHeight
-  })
+  }
+  if (image[0].complete) {
+    loaded()
+  } else {
+    image.on('load', loaded)
+  }
   image.on('mousedown', function (e) {
     if (left !== null) {
       var offsetWidth = image[0].offsetWidth
@@ -78,7 +83,8 @@ window.django.jQuery(function () {
   var naturalWidth = image[0].naturalWidth
   var naturalHeight = image[0].naturalHeight
   var ratioX, ratioY
-  image.on('load', function () {
+
+  function loaded() {
     naturalWidth = image[0].naturalWidth
     naturalHeight = image[0].naturalHeight
     var offsetWidth = image[0].offsetWidth
@@ -86,7 +92,13 @@ window.django.jQuery(function () {
     ratioX = naturalWidth / offsetWidth
     ratioY = naturalHeight / offsetHeight
     drawHighlightRects()
-  })
+  }
+  if (image[0].complete) {
+    loaded()
+  } else {
+    image.on('load', loaded)
+  }
+
   image.on('mousedown', function (e) {
     if (currentHighlight !== null) {
       var w = Math.round((e.offsetX - currentHighlight.left) * ratioX)
