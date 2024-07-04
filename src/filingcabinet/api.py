@@ -57,7 +57,7 @@ def create_document(pdf_file_obj, metadata, process=True, update=False):
     if metadata.get("tags"):
         doc.tags.add(*metadata["tags"])
 
-    if metadata["collection"] is not None:
+    if metadata.get("collection") is not None:
         CollectionDocument.objects.get_or_create(
             collection=metadata["collection"],
             document=doc,
