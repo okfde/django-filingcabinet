@@ -35,6 +35,11 @@ from .pdf_utils import (
 from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT, TESSERACT_DATA_PATH
 from .tasks import convert_images_to_webp_task, process_document_task
 
+try:
+    from easy_thumbnails.files import get_thumbnailer
+except ImportError:
+    get_thumbnailer = None
+
 Document = get_document_model()
 
 
@@ -208,6 +213,9 @@ def make_page_annotation(annotation):
         annotation.height,
         transform_func=transform_func,
     )
+    if get_thumbnailer is not None:
+        thumbnailer = get_thumbnailer(annotation.image)
+        thumbnailer.delete_thumbnails()
     annotation.image.save("page_annotation.png", ContentFile(image_bytes), save=False)
 
 
