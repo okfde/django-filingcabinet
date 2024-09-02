@@ -9,36 +9,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'yarn'
-      - name: Cache pip
-        uses: actions/cache@v1
-        with:
-          key: v0-${{ runner.os }}-pip-lint-${{ hashFiles('setup.py') }}
-          path: ~/.cache/pip
-          restore-keys: |
-            v0-${{ runner.os }}-pip-lint-
-            v0-${{ runner.os }}-pip-
-      - name: Install system-level dependencies
-        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
-      - name: Install dependencies
-        run: |
-          pip install -e ".[test]"
-          yarn install
-      - name: Run flake8
-        run: flake8 src tests test_project --statistics
-      - name: Run black
-        run: black --check src tests test_project
-      - name: Run isort
-        run: isort --check src tests test_project
-      - name: Run eslint
-        run: yarn lint
+      - uses: actions/checkout@v4
+      - uses: pre-commit/action@v3.0.1
 
   test:
     runs-on: ubuntu-latest
@@ -46,16 +18,28 @@ jobs:
       matrix:
         python-version: ['3.10']
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
       - name: Install system-level dependencies
         run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
+      - name: uv cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.uv-cache
+          key: uv-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+          restore-keys: |
+            uv-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+            uv-${{ runner.os }}
       - name: Install dependencies
         run: |
-          pip install -e ".[test]"
-          playwright install --with-deps chromium
+          python -m pip install uv
+          uv pip install ".[test]"
           yarn install
       - name: Build frontend
         run: yarn run build
@@ -63,3 +47,5 @@ jobs:
         run: coverage run --branch -m pytest -m "not slow"
       - name: Show coverage report
         run: coverage report
+      - name: Minimize uv cache
+        run: uv cache prune --ci
