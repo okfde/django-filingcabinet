@@ -1,12 +1,9 @@
 {% extends "filingcabinet/base.html" %}
-
 {% block title %}{{ object.title }}{% endblock %}
-
 {% block body_tag %}
-  {% include "filingcabinet/_documentcollection_viewer.html" with container_fluid=True %}
+    {% include "filingcabinet/_documentcollection_viewer.html" with container_fluid=True %}
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}

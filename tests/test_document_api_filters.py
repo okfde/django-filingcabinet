@@ -88,7 +88,6 @@ def test_document_api_filter_id(
     client,
     document_factory,
 ):
-
     documents = document_factory.create_batch(5, public=True)
 
     response = client.get(
@@ -208,7 +207,6 @@ def test_document_api_filter_tags(
     client,
     document_factory,
 ):
-
     documents = document_factory.create_batch(5, public=True)
     documents[0].tags.add("tag1")
 
@@ -223,7 +221,6 @@ def test_document_api_filter_created_at(
     client,
     document_factory,
 ):
-
     week = timedelta(days=7)
     date = datetime(2019, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
     documents = document_factory.create_batch(5, public=True, created_at=date)

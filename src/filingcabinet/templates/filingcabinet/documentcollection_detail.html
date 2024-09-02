@@ -1,33 +1,23 @@
 {% extends "filingcabinet/base.html" %}
-
 {% load i18n %}
-
 {% block title %}{{ object.title }}{% endblock %}
-
 {% block css %}
-  {{ block.super }}
-  <link rel="alternate" type="application/json+oembed"
-  href="{{ SITE_URL }}{% url 'api:documentcollection-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
-  title="{% translate 'Document Collection oEmbed Profile' %}" />
+    {{ block.super }}
+    <link rel="alternate"
+          type="application/json+oembed"
+          href="{{ SITE_URL }}{% url 'api:documentcollection-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
+          title="{% translate 'Document Collection oEmbed Profile' %}" />
 {% endblock %}
-
 {% block body %}
-{% block documentcollection_top %}
-<div class="container mt-3 mb-5">
-    <h2>{{ object.title }}</h2>
-    {% if object.description %}
-      <p>
-         {{ object.description }} 
-      </p>
-    {% endif %}
-</div>
-{% endblock documentcollection_top %}
-
-{% include "filingcabinet/_documentcollection_viewer.html" %}
-
+    {% block documentcollection_top %}
+        <div class="container mt-3 mb-5">
+            <h2>{{ object.title }}</h2>
+            {% if object.description %}<p>{{ object.description }}</p>{% endif %}
+        </div>
+    {% endblock documentcollection_top %}
+    {% include "filingcabinet/_documentcollection_viewer.html" %}
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}

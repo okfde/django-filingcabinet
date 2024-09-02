@@ -23,8 +23,10 @@ def get_model(model_name):
     try:
         return django_apps.get_model(model_name, require_ready=False)
     except ValueError:
-        raise ImproperlyConfigured("setting must be of the form 'app_label.model_name'")
+        raise ImproperlyConfigured(
+            "setting must be of the form 'app_label.model_name'"
+        ) from None
     except LookupError:
         raise ImproperlyConfigured(
             "setting refers to model '%s' that has not been installed" % (model_name)
-        )
+        ) from None

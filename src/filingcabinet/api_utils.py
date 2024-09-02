@@ -43,9 +43,7 @@ def make_oembed_response(request, model):
             "html": """
 <iframe style="width:{width};border:0;height:{height}"
 src="{url}?maxHeight={height}"></iframe>
-        """.format(
-                url=iframe_url, height=height, width=width
-            ).strip(),
+        """.format(url=iframe_url, height=height, width=width).strip(),
         }
     )
 

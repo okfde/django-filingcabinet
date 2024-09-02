@@ -1,13 +1,15 @@
 {% extends "admin/change_list.html" %}
 {% load i18n %}
-
 {% block content %}
-  {{ block.super }}
-  <div>
-    <form enctype="multipart/form-data" method="post" action="{% url 'admin:filingcabinet-document-upload' %}">
-    {% csrf_token %}
-      <input type="file" name="file" accept="application/pdf" multiple/>
-      <input type="submit" value="{% blocktrans with cl.opts.verbose_name_plural as name %}Import {{ name }}{% endblocktrans %}"/>
-    </form>
-  </div>
+    {{ block.super }}
+    <div>
+        <form enctype="multipart/form-data"
+              method="post"
+              action="{% url 'admin:filingcabinet-document-upload' %}">
+            {% csrf_token %}
+            <input type="file" name="file" accept="application/pdf" multiple />
+            <input type="submit"
+                   value="{% blocktrans with cl.opts.verbose_name_plural as name %}Import {{ name }}{% endblocktrans %}" />
+        </form>
+    </div>
 {% endblock %}
