@@ -260,7 +260,7 @@ def trigger_process_document_task(doc_pk):
 
 
 class DocumentStorer:
-    ZIP_BLOCK_LIST = set(["__MACOSX"])
+    ZIP_BLOCK_LIST = {"__MACOSX"}
 
     def __init__(self, user, public=False, collection=None, tags=None):
         self.user = user

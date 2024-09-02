@@ -126,7 +126,6 @@ def test_page_api_filter_collection_directory(
 
 @pytest.mark.django_db
 def test_document_api_filter_document(client, processed_document, dummy_user):
-
     processed_document.public = False
     processed_document.user = dummy_user
     processed_document.save()
@@ -153,7 +152,6 @@ def test_document_api_filter_portal(
     page_factory,
     dummy_user,
 ):
-
     portal = document_portal_factory.create(public=False)
     processed_document.portal = portal
     processed_document.save()
@@ -188,7 +186,6 @@ def test_document_api_filter_data_filters(
     document_collection_factory,
     dummy_user,
 ):
-
     publisher_value = "wd1"
     document = document_factory(
         public=True, num_pages=1, data={"publisher": publisher_value, "index": 23}
@@ -277,7 +274,6 @@ def test_page_api_filter_tags(
     page_factory,
     dummy_user,
 ):
-
     document = document_factory(public=True)
     page_factory(document=document)
     processed_document.tags.add("tag1")
@@ -298,7 +294,6 @@ def test_page_api_filter_created_at(
     page_factory,
     dummy_user,
 ):
-
     week = timedelta(days=7)
     date = datetime(2019, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 

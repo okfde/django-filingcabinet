@@ -1,21 +1,14 @@
 {% extends "filingcabinet/base.html" %}
-
 {% load i18n %}
-
 {% block title %}{{ object.title }}{% endblock %}
-
 {% block body_tag %}
-{% include "filingcabinet/_document_viewer.html" with object=object container_fluid=True %}
+    {% include "filingcabinet/_document_viewer.html" with object=object container_fluid=True %}
 {% endblock %}
-
 {% block css %}
-  {{ block.super }}
-  {% if object.pending %}
-    <meta http-equiv="refresh" content="30">
-  {% endif %}
+    {{ block.super }}
+    {% if object.pending %}<meta http-equiv="refresh" content="30">{% endif %}
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}

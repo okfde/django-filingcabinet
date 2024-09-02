@@ -1,42 +1,29 @@
 {% extends "filingcabinet/base.html" %}
-
 {% load i18n %}
-
 {% block title %}{{ object.title }}{% endblock %}
-
 {% block css %}
-{{ block.super }}
-{% if object.pending %}
-<meta http-equiv="refresh" content="30">
-{% endif %}
-
-<link rel="alternate" type="application/json+oembed"
-  href="{{ SITE_URL }}{% url 'api:document-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
-  title="{% translate 'Document oEmbed Profile' %}" />
+    {{ block.super }}
+    {% if object.pending %}<meta http-equiv="refresh" content="30">{% endif %}
+    <link rel="alternate"
+          type="application/json+oembed"
+          href="{{ SITE_URL }}{% url 'api:document-oembed' %}?url={{ object.get_absolute_domain_url|urlencode }}&amp;format=json"
+          title="{% translate 'Document oEmbed Profile' %}" />
 {% endblock %}
-
 {% block body %}
-{% block document_top %}
-  <div class="container mt-3 mb-5">
-    <h2>{{ object.title }}</h2>
-    {% if not object.public %}
-      <span class="badge text-bg-secondary">{% trans "private" %}</span>
-    {% endif %}
-    {% if object.description %}
-      <p>
-         {{ object.description }}
-      </p>
-    {% endif %}
-  </div>
-{% endblock document_top %}
-
-{% block document_main %}
-  {% include "filingcabinet/_document_viewer.html" with object=object %}
-{% endblock document_main %}
-
+    {% block document_top %}
+        <div class="container mt-3 mb-5">
+            <h2>{{ object.title }}</h2>
+            {% if not object.public %}
+                <span class="badge text-bg-secondary">{% trans "private" %}</span>
+            {% endif %}
+            {% if object.description %}<p>{{ object.description }}</p>{% endif %}
+        </div>
+    {% endblock document_top %}
+    {% block document_main %}
+        {% include "filingcabinet/_document_viewer.html" with object=object %}
+    {% endblock document_main %}
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}

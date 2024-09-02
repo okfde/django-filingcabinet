@@ -1,146 +1,154 @@
 {% load static %}
 {% load i18n %}
-
 {% load filingcabinet %}
-
 {% if object.pending %}
-  <div class="container">
-    <p>
-      {% trans "This document is still being processed..." %}
-    </p>
-    {% with progress=object.get_progress %}
-      <div class="progress">
-        <div class="progress-bar {% if not progress %}progress-bar-striped progress-bar-animated{% endif %}" role="progressbar" style="width: {% if progress %}{{ progress }}{% else %}100{% endif %}%" aria-valuenow="{% if progress %}{{ progress }}{% else %}0{% endif %}" aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-    {% endwith %}
-  </div>
-{% endif %}
-
-{% if not object.pending %}
-  <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
-    <div
-      data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}{% if object.unlisted %}?uid={{ object.uid }}{% endif %}"
-      data-fcdocument="{{ document_data }}"
-      data-fcpage="{{ page_number }}"
-      data-fcconfig="{{ config }}"
-      data-fcdefaults="{{ defaults }}"
-      {% if maxHeight %}style="overflow: auto;padding:0 12px;height:{{ maxHeight }}"{% endif %}>
-      <div class="toolbar">
-        <div>
-          <div class="row py-2 bg-dark toolbar-row">
-            <div class="col-auto px-1 px-sm-2">
-              <div role="group" class="btn-group">
-                <button type="button" class="btn btn-sm btn-secondary" disabled>
-                  <i class="fa fa-toggle-left"></i>
-                </button>
-              </div>
+    <div class="container">
+        <p>{% trans "This document is still being processed..." %}</p>
+        {% with progress=object.get_progress %}
+            <div class="progress">
+                <div class="progress-bar {% if not progress %}progress-bar-striped progress-bar-animated{% endif %}"
+                     role="progressbar"
+                     style="width: {% if progress %}{{ progress }}{% else %}100{% endif %}%"
+                     aria-valuenow="{% if progress %}{{ progress }}{% else %}0{% endif %}"
+                     aria-valuemin="0"
+                     aria-valuemax="100"></div>
             </div>
-            <div class="col col-md-auto pe-0 ps-1 px-sm-2">
-              <div class="input-group input-group-sm">
-                <input type="number" class="page-number-input form-control bg-light form-control-sm" disabled value="{{ page_number }}" style="width: 70px!important">
-                <span class="d-none d-sm-inline input-group-text">/ {{ object.num_pages }}</span>
-              </div>
-            </div>
-            <div class="col col-md-auto ps-0 pe-1 px-sm-2">
-              <div role="group" class="btn-group">
-                <button class="btn btn-sm btn-secondary" disabled>
-                  <i class="fa fa-info-circle"></i>
-                  <span class="visually-hidden">Dokumentendetails</span>
-                </button>
-                <button type="button" class="btn btn-sm btn-secondary" disabled>
-                  <i class="fa fa-file-text"></i>
-                  <span class="visually-hidden">Zeige/verstecke Text</span>
-                </button>
-                <a href="#" class="btn btn-sm btn-secondary">
-                  <i class="fa fa-download"></i>
-                  <span class="visually-hidden">PDF herunterladen</span>
-                </a>
-              </div>
-            </div>
-            <div class="col col-md-auto px-1 px-sm-2">
-              <div role="group" class="btn-group">
-                <button type="button" disabled="disabled" class="btn btn-sm btn-secondary" disabled>
-                  <i class="fa fa-search-minus"></i>
-                </button>
-                <button type="button" class="btn btn-sm btn-secondary" disabled>
-                  <i class="fa fa-search-plus"></i>
-                </button>
-              </div>
-            </div>
-            <div class="col col-sm-auto px-1 px-sm-2 ms-auto text-end">
-              <button type="button" class="btn btn-sm btn-secondary" disabled>
-                <i class="fa fa-search"></i>
-              </button>
-            </div>
-          </div>
-            <!---->
-        </div>
-          <!---->
-      </div>
-      <div class="row main-row">
-        <div class="sidebar-container d-none d-md-block col-md-3 col-sm-2 px-0 bg-dark">
-          <div class="sidebar preview" style="top: 47px;">
-            <div class="sidebar-content" style="height: calc(100vh - 47px)">
-              <div class="document-preview-pages">
-                {% for page in pages %}
-                  <div>
-                    <a href="#page-{{ page.number }}" class="document-preview-page px-2 text-center d-block">
-                      <picture>
-                        {% if object.has_format_webp %}
-                          <source
-                            srcset="{{ page.get_preview_image_url_webp }}"
-                            type="image/webp"
-                          >
-                        {% endif %}
-                        <img src="{{ page.get_preview_image_url }}" loading="lazy" alt="" class="img-fluid page-image">
-                      </picture>
-                      <!---->
-                      <p class="text-white">{{ page.number }}</p>
-                    </a>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-        </div>
-          <!---->
-
-        <div class="col document-pages-container bg-light annotations-hidden">
-          <div class="document-pages">
-
-            {% for page in pages %}
-              <div class="row justify-content-center">
-                <div class="col">
-                  <div class="page-wrapper">
-                    <div id="page-{{ page.number }}" class="page" style="width:100%;padding-bottom:{{ page.dim_ratio_percent }}%;">
-                      <pre class="visually-hidden">{{ page.content }}</pre>
-                      <picture>
-                        {% if object.has_format_webp %}
-                          <source
-                            srcset="{{ page.get_image_srcset_webp }}"
-                            type="image/webp"
-                          >
-                        {% endif %}
-                        <img src="{{ page.get_normal_image_url }}" loading="lazy" srcset="{{ page.get_image_srcset }}" alt="{{ page.number }}" draggable="false" class="page-image img-fluid"/>
-                      </picture>
-                    </div>
-                  </div>
-                  <p class="page-number">{{ page.numnber }}</p>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-      {% if next_page %}
-        <a href="./?page={{ next_page }}">
-          {% translate "Go to next pages" %}
-        </a>
-      {% endif %}
+        {% endwith %}
     </div>
-  </div>
+{% endif %}
+{% if not object.pending %}
+    <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
+        <div data-fcdocumenturl="{% url 'api:document-detail' pk=object.pk %}{% if object.unlisted %}?uid={{ object.uid }}{% endif %}"
+             data-fcdocument="{{ document_data }}"
+             data-fcpage="{{ page_number }}"
+             data-fcconfig="{{ config }}"
+             data-fcdefaults="{{ defaults }}"
+             {% if maxHeight %}style="overflow: auto;padding:0 12px;height:{{ maxHeight }}"{% endif %}>
+            <div class="toolbar">
+                <div>
+                    <div class="row py-2 bg-dark toolbar-row">
+                        <div class="col-auto px-1 px-sm-2">
+                            <div role="group" class="btn-group">
+                                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fa fa-toggle-left"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col col-md-auto pe-0 ps-1 px-sm-2">
+                            <div class="input-group input-group-sm">
+                                <input type="number"
+                                       class="page-number-input form-control bg-light form-control-sm"
+                                       disabled
+                                       value="{{ page_number }}"
+                                       style="width: 70px!important">
+                                <span class="d-none d-sm-inline input-group-text">/ {{ object.num_pages }}</span>
+                            </div>
+                        </div>
+                        <div class="col col-md-auto ps-0 pe-1 px-sm-2">
+                            <div role="group" class="btn-group">
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fa fa-info-circle"></i>
+                                    <span class="visually-hidden">Dokumentendetails</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fa fa-file-text"></i>
+                                    <span class="visually-hidden">Zeige/verstecke Text</span>
+                                </button>
+                                <a href="#" class="btn btn-sm btn-secondary">
+                                    <i class="fa fa-download"></i>
+                                    <span class="visually-hidden">PDF herunterladen</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col col-md-auto px-1 px-sm-2">
+                            <div role="group" class="btn-group">
+                                <button type="button"
+                                        disabled="disabled"
+                                        class="btn btn-sm btn-secondary"
+                                        disabled>
+                                    <i class="fa fa-search-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-secondary" disabled>
+                                    <i class="fa fa-search-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col col-sm-auto px-1 px-sm-2 ms-auto text-end">
+                            <button type="button" class="btn btn-sm btn-secondary" disabled>
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!---->
+                </div>
+                <!---->
+            </div>
+            <div class="row main-row">
+                <div class="sidebar-container d-none d-md-block col-md-3 col-sm-2 px-0 bg-dark">
+                    <div class="sidebar preview" style="top: 47px;">
+                        <div class="sidebar-content" style="height: calc(100vh - 47px)">
+                            <div class="document-preview-pages">
+                                {% for page in pages %}
+                                    <div>
+                                        <a href="#page-{{ page.number }}"
+                                           class="document-preview-page px-2 text-center d-block">
+                                            <picture>
+                                                {% if object.has_format_webp %}<source srcset="{{ page.get_preview_image_url_webp }}" type="image/webp">{% endif %}
+                                                <img src="{{ page.get_preview_image_url }}"
+                                                     loading="lazy"
+                                                     alt=""
+                                                     class="img-fluid page-image">
+                                            </picture>
+                                            <!---->
+                                            <p class="text-white">{{ page.number }}</p>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!---->
+                <div class="col document-pages-container bg-light annotations-hidden">
+                    <div class="document-pages">
+                        {% for page in pages %}
+                            <div class="row justify-content-center">
+                                <div class="col">
+                                    <div class="page-wrapper">
+                                        <div id="page-{{ page.number }}"
+                                             class="page"
+                                             style="width:100%;
+                                                    padding-bottom:{{ page.dim_ratio_percent }}%">
+                                            <pre class="visually-hidden">{{ page.content }}</pre>
+                                            <picture>
+                                                {% if object.has_format_webp %}<source srcset="{{ page.get_image_srcset_webp }}" type="image/webp">{% endif %}
+                                                <img src="{{ page.get_normal_image_url }}"
+                                                     loading="lazy"
+                                                     srcset="{{ page.get_image_srcset }}"
+                                                     alt="{{ page.number }}"
+                                                     draggable="false"
+                                                     class="page-image img-fluid" />
+                                            </picture>
+                                        </div>
+                                    </div>
+                                    <p class="page-number">{{ page.numnber }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% if next_page %}
+                <a href="./?page={{ next_page }}">{% translate "Go to next pages" %}</a>
+            {% endif %}
+        </div>
+    </div>
 {% else %}
-  <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
-    <iframe src="{{ object.get_authorized_file_url }}" frameborder="0" style="width: 100%; height: 90vh; border: 0;"></iframe>
-  </div>
+    <div class="{% if container_fluid %}container-fluid{% else %}container{% endif %}">
+        <iframe src="{{ object.get_authorized_file_url }}"
+                frameborder="0"
+                style="width: 100%;
+                       height: 90vh;
+                       border: 0"></iframe>
+    </div>
 {% endif %}

@@ -67,22 +67,22 @@ def try_reading_pdf(pdf_file, password=None):
     try:
         pdf_reader = PdfReader(pdf_file, strict=False)
     except (PdfReadError, ValueError, OSError) as e:
-        raise PDFException(e, "rewrite")
+        raise PDFException(e, "rewrite") from None
 
     if pdf_reader.is_encrypted:
-        raise PDFException(None, "decrypt")
+        raise PDFException(None, "decrypt") from None
 
     try:
         # Try reading number of pages
         len(pdf_reader.pages)
     except KeyError as e:  # catch KeyError '/Pages'
-        raise PDFException(e, "rewrite")
+        raise PDFException(e, "rewrite") from None
     except ValueError as e:  # catch invalid literal for int() with base 10
-        raise PDFException(e, "rewrite")
+        raise PDFException(e, "rewrite") from None
     except RecursionError as e:  # catch RecursionError in pypdf
-        raise PDFException(e, "rewrite")
+        raise PDFException(e, "rewrite") from None
     except PdfReadError as e:
-        raise PDFException(e, "decrypt")
+        raise PDFException(e, "decrypt") from None
     return pdf_reader
 
 
@@ -98,7 +98,7 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
                 pdf_file = copy_func(pdf_file)
             tries += 1
             if tries > 2:
-                raise Exception("PDF Redaction Error")
+                raise Exception("PDF Redaction Error") from None
             if e.reason == "rewrite":
                 next_pdf_file = rewrite_pdf_in_place(
                     pdf_file, password=password, timeout=timeout
@@ -112,7 +112,7 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
                     pdf_file, password=password, timeout=timeout
                 )
             if next_pdf_file is None:
-                raise Exception("PDF Rewrite Error")
+                raise Exception("PDF Rewrite Error") from None
             pdf_file = next_pdf_file
 
 

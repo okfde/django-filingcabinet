@@ -10,4 +10,4 @@ def validate_settings_schema(val):
     try:
         validate(val, SETTINGS_SCHEMA)
     except JSValidationError as e:
-        raise ValidationError(str(e))
+        raise ValidationError(str(e)) from None

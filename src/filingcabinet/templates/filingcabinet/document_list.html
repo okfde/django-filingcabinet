@@ -1,20 +1,14 @@
 {% extends "filingcabinet/base.html" %}
-
 {% load i18n %}
 {% load static %}
-
 {% block title %}{{ object.title }}{% endblock %}
 {% block description %}{{ object.description }}{% endblock %}
-
 {% block body %}
-{% block documentcollection_top %}
-{% endblock documentcollection_top %}
-
-{% include "filingcabinet/_documentcollection_viewer.html" %}
-
+    {% block documentcollection_top %}
+    {% endblock documentcollection_top %}
+    {% include "filingcabinet/_documentcollection_viewer.html" %}
 {% endblock %}
-
 {% block scripts %}
-  {{ block.super }}
-  {% include "_frontend.html" with entry_point="filingcabinet.js" %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="filingcabinet.js" %}
 {% endblock %}
