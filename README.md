@@ -122,8 +122,8 @@ python3 -m venv fc-env
 source  fc-env/bin/activate
 pip install -e ".[test]"
 playwright install --with-deps chromium
-yarn install
-yarn run build
+pnpm install
+pnpm run build
 ```
 
 To run the tests, use:

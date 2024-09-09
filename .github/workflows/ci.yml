@@ -25,10 +25,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: 'pnpm'
       - name: Install system-level dependencies
         run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
       - name: uv cache
@@ -43,9 +47,9 @@ jobs:
         run: |
           python -m pip install uv
           uv pip install ".[test]"
-          yarn install
+          pnpm install
       - name: Build frontend
-        run: yarn run build
+        run: pnpm run build
       - name: Run tests
         run: coverage run --branch -m pytest -m "not slow"
       - name: Show coverage report
