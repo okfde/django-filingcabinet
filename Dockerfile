@@ -1,10 +1,11 @@
-FROM node:16-alpine as jsbuilder
+FROM node:20-alpine as jsbuilder
 WORKDIR /usr/src/js
-COPY package.json yarn.lock /usr/src/js/
-RUN yarn install
+COPY package.json pnpm-lock.yaml /usr/src/js/
+RUN corepack enable
+RUN pnpm install
 COPY frontend /usr/src/js/frontend
 COPY vite.config.js .
-RUN yarn build
+RUN pnpm build
 
 # ---
 

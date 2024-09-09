@@ -1,4 +1,3 @@
-
 import prettier from 'eslint-config-prettier'
 import pluginVue from 'eslint-plugin-vue'
 import js from '@eslint/js'
