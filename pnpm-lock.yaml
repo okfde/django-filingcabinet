@@ -21,7 +21,7 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       pdfjs-dist:
-        specifier: '==2.9.359'
+        specifier: 2.9.359
         version: 2.9.359(worker-loader@3.0.8(webpack@5.94.0))
       vue:
         specifier: ^3.3.4
