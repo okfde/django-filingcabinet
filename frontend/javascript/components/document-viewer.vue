@@ -20,7 +20,8 @@
           @showinfo="
             preferences.showDocumentProperties =
               !preferences.showDocumentProperties
-          " />
+          "
+        />
         <transition name="slidedown">
           <document-searchbar
             v-if="preferences.showSearchbar"
@@ -30,13 +31,15 @@
             :is-small-screen="isSmallScreen"
             :default-search="preferences.defaultSearch"
             @search="search"
-            @movesearchindex="moveSearchIndex" />
+            @movesearchindex="moveSearchIndex"
+          />
         </transition>
         <transition name="slidedown">
           <document-properties
             v-if="preferences.showDocumentProperties"
             :document="document"
-            @close="preferences.showDocumentProperties = false" />
+            @close="preferences.showDocumentProperties = false"
+          />
         </transition>
       </div>
       <transition v-if="isSmallScreen" name="slidedown">
@@ -46,19 +49,22 @@
           :class="{
             'bg-dark': !preferences.showSearchResults,
             'bg-secondary': !!preferences.showSearchResults
-          }">
+          }"
+        >
           <document-search-sidebar
             v-if="preferences.showSearchResults"
             :document-pages="document.pages"
             :pages="pagesWithMatches"
             :current-page="currentPage"
             :height="sidebarContentHeight"
-            @navigate="navigate" />
+            @navigate="navigate"
+          />
           <document-outline-sidebar
             v-else-if="preferences.showOutline"
             :outline="document.outline"
             :height="sidebarContentHeight"
-            @navigate="navigate" />
+            @navigate="navigate"
+          />
         </div>
       </transition>
     </div>
@@ -70,14 +76,16 @@
         :class="{
           'bg-dark': !preferences.showSearchResults,
           'bg-secondary': !!preferences.showSearchResults
-        }">
+        }"
+      >
         <div
           class="sidebar"
           :class="{
             preview: !preferences.showSearchResults,
             search: !!preferences.showSearchResults
           }"
-          :style="sidebarStyle">
+          :style="sidebarStyle"
+        >
           <div class="sidebar-content" :style="sidebarContentStyle">
             <document-search-sidebar
               v-if="preferences.showSearchResults"
@@ -85,19 +93,22 @@
               :pages="pagesWithMatches"
               :current-page="currentPage"
               :height="sidebarContentHeight"
-              @navigate="navigate" />
+              @navigate="navigate"
+            />
             <document-outline-sidebar
               v-else-if="preferences.showOutline"
               :outline="document.outline"
               :height="sidebarContentHeight"
-              @navigate="navigate" />
+              @navigate="navigate"
+            />
             <document-preview-sidebar
               v-else
               :pages="document.pages"
               :image-formats="supportedImageFormats"
               :height="sidebarContentHeight"
               @navigate="navigate"
-              @navigatesidebar="navigateSidebar(currentPage)" />
+              @navigatesidebar="navigateSidebar(currentPage)"
+            />
           </div>
         </div>
       </div>
@@ -107,7 +118,8 @@
         :class="{
           'annotations-hidden': !preferences.showAnnotations,
           '-sm': isSmallScreen
-        }">
+        }"
+      >
         <document-pages
           :document="document"
           :pages="document.pages"
@@ -122,7 +134,8 @@
           @currentannotation="updateCurrentAnnotation"
           @activateannotationform="activateAnnotationForm"
           @deleteannotation="deleteAnnotation"
-          @navigate="navigate" />
+          @navigate="navigate"
+        />
       </div>
     </div>
   </div>
@@ -131,7 +144,7 @@
 <script>
 import { nextTick } from 'vue'
 
-import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.js?url'
+import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 import DocumentOutlineSidebar from './document-outline-sidebar.vue'
 import DocumentPages from './document-pages.vue'
