@@ -317,7 +317,7 @@ class DocumentStorer:
 
             doc_paths = remove_common_root_path(zip_paths)
             directories = get_existing_directories(self.collection)
-            for doc_path, zip_path in zip(doc_paths, zip_paths):
+            for doc_path, zip_path in zip(doc_paths, zip_paths, strict=False):
                 self.ensure_directory_exists(doc_path, directories)
                 directory = directories.get(doc_path.parent)
                 file_obj = BytesIO(zf.read(str(zip_path)))
