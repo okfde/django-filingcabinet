@@ -521,7 +521,7 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
     a4_width, a4_height = A4
     writer = io.BytesIO()
     pdf = canvas.Canvas(writer, pagesize=A4)
-    for filename, instruction in zip(filenames, instructions):
+    for filename, instruction in zip(filenames, instructions, strict=False):
         with Image(filename=filename, resolution=dpi) as image:
             image.background_color = Color("white")
             image.format = "jpg"
