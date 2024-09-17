@@ -144,7 +144,7 @@
 <script>
 import { nextTick } from 'vue'
 
-import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
+import PDFJSWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url'
 
 import DocumentOutlineSidebar from './document-outline-sidebar.vue'
 import DocumentPages from './document-pages.vue'
