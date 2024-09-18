@@ -111,6 +111,7 @@ import PageAnnotations from './document-annotations.vue'
 import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
 import { FilingcabinetLinkService } from '../lib/pdfjs-utils.js'
+import { toRaw } from 'vue'
 
 const PAGE_SIZES = {
   small: 180,
@@ -401,7 +402,7 @@ export default {
     },
     loadText(pdfDocument) {
       this.textLoaded = true
-      pdfDocument
+      toRaw(pdfDocument)
         .getPage(this.page.number)
         .then((pdfPage) => {
           if (this.destroyed) {
