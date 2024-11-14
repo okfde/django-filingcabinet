@@ -28,11 +28,12 @@ class Downloader {
     const documents = await this.getDocumentsData(collection.documents_uri, directory)
     for (const document of documents) {
       console.log("Downloading file", document)
-      await this.downloadAndAddFile(document, dirHandle)
+      await this.downloadAndWriteFile(document, dirHandle)
+      this.documentsDownloaded += 1
+      this.progressCallback(this.documentsDownloaded / this.documentCount * 100)  
     }
     for (const directory of collection.directories) {
-      const dirName = directory.name
-      const subDirHandle = await dirHandle.getDirectoryHandle(dirName, { create: true });
+      const subDirHandle = await this.getSubDirectoryHandle(dirHandle, directory)
       await this.downloadDirectory(subDirHandle, directory)
     }
   }
@@ -80,8 +81,41 @@ class Downloader {
     return await window.showDirectoryPicker(pickerOpts);
   }
 
-  async downloadAndAddFile(document, dirHandle) {
+  async getSubDirectoryHandle(dirHandle, directory) {
+    const dirName = directory.name
+    try {
+      // If directory exists, return handle
+      return await dirHandle.getDirectoryHandle(dirName, { create: false });
+    } catch (e) {
+      if (e.name !== "NotFoundError") {
+        throw e
+      }
+    }
+    // If directory does not exist, try creating it
+    try {
+      return await dirHandle.getDirectoryHandle(dirName, { create: true });
+    } catch (e) {
+      if (e.name !== "TypeError") {
+        throw e
+      }
+    }
+
+    // Name is not valid, try slugifying it
+    const newDirName = dirName.replace(/\\\/:\*\?"<>\|/gi, '_').substring(0, 100) + '-' + directory.id
+    return await dirHandle.getDirectoryHandle(newDirName, { create: true });
+  }
+
+  async downloadAndWriteFile(document, dirHandle) {
     const filename = document.url.split('/').pop().replace(/\.pdf$/, `-${document.id}.pdf`);
+    try {
+      // if file exists, skip
+      await dirHandle.getFileHandle(filename, { create: false });
+      return
+    } catch (e) {
+      if (e.name !== "NotFoundError") {
+        throw e
+      }
+    }
     const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
     const response = await fetch(document.url);
     const writable = await fileHandle.createWritable();
@@ -92,8 +126,6 @@ class Downloader {
       await writable.write(value);
     }
     await writable.close();
-    this.documentsDownloaded += 1
-    this.progressCallback(this.documentsDownloaded / this.documentCount * 100)
   }
 }
 
