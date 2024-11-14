@@ -3,6 +3,7 @@ from django.utils.translation import pgettext_lazy
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from .views import (
+    DocumentCollectionDownloadView,
     DocumentCollectionEmbedView,
     DocumentCollectionView,
     DocumentCollectionZipDownloadView,
@@ -38,6 +39,14 @@ fc_urlpatterns = [
         ),
         xframe_options_exempt(DocumentCollectionEmbedView.as_view()),
         name="document-collection_embed",
+    ),
+    path(
+        pgettext_lazy(
+            "url part",
+            "collection/<int:pk>-<slug:slug>/download/",
+        ),
+        xframe_options_exempt(DocumentCollectionDownloadView.as_view()),
+        name="document-collection_download",
     ),
     path(
         pgettext_lazy(

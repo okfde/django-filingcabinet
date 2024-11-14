@@ -269,6 +269,12 @@ class DocumentCollectionEmbedView(DocumentCollectionView):
     redirect_short_url_name = "filingcabinet:document-collection_embed_short"
 
 
+class DocumentCollectionDownloadView(DocumentCollectionView):
+    template_name = "filingcabinet/documentcollection_detail_download.html"
+    redirect_url_name = "filingcabinet:document-collection_download"
+    redirect_short_url_name = "filingcabinet:document-collection_embed_short"
+
+
 def get_document_portal_context(portal, request):
     context = {"object": portal}
     context["documents"] = Document.objects.filter(portal=portal, pending=False)

@@ -1,0 +1,33 @@
+{% extends "filingcabinet/base.html" %}
+{% load i18n %}
+{% block title %}
+    {{ object.title }}
+{% endblock title %}
+{% block body %}
+    <div class="container mt-3">
+        <h2>{{ object.title }}</h2>
+        <div data-fcdownload="{% url 'api:documentcollection-detail' pk=object.id %}">
+            <div class="progress"
+                 role="progressbar"
+                 aria-label="Basic example"
+                 aria-valuenow="0"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 hidden>
+                <div class="progress-bar progress-bar-animated" style="width: 100%"></div>
+            </div>
+            <div class="alert alert-danger" hidden>
+                {% translate "Your browser does not support batch downloading. You will need a Chrome-based browser." %}
+            </div>
+            <p class="text-center mt-5">
+                <button data-downloading="{% translate 'Downloading...' %}"
+                        data-downloaded="{% translate 'Download complete' %}"
+                        class="btn btn-primary btn-lg">{% translate "Choose directory and start download" %}</button>
+            </p>
+        </div>
+    </div>
+{% endblock body %}
+{% block scripts %}
+    {{ block.super }}
+    {% include "_frontend.html" with entry_point="fcdownloader.js" %}
+{% endblock %}
