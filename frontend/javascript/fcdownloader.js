@@ -69,7 +69,7 @@ class Downloader {
         id: obj.id,
         url: obj.file_url
       })));
-      url = data.next;
+      url = data.meta.next;
     }
     return documents
   }
