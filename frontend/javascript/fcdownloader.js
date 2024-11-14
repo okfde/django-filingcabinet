@@ -82,27 +82,18 @@ class Downloader {
   }
 
   async getSubDirectoryHandle(dirHandle, directory) {
-    const dirName = directory.name
+    const dirName = directory.name.replace(/[\\/:*?"<>|]/gi, '_')
     try {
       // If directory exists, return handle
       return await dirHandle.getDirectoryHandle(dirName, { create: false });
     } catch (e) {
       if (e.name !== "NotFoundError") {
+        console.warn("Error getting subdirectory handle", directory)
         throw e
       }
     }
     // If directory does not exist, try creating it
-    try {
-      return await dirHandle.getDirectoryHandle(dirName, { create: true });
-    } catch (e) {
-      if (e.name !== "TypeError") {
-        throw e
-      }
-    }
-
-    // Name is not valid, try slugifying it
-    const newDirName = dirName.replace(/\\\/:\*\?"<>\|/gi, '_').substring(0, 100) + '-' + directory.id
-    return await dirHandle.getDirectoryHandle(newDirName, { create: true });
+    return await dirHandle.getDirectoryHandle(dirName, { create: true });
   }
 
   async downloadAndWriteFile(document, dirHandle) {
