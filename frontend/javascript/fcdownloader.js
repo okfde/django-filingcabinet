@@ -46,6 +46,8 @@ class Downloader {
     const params = new URLSearchParams(url.search)
     if (directory) {
       params.append('directory', directory.id)
+    } else {
+      params.append('directory', "-")
     }
     url.search = params
     return url
