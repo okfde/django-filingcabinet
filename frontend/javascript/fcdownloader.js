@@ -25,8 +25,8 @@ class Downloader {
     if (directory === null) {
       this.documentCount = collection.document_count
     }
-    const documents = await this.getDocumentsData(collection.documents_uri, directory)
-    for (const document of documents) {
+    const documentGenerator = this.getDocumentsData(collection.documents_uri, directory)
+    for await (const document of documentGenerator) {
       console.log("Downloading file", document)
       await this.downloadAndWriteFile(document, dirHandle)
       this.documentsDownloaded += 1
@@ -38,11 +38,8 @@ class Downloader {
     }
   }
 
-  _addDirectoryParamToUrl(url, directory) {
-    url = new URL(
-      url,
-      window.location.origin
-    )
+  addDirectoryParamToUrl(url, directory) {
+    url = new URL(url, window.location.origin)
     const params = new URLSearchParams(url.search)
     if (directory) {
       params.append('directory', directory.id)
@@ -54,24 +51,24 @@ class Downloader {
   }
 
   async getCollectionData(directory = null) {
-    const url = this._addDirectoryParamToUrl(this.collectionUrl, directory)
+    const url = this.addDirectoryParamToUrl(this.collectionUrl, directory)
     const response = await fetch(url);
     return await response.json();
   }
 
-  async getDocumentsData(documentUrl, directory = null) {
-    let url = this._addDirectoryParamToUrl(documentUrl, directory)
-    const documents = []
+  async *getDocumentsData(documentUrl, directory = null) {
+    let url = this.addDirectoryParamToUrl(documentUrl, directory)
     while (url) {
       const response = await fetch(url);
       const data = await response.json();
-      documents.push(...data.objects.map((obj) => ({
-        id: obj.id,
-        url: obj.file_url
-      })));
+      for (const obj of data.objects) {
+        yield {
+          id: obj.id,
+          url: obj.file_url
+        }
+      }
       url = data.meta.next;
     }
-    return documents
   }
 
   async getDirectoryHandle () {
@@ -111,25 +108,34 @@ class Downloader {
     }
     const fileHandle = await dirHandle.getFileHandle(filename, { create: true });
     const response = await fetch(document.url);
+    if (response.status !== 200) {
+      throw new Error(`Failed to download ${document.url}: ${response.status}`);
+    }
     const writable = await fileHandle.createWritable();
     const reader = response.body.getReader();
+    let bytesWritten = 0
     while (true) {
       const {value, done} = await reader.read();
       if (done) break;
       await writable.write(value);
+      bytesWritten += value.byteLength
     }
     await writable.close();
+    if (bytesWritten === 0) {
+      console.warn("File is empty", document)
+    }
   }
 }
 
 
 const startDownload = async (collectionUrl, downloadError, downloadButton, downloadProgress) => {
-  const downloader = new Downloader(collectionUrl, (progress) => {
+  const progressCallback = (progress) => {
     downloadProgress.setAttribute('aria-valuenow', progress)
     const bar = downloadProgress.querySelector('.progress-bar')
     bar.style.width = `${progress}%`
     bar.classList.remove('progress-bar-animated')
-  });
+  }
+  const downloader = new Downloader(collectionUrl, progressCallback)
   downloadButton.disabled = true;
   downloadProgress.hidden = false
   downloadButton.textContent = downloadButton.dataset.downloading;
@@ -142,6 +148,7 @@ const startDownload = async (collectionUrl, downloadError, downloadButton, downl
     return
   }
   if (result) {
+    progressCallback(100)
     downloadButton.textContent = downloadButton.dataset.downloaded;
   } else {
     downloadButton.disabled = false;
