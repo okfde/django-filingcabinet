@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-14 14:05+0100\n"
+"POT-Creation-Date: 2024-11-15 10:29+0100\n"
 "PO-Revision-Date: 2024-11-14 14:40+0100\n"
 "Last-Translator: Karl Engelhardt <karl.engelhardt@okfn.de>\n"
 "Language-Team: German <https://weblate.frag-den-staat.de/projects/froide/"
@@ -19,425 +19,425 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.5\n"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Documents"
 msgstr "Dokumente"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Processed"
 msgstr "Verarbeitet"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Pages"
 msgstr "Seiten"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "has detected tables"
 msgstr "Tabellen wurden erkannt"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Started processing documents."
 msgstr "Verarbeitung der Dokumente gestartet."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Process documents"
 msgstr "Verarbeite Dokumente"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Started reprocessing documents."
 msgstr "Neuverarbeitung der Dokumente gestartet."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Reprocess documents"
 msgstr "Dokument neuverarbeiten"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Fixing document paths..."
 msgstr "Dokumentenpfade werden repariert..."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Fix document paths"
 msgstr "Repariere Dokumentenpfade"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Publishing {} documents..."
 msgstr "{} Dokumente werden veröffentlicht..."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Please select only non-pending documents for publishing."
 msgstr "Bitte wählen Sie nur fertige Dokumente zur Veröffentlichung."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Publish documents"
 msgstr "Dokumente veröffentlichen"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Unpublishing {} documents..."
 msgstr "{} Dokumente werden depubliziert..."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Unpublish documents"
 msgstr "Dokumente depublizieren"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Mark as listed"
 msgstr "Als gelistet markieren"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Mark as unlisted"
 msgstr "Als ungelistet markieren"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Detecting tables tasks started..."
 msgstr "Tabellenerkennung wurde gestartet..."
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Detect tables"
 msgstr "Tabellen erkennen"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Set to pending"
 msgstr "Auf unverarbeitet setzen"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Rotate 90 degrees clockwise"
 msgstr "Drehe um 90 Grad im Uhrzeigersinn"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Rotate 180 degrees"
 msgstr "Drehe um 180 Grad"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Rotate 90 degrees counter-clockwise"
 msgstr "Drehe um 90 Grad gegen den Uhrzeigersinn"
 
-#: admin.py
+#: src/filingcabinet/admin.py
 msgid "Rotating pages tasks started..."
 msgstr "Seitendrehungs-Task wurde gestartet…"
 
-#: admin_utils.py
+#: src/filingcabinet/admin_utils.py
 msgid "Has value"
 msgstr "Hat Wert"
 
-#: admin_utils.py
+#: src/filingcabinet/admin_utils.py
 msgid "None"
 msgstr "Kein Wert"
 
-#: api_renderers.py
+#: src/filingcabinet/api_renderers.py
 msgid "Document feed"
 msgstr "Dokumenten-Feed"
 
-#: api_renderers.py
+#: src/filingcabinet/api_renderers.py
 msgid "Feed for document search"
 msgstr "Feed für Dokumentensuche"
 
-#: api_renderers.py
+#: src/filingcabinet/api_renderers.py
 msgid "{} (p. {})"
 msgstr "{} (S. {})"
 
-#: apps.py
+#: src/filingcabinet/apps.py
 msgid "Filing Cabinet"
 msgstr "Aktenschrank"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "document portal"
 msgstr "Dokumentenportal"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "document portals"
 msgstr "Dokumentenportale"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "Document Tag"
 msgstr "Dokumenten-Schlagwort"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "Document Tags"
 msgstr "Dokumenten-Schlagworte"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "User"
 msgstr "Nutzer"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "document"
 msgstr "Dokument"
 
-#: models.py views.py
+#: src/filingcabinet/models.py src/filingcabinet/views.py
 msgid "documents"
 msgstr "Dokumente"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "created at"
 msgstr "erstellt am"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "Collection directory"
 msgstr "Sammlungsverzeichnis"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "Collection directories"
 msgstr "Sammlungsverzeichnisse"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "directory"
 msgstr "Verzeichnis"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "document collection"
 msgstr "Dokumentensammlung"
 
-#: models.py
+#: src/filingcabinet/models.py
 msgid "document collections"
 msgstr "Dokumentensammlungen"
 
-#: templates/admin/filingcabinet/document/change_list.html
+#: src/filingcabinet/templates/admin/filingcabinet/document/change_list.html
 #, python-format
 msgid "Import %(name)s"
 msgstr "Importiere %(name)s"
 
-#: templates/admin/filingcabinet/pageannotation/change_form.html
+#: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html
 msgid "Annotation"
 msgstr "Annotation"
 
-#: templates/admin/filingcabinet/pageannotation/change_form.html
+#: src/filingcabinet/templates/admin/filingcabinet/pageannotation/change_form.html
 msgid "Make annotation"
 msgstr "Annotation schreiben"
 
-#: templates/filingcabinet/_document_viewer.html
+#: src/filingcabinet/templates/filingcabinet/_document_viewer.html
 msgid "This document is still being processed..."
 msgstr "Dieses Dokument wird noch verarbeitet..."
 
-#: templates/filingcabinet/_document_viewer.html
+#: src/filingcabinet/templates/filingcabinet/_document_viewer.html
 msgid "Go to next pages"
 msgstr "Zur nächsten Seite"
 
-#: templates/filingcabinet/document_detail.html
+#: src/filingcabinet/templates/filingcabinet/document_detail.html
 msgid "Document oEmbed Profile"
 msgstr "Dokument-oEmbed-Profil"
 
-#: templates/filingcabinet/document_detail.html
+#: src/filingcabinet/templates/filingcabinet/document_detail.html
 msgid "private"
 msgstr "privat"
 
-#: templates/filingcabinet/documentcollection_detail.html
+#: src/filingcabinet/templates/filingcabinet/documentcollection_detail.html
 msgid "Document Collection oEmbed Profile"
 msgstr "Dokumentensammlung oEmbed-Profil"
 
-#: templates/filingcabinet/documentcollection_detail_download.html
+#: src/filingcabinet/templates/filingcabinet/documentcollection_detail_download.html
 msgid ""
 "Your browser does not support batch downloading. You will need a Chrome-"
 "based browser."
 msgstr ""
-"Ihr Browser unterstützt leider kein Verzeichnis-Zugriff. Sie benötigen "
-"ggf. einen Chrome-basierten Browser."
+"Ihr Browser unterstützt leider kein Verzeichnis-Zugriff. Sie benötigen ggf. "
+"einen Chrome-basierten Browser."
 
-#: templates/filingcabinet/documentcollection_detail_download.html
+#: src/filingcabinet/templates/filingcabinet/documentcollection_detail_download.html
 msgid "Downloading..."
 msgstr "Download gestartet…"
 
-#: templates/filingcabinet/documentcollection_detail_download.html
+#: src/filingcabinet/templates/filingcabinet/documentcollection_detail_download.html
 msgid "Download complete"
 msgstr "Download abgeschlossen."
 
-#: templates/filingcabinet/documentcollection_detail_download.html
+#: src/filingcabinet/templates/filingcabinet/documentcollection_detail_download.html
 msgid "Choose directory and start download"
 msgstr "Verzeichnis auswählen und Download starten"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "embed/"
 msgstr "embed/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>-<slug:slug>/"
 msgstr "sammlung/<int:pk>-<slug:slug>/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>/"
 msgstr "sammlung/<int:pk>/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>-<slug:slug>/embed/"
 msgstr "sammlung/<int:pk>-<slug:slug>/embed/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>-<slug:slug>/download/"
 msgstr "sammlung/<int:pk>-<slug:slug>/download/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>/embed/"
 msgstr "sammlung/<int:pk>/embed/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "portal/<slug:slug>/"
 msgstr "portal/<slug:slug>/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "portal/<slug:slug>/embed/"
 msgstr "portal/<slug:slug>/embed/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>/zip/"
 msgstr "sammlung/<int:pk>/zip/"
 
-#: urls.py
+#: src/filingcabinet/urls.py
 msgctxt "url part"
 msgid "collection/<int:pk>-<slug:slug>/zip/"
 msgstr "sammlung/<int:pk>-<slug:slug>/zip/"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Loading..."
 msgstr "Wird geladen..."
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Load more"
 msgstr "Mehr laden"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "page"
 msgstr "Seite"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "pages"
 msgstr "Seiten"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "one match"
 msgstr "ein Ergebnis"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "matches"
 msgstr "Ergebnisse"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Search"
 msgstr "Suchen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Clear"
 msgstr "Leeren"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Search term"
 msgstr "Suchbegriff"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Searching..."
 msgstr "Suche läuft..."
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Found on"
 msgstr "Gefunden auf"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "found"
 msgstr "gefunden"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "clear search"
 msgstr "Suche zurücksetzen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "searched in directory"
 msgstr "gesucht im Ordner"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Show/hide Text"
 msgstr "Zeige/verstecke Text"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Title"
 msgstr "Titel"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Description"
 msgstr "Beschreibung"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Add annotation"
 msgstr "Annotation hinzufügen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Delete this annotation?"
 msgstr "Diese Annotation löschen?"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Back"
 msgstr "Zurück"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "are shown"
 msgstr "angezeigt"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Download PDF"
 msgstr "PDF herunterladen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Document Info"
 msgstr "Dokumentendetails"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Author"
 msgstr "Autor:in"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "publication date"
 msgstr "Veröffentlichungsdatum"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Creator"
 msgstr "Ersteller:in"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "producer"
 msgstr "Produzent:in"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "URL"
 msgstr "URL"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Copy document URL"
 msgstr "Dokumenten-URL kopieren"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Zoom in"
 msgstr "Vergrößern"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Zoom out"
 msgstr "Verkleinern"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Annotations"
 msgstr "Annotationen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Show Searchbar"
 msgstr "Suchleiste anzeigen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Show Annotations"
 msgstr "Annotationen anzeigen"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "Hide Annotations"
 msgstr "Annotationen verstecken"
 
-#: views.py
+#: src/filingcabinet/views.py
 msgid "All documents"
 msgstr "Alle Dokumente"
