@@ -189,7 +189,9 @@ class DocumentCollectionViewSet(
         try:
             dir_id = int(self.request.GET.get("directory", ""))
             parent_directory = CollectionDirectory.objects.get(id=dir_id)
-        except (ValueError, CollectionDirectory.DoesNotExist):
+        except (ValueError, CollectionDirectory.DoesNotExist, AttributeError):
+            # request is not available when called from manage.py generateschema
+            # request.GET therefore raises an AttributeError
             parent_directory = None
 
         ctx.update({"parent_directory": parent_directory})
