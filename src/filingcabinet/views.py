@@ -189,6 +189,27 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
         return context
 
 
+async def as_aiter(iter):
+    for i in iter:
+        yield i
+
+
+class ZipStreamResponse(StreamingHttpResponse):
+    @property
+    def streaming_content(self):
+        return self._sc
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._sc = value
+
+    def __iter__(self):
+        return iter(self._sc)
+
+    def __aiter__(self):
+        return as_aiter(iter(self._sc))
+
+
 class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
     model = DocumentCollection
     redirect_url_name = "filingcabinet:document-collection_zip"
@@ -236,7 +257,7 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
                 arcname=ensure_unique_filename(filename_counter, filename),
             )
 
-        resp = StreamingHttpResponse(
+        resp = ZipStreamResponse(
             archive_stream,
             content_type="application/zip",
         )
