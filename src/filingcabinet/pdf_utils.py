@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import BinaryIO, Union
+from typing import BinaryIO, Optional, Union
 
 import pikepdf
 import wand
@@ -175,9 +175,11 @@ class PikePDFProcessor:
         return "".join(self.iter_markdown_outline())
 
 
-def fix_text(text):
+def fix_text(text: Optional[str | bytes]) -> Optional[str]:
     if text is None:
         return None
+    if isinstance(text, bytes):
+        text = text.decode("utf-8", errors="ignore")
     return text.replace("\u0000", "")
 
 
