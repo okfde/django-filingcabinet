@@ -186,13 +186,14 @@ class DocumentCollectionViewSet(
             return ctx
 
         # FIXME: check if directory is part of this collection
+        parent_directory = None
         try:
-            dir_id = int(self.request.GET.get("directory", ""))
-            parent_directory = CollectionDirectory.objects.get(id=dir_id)
-        except (ValueError, CollectionDirectory.DoesNotExist, AttributeError):
             # request is not available when called from manage.py generateschema
-            # request.GET therefore raises an AttributeError
-            parent_directory = None
+            if self.request is not None:
+                dir_id = int(self.request.GET.get("directory", ""))
+                parent_directory = CollectionDirectory.objects.get(id=dir_id)
+        except (ValueError, CollectionDirectory.DoesNotExist):
+            pass
 
         ctx.update({"parent_directory": parent_directory})
         return ctx
