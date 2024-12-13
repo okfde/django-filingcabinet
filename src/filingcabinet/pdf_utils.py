@@ -175,7 +175,7 @@ class PikePDFProcessor:
         return "".join(self.iter_markdown_outline())
 
 
-def fix_text(text):
+def fix_text(text: str):
     if text is None:
         return None
     return text.replace("\u0000", "")
