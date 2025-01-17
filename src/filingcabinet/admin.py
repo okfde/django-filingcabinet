@@ -104,7 +104,16 @@ class DocumentBaseAdmin(admin.ModelAdmin):
         "pending",
         "processed_pages_percentage",
     )
-    list_filter = ("pending", "public", "allow_annotation", "portal", HasTablesFilter)
+    list_filter = (
+        "pending",
+        "public",
+        "listed",
+        "allow_annotation",
+        "portal",
+        HasTablesFilter,
+        "created_at",
+        "published_at",
+    )
     raw_id_fields = ("user",)
     readonly_fields = ("uid", "public", "pending", "content_hash")
     prepopulated_fields = {"slug": ("title",)}
