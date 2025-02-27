@@ -133,10 +133,12 @@ def get_document_file_path(instance, filename, public):
     )
 
 
-def get_document_path(instance, filename):
+def get_document_path(instance, filename, public=None):
+    if public is None:
+        public = instance.public
     name, ext = os.path.splitext(filename)
     slug = slugify(name)[:80]
-    return get_document_file_path(instance, slug + ext, instance.public)
+    return get_document_file_path(instance, slug + ext, public)
 
 
 def get_page_image_filename(
@@ -363,7 +365,9 @@ class AbstractDocument(models.Model):
         )
 
         if self.pdf_file:
-            dst_file_name = get_document_path(self, self.get_document_filename())
+            dst_file_name = get_document_path(
+                self, self.get_document_filename(), public=target_public
+            )
         else:
             dst_file_name = get_document_file_path(self, "dummy.pdf", target_public)
         dst_file_dir = os.path.dirname(os.path.join(settings.MEDIA_ROOT, dst_file_name))
