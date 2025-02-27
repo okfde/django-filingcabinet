@@ -1,3 +1,5 @@
+from django.db import transaction
+
 from celery import shared_task
 
 from . import get_document_model
@@ -54,7 +56,7 @@ def publish_document(doc_pk, public=True):
         doc.save()
         doc._move_file(public)
         doc.save()
-        files_moved_task.delay(doc.pk)
+        transaction.on_commit(lambda: files_moved_task.delay(doc.pk))
 
 
 @shared_task(acks_late=True, time_limit=5 * 60)
