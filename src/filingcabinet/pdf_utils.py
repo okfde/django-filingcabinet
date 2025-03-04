@@ -4,7 +4,6 @@ import hashlib
 import io
 import logging
 import os
-import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -312,41 +311,44 @@ def can_convert_to_pdf(filetype, name=None):
     )
 
 
-def convert_to_pdf(filepath, binary_name=None, construct_call=None, timeout=120):
+def convert_to_pdf(
+    filepath: Path | str, binary_name=None, construct_call=None, timeout=120
+):
     if binary_name is None and construct_call is None:
         return
-    outpath = Path(tempfile.mkdtemp())
-    path, filename = os.path.split(filepath)
-    parts = filename.rsplit(".", 1)
-    name = parts[0]
-    output_file = outpath / "%s.pdf" % name
-    arguments = [
-        binary_name,
-        "--headless",
-        "--nodefault",
-        "--nofirststartwizard",
-        "--nolockcheck",
-        "--nologo",
-        "--norestore",
-        "--invisible",
-        "--convert-to",
-        "pdf",
-        "--outdir",
-        str(outpath),
-        str(filepath),
-    ]
-    if construct_call is not None:
-        arguments, output_file = construct_call(filepath, outpath)
+    filepath = Path(filepath)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
+        filename = filepath.name
+        parts = filename.rsplit(".", 1)
+        name = parts[0]
+        output_file = temp_dir / "%s.pdf" % name
+        arguments = [
+            binary_name,
+            "--headless",
+            "--nodefault",
+            "--nofirststartwizard",
+            "--nolockcheck",
+            "--nologo",
+            "--norestore",
+            "--invisible",
+            "--convert-to",
+            "pdf",
+            "--outdir",
+            str(temp_dir),
+            str(filepath),
+        ]
+        if construct_call is not None:
+            arguments, output_file = construct_call(str(filepath), str(temp_dir))
 
-    try:
-        output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
-        return output_bytes
-    except Exception as err:
-        logger.error("Error during Doc to PDF conversion: %s", err)
-        logger.exception(err)
-    finally:
-        shutil.rmtree(outpath)
-    return None
+        try:
+            output_bytes = shell_call(
+                arguments, temp_dir, Path(output_file), timeout=timeout
+            )
+            return output_bytes
+        except Exception as err:
+            logger.error("Error during Doc to PDF conversion: %s", err)
+            logger.exception(err)
 
 
 def convert_images_to_ocred_pdf(
