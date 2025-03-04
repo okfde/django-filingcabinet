@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import BinaryIO, Callable, NamedTuple, Optional, Union
+from typing import BinaryIO, Callable, Generator, NamedTuple, Optional
 
 import pikepdf
 import wand
@@ -58,7 +58,7 @@ class ShellRecipe(NamedTuple):
     output_file: Path
 
 
-ShellRecipeMaker = Callable[[str, str], ShellRecipe]
+ShellRecipeMaker = Callable[[Path, Path], ShellRecipe]
 
 
 class PDFException(Exception):
@@ -67,7 +67,7 @@ class PDFException(Exception):
         self.reason = reason
 
 
-def try_reading_pdf(pdf_file, password=None):
+def try_reading_pdf(pdf_file: Path, password=None) -> PdfReader:
     try:
         pdf_reader = PdfReader(pdf_file, strict=False)
     except (PdfReadError, ValueError, OSError) as e:
@@ -90,7 +90,7 @@ def try_reading_pdf(pdf_file, password=None):
     return pdf_reader
 
 
-def get_readable_pdf(pdf_file, copy_func, password=None):
+def get_readable_pdf(pdf_file: Path, copy_func, password=None):
     tries = 0
     timeout = FILINGCABINET_PAGE_PROCESSING_TIMEOUT
     while True:
@@ -121,7 +121,9 @@ def get_readable_pdf(pdf_file, copy_func, password=None):
 
 
 class PikePDFProcessor:
-    def __init__(self, filename):
+    filename: Path
+
+    def __init__(self, filename: Path):
         self._pdf = None
         self.filename = filename
 
@@ -188,9 +190,11 @@ def fix_text(text: Optional[str | bytes]) -> Optional[str]:
 
 
 class PDFProcessor(object):
-    def __init__(self, filename, copy_func=None, language=None, config=None):
+    def __init__(
+        self, filename: str | Path, copy_func=None, language=None, config=None
+    ):
         filename, pdf_reader = get_readable_pdf(filename, copy_func)
-        self.filename = filename
+        self.filename = Path(filename)
         self.pdf_reader = pdf_reader
         self.num_pages = len(self.pdf_reader.pages)
         self.language = language
@@ -311,11 +315,11 @@ def can_convert_to_pdf(filetype, name=None):
 def convert_to_pdf(filepath, binary_name=None, construct_call=None, timeout=120):
     if binary_name is None and construct_call is None:
         return
-    outpath = tempfile.mkdtemp()
+    outpath = Path(tempfile.mkdtemp())
     path, filename = os.path.split(filepath)
     parts = filename.rsplit(".", 1)
     name = parts[0]
-    output_file = os.path.join(outpath, "%s.pdf" % name)
+    output_file = outpath / "%s.pdf" % name
     arguments = [
         binary_name,
         "--headless",
@@ -328,8 +332,8 @@ def convert_to_pdf(filepath, binary_name=None, construct_call=None, timeout=120)
         "--convert-to",
         "pdf",
         "--outdir",
-        outpath,
-        filepath,
+        str(outpath),
+        str(filepath),
     ]
     if construct_call is not None:
         arguments, output_file = construct_call(filepath, outpath)
@@ -345,56 +349,57 @@ def convert_to_pdf(filepath, binary_name=None, construct_call=None, timeout=120)
     return None
 
 
-def convert_images_to_ocred_pdf(filenames, language="en", instructions=None):
-    try:
-        temp_dir = tempfile.mkdtemp()
-        output_file = os.path.join(temp_dir, "out.pdf")
-        pdf_bytes = convert_images_to_pdf(filenames, instructions=instructions)
+def convert_images_to_ocred_pdf(
+    filenames: list[str | Path], language="en", instructions=None
+):
+    filenames = [Path(f) for f in filenames]
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
+        try:
+            output_file = temp_dir / "out.pdf"
+            pdf_bytes = convert_images_to_pdf(filenames, instructions=instructions)
 
-        with open(output_file, "wb") as f:
-            f.write(pdf_bytes)
+            with open(output_file, "wb") as f:
+                f.write(pdf_bytes)
 
-        return run_ocr(output_file, language=language, timeout=180)
+            return run_ocr(output_file, language=language, timeout=180)
 
-    except Exception as err:
-        logger.error("Error during convert images to ocred pdf: %s", err)
-        logger.exception(err)
-        return None
-    finally:
-        # Delete all temporary files
-        shutil.rmtree(temp_dir)
+        except Exception as err:
+            logger.error("Error during convert images to ocred pdf: %s", err)
+            logger.exception(err)
+            return None
 
 
-def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
+def run_ocr(
+    filename: Path, language: Optional[str] = None, binary_name="ocrmypdf", timeout=50
+):
     if binary_name is None:
         return
-    outpath = tempfile.mkdtemp()
-    lang = TESSERACT_LANGUAGE.get(language)
-    output_file = os.path.join(outpath, "out.pdf")
-    arguments = [binary_name]
-    if lang is not None:
-        arguments.extend(
-            [
-                "-l",
-                lang,
-            ]
-        )
-    arguments += [
-        "--deskew",
-        "--skip-text",
-        # '--title', title
-        filename,
-        output_file,
-    ]
-    try:
-        output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
-        return output_bytes
-    except Exception as err:
-        logger.error("Error during PDF OCR: %s", err)
-        logger.exception(err)
-    finally:
-        shutil.rmtree(outpath)
-    return None
+    with tempfile.TemporaryDirectory() as outpath:
+        outpath = Path(outpath)
+        output_file = outpath / "out.pdf"
+        lang = TESSERACT_LANGUAGE.get(language)
+        arguments = [binary_name]
+        if lang is not None:
+            arguments.extend(
+                [
+                    "-l",
+                    lang,
+                ]
+            )
+        arguments += [
+            "--deskew",
+            "--skip-text",
+            # '--title', title
+            str(filename),
+            str(output_file),
+        ]
+        try:
+            output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
+            return output_bytes
+        except Exception as err:
+            logger.error("Error during PDF OCR: %s", err)
+            logger.exception(err)
 
 
 def shell_call(
@@ -415,7 +420,10 @@ def shell_call(
     p = None
     try:
         p = subprocess.Popen(
-            arguments, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            arguments,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=env,
         )
 
         out, err = p.communicate(timeout=timeout)
@@ -438,58 +446,57 @@ def shell_call(
 
 
 def run_command_overwrite(
-    filename: str,
+    filename: Path,
     argument_func: ShellRecipeMaker,
     timeout=50,
     successful_returncodes=None,
 ):
-    try:
-        temp_dir = tempfile.mkdtemp()
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
         arguments, temp_out = argument_func(filename, temp_dir)
-        output_bytes = shell_call(
-            arguments,
-            temp_dir,
-            temp_out,
-            timeout=timeout,
-            successful_returncodes=successful_returncodes,
-        )
+        try:
+            output_bytes = shell_call(
+                arguments,
+                temp_dir,
+                temp_out,
+                timeout=timeout,
+                successful_returncodes=successful_returncodes,
+            )
 
-        with open(filename, "wb") as f:
-            f.write(output_bytes)
-        return filename
-    except Exception as err:
-        logger.error("Error during command overwrite %s", err)
-        logger.exception(err)
-        return None
-    finally:
-        # Delete all temporary files
-        shutil.rmtree(temp_dir)
+            with open(filename, "wb") as f:
+                f.write(output_bytes)
+            return filename
+        except Exception as err:
+            logger.error("Error during command overwrite %s", err)
+            logger.exception(err)
+            return None
 
 
 def get_decrypt_pdf_recipe(
-    filename: str, temp_dir: str | Path, password: Optional[str]
+    filename: Path, temp_dir: Path, password: Optional[str]
 ) -> ShellRecipe:
-    temp_out = Path(os.path.join(temp_dir, "qpdf_out.pdf"))
+    temp_out = temp_dir / "qpdf_out.pdf"
     arguments = ["qpdf", "--decrypt"]
 
     if password is not None:
         arguments.extend(["--password=%s" % password])
 
-    arguments.extend([filename, temp_out])
+    arguments.extend([str(filename), str(temp_out)])
     return ShellRecipe(arguments, temp_out)
 
 
 def decrypt_pdf_recipe_with_password(password: str) -> ShellRecipeMaker:
-    def inner(filename, temp_dir) -> ShellRecipe:
+    def inner(filename: Path, temp_dir: Path) -> ShellRecipe:
         return get_decrypt_pdf_recipe(filename, temp_dir, password)
 
     return inner
 
 
 def decrypt_pdf(
-    filename: str | Path, password: Optional[str] = None, timeout: int = 50
+    filename: Path, password: Optional[str] = None, timeout: int = 50
 ) -> Optional[bytes]:
     with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
         arguments, temp_out = get_decrypt_pdf_recipe(filename, temp_dir, password)
         resulting_bytes = shell_call(
             arguments,
@@ -501,7 +508,7 @@ def decrypt_pdf(
         return resulting_bytes
 
 
-def decrypt_pdf_in_place(filename: str, password: Optional[str] = None, timeout=50):
+def decrypt_pdf_in_place(filename: Path, password: Optional[str] = None, timeout=50):
     return run_command_overwrite(
         filename,
         decrypt_pdf_recipe_with_password(password),
@@ -510,32 +517,34 @@ def decrypt_pdf_in_place(filename: str, password: Optional[str] = None, timeout=
     )
 
 
-def rewrite_pdf_in_place(filename, password=None, timeout=50):
-    def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, "gs_pdf_out.pdf")
+def rewrite_pdf_in_place(filename: Path, password=None, timeout=50):
+    def argument_func(filename: Path, temp_dir: Path):
+        temp_out = temp_dir / "gs_pdf_out.pdf"
         arguments = [
             "gs",
             "-o",
-            temp_out,
+            str(temp_out),
         ]
         if password is not None:
             arguments.extend(["-sPDFPassword=%s" % password])
-        arguments.extend(["-sDEVICE=pdfwrite", "-dPDFSETTINGS=/prepress", filename])
+        arguments.extend(
+            ["-sDEVICE=pdfwrite", "-dPDFSETTINGS=/prepress", str(filename)]
+        )
         return arguments, temp_out
 
     return run_command_overwrite(filename, argument_func, timeout=timeout)
 
 
-def rewrite_hard_pdf_in_place(filename, password=None, timeout=50):
+def rewrite_hard_pdf_in_place(filename: Path, password=None, timeout=50):
     def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, "pdfcairo_out.pdf")
+        temp_out = temp_dir / "pdfcairo_out.pdf"
         arguments = [
             "pdftocairo",
             "-pdf",
         ]
         if password is not None:
             arguments.extend(["-upw", password])
-        arguments.extend([filename, temp_out])
+        arguments.extend([str(filename), str(temp_out)])
         return arguments, temp_out
 
     return run_command_overwrite(filename, argument_func, timeout=timeout)
@@ -544,14 +553,14 @@ def rewrite_hard_pdf_in_place(filename, password=None, timeout=50):
 MAX_HEIGHT_A4 = 3507  # in pixels at 300 dpi
 
 
-def convert_images_to_pdf(filenames, instructions=None, dpi=300):
+def convert_images_to_pdf(filenames: list[Path], instructions=None, dpi=300):
     if instructions is None:
         instructions = [{} for _ in range(len(filenames))]
     a4_width, a4_height = A4
     writer = io.BytesIO()
     pdf = canvas.Canvas(writer, pagesize=A4)
     for filename, instruction in zip(filenames, instructions, strict=False):
-        with Image(filename=filename, resolution=dpi) as image:
+        with Image(filename=str(filename), resolution=dpi) as image:
             image.background_color = Color("white")
             image.format = "jpg"
             image.alpha_channel = "remove"
@@ -580,9 +589,9 @@ def convert_images_to_pdf(filenames, instructions=None, dpi=300):
 
 
 def get_images_from_pdf(
-    pdf_reader,
-    filename,
-    pages,
+    pdf_reader: PdfReader,
+    filename: Path,
+    pages: list[int],
     max_dpi=300,
     max_resolution=MAX_HEIGHT_A4,
     timeout=5 * 60,
@@ -602,30 +611,41 @@ def get_images_from_pdf(
 
 @contextlib.contextmanager
 def get_image_from_pdf_page(
-    pdf_reader, filename, page, max_dpi, max_resolution, timeout
+    pdf_reader: PdfReader,
+    filename: Path,
+    page: int,
+    max_dpi: int,
+    max_resolution: int,
+    timeout: int,
 ):
-    try:
-        temp_dir = tempfile.mkdtemp()
-        yield page_to_png(
-            pdf_reader=pdf_reader,
-            filename=filename,
-            temp_dir=temp_dir,
-            page=page,
-            max_dpi=max_dpi,
-            max_resolution=max_resolution,
-            timeout=timeout,
-        )
-    except Exception as err:
-        logger.error("Error during command overwrite %s", err)
-        logger.exception(err)
-        yield None
-    finally:
-        # Delete all temporary files
-        shutil.rmtree(temp_dir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = Path(temp_dir)
+        try:
+            yield page_to_png(
+                pdf_reader=pdf_reader,
+                filename=filename,
+                temp_dir=temp_dir,
+                page=page,
+                max_dpi=max_dpi,
+                max_resolution=max_resolution,
+                timeout=timeout,
+            )
+        except Exception as err:
+            logger.error("Error during page to png %s", err)
+            logger.exception(err)
+            yield None
 
 
-def page_to_png(pdf_reader, filename, temp_dir, page, max_dpi, max_resolution, timeout):
-    temp_out = os.path.join(temp_dir, "image")
+def page_to_png(
+    pdf_reader: PdfReader,
+    filename: Path,
+    temp_dir: Path,
+    page: int,
+    max_dpi: int,
+    max_resolution: int,
+    timeout: int,
+):
+    temp_out = temp_dir / "image"
 
     page_size = pdf_reader.pages[page - 1].cropbox
     max_x_dpi = max_resolution / (page_size.width / 72)
@@ -641,20 +661,16 @@ def page_to_png(pdf_reader, filename, temp_dir, page, max_dpi, max_resolution, t
         "-singlefile",
         "-f",
         str(page),
-        filename,
-        temp_out,
+        str(filename),
+        str(temp_out),
     ]
     shell_call(command, temp_dir, output_file=None, timeout=timeout, raise_timeout=True)
 
-    out_filename = glob.glob(temp_out + "*")[0]
+    out_filename = glob.glob(str(temp_out) + "*")[0]
     return (page, out_filename)
 
 
-def get_page_number(filename):
-    return int(filename.rsplit("-", 1)[1].split(".")[0])
-
-
-def get_continuous_pages(pages):
+def get_continuous_pages(pages: list[int]) -> Generator[tuple[int, int], None, None]:
     first, last = None, None
 
     for page in pages:
@@ -671,7 +687,7 @@ def get_continuous_pages(pages):
     yield (first, last)
 
 
-def detect_tables(filename):
+def detect_tables(filename: Path):
     try:
         import camelot
     except ImportError:
@@ -682,11 +698,6 @@ def detect_tables(filename):
     except Exception:
         # Camelot may fail on bad pdfs, just ignore
         return []
-
-
-def calculate_content_hash(filename: Union[str, Path]):
-    with open(filename, "rb") as f:
-        return calculcate_content_hash_from_file(f)
 
 
 def calculcate_content_hash_from_file(file_object: BinaryIO):
