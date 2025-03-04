@@ -322,7 +322,7 @@ def convert_to_pdf(
         filename = filepath.name
         parts = filename.rsplit(".", 1)
         name = parts[0]
-        output_file = temp_dir / "%s.pdf" % name
+        output_file = temp_dir / f"{name}.pdf"
         arguments = [
             binary_name,
             "--headless",
