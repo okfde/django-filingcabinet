@@ -14,7 +14,7 @@ FROM python:3.10
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE fc_project.settings
 
-RUN apt-get update && apt-get install -y --no-install-recommends imagemagick tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu tesseract-ocr-nld tesseract-ocr-osd poppler-utils qpdf
+RUN apt-get update && apt-get install -y --no-install-recommends imagemagick tesseract-ocr tesseract-ocr-eng tesseract-ocr-deu tesseract-ocr-nld tesseract-ocr-osd qpdf
 
 WORKDIR /project
 

@@ -41,7 +41,7 @@ jobs:
           node-version: 20
           cache: 'pnpm'
       - name: Install system-level dependencies
-        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev poppler-utils libpoppler-cpp-dev
+        run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev
       - name: Setup venv
         run: |
           uv venv --python ${{ matrix.python-version }}

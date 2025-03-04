@@ -26,7 +26,6 @@ pkgs.mkShell {
     hdf5
     hdf5.dev
     tesseract
-    poppler_utils
     blas.dev
     qpdf
     libcxx.dev
