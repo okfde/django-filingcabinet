@@ -8,7 +8,7 @@ import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO, Callable, NamedTuple, Optional, Union
 
 import pikepdf
 import wand
@@ -55,6 +55,14 @@ OFFICE_EXTENSIONS = (
 
 
 TESSERACT_LANGUAGE = {"en": "eng", "de": "deu"}
+
+
+class ShellRecipe(NamedTuple):
+    arguments: list[str]
+    output_file: Path
+
+
+ShellRecipeMaker = Callable[[str, str], ShellRecipe]
 
 
 class PDFException(Exception):
@@ -398,13 +406,13 @@ def run_ocr(filename, language=None, binary_name="ocrmypdf", timeout=50):
 
 
 def shell_call(
-    arguments,
-    outpath,
-    output_file=None,
+    arguments: list[str],
+    outpath: Path,
+    output_file: Optional[Path] = None,
     timeout=50,
     raise_timeout=False,
     successful_returncodes=None,
-):
+) -> bytes:
     if successful_returncodes is None:
         successful_returncodes = [0]
     env = dict(os.environ)
@@ -430,7 +438,7 @@ def shell_call(
             p.kill()
             out, err = p.communicate()
     if p is not None and p.returncode in successful_returncodes:
-        if output_file is not None and os.path.exists(output_file):
+        if output_file is not None and output_file.exists():
             with open(output_file, "rb") as f:
                 return f.read()
     if output_file is not None:
@@ -438,11 +446,13 @@ def shell_call(
 
 
 def run_command_overwrite(
-    filename, argument_func, timeout=50, successful_returncodes=None
+    filename: str,
+    argument_func: ShellRecipeMaker,
+    timeout=50,
+    successful_returncodes=None,
 ):
     try:
         temp_dir = tempfile.mkdtemp()
-        temp_out = os.path.join(temp_dir, "gs_pdf_out.pdf")
         arguments, temp_out = argument_func(filename, temp_dir)
         output_bytes = shell_call(
             arguments,
@@ -464,20 +474,45 @@ def run_command_overwrite(
         shutil.rmtree(temp_dir)
 
 
-def decrypt_pdf_in_place(filename, password=None, timeout=50):
-    def argument_func(filename, temp_dir):
-        temp_out = os.path.join(temp_dir, "qpdf_out.pdf")
-        arguments = ["qpdf", "--decrypt"]
+def get_decrypt_pdf_recipe(
+    filename: str, temp_dir: str | Path, password: Optional[str]
+) -> ShellRecipe:
+    temp_out = Path(os.path.join(temp_dir, "qpdf_out.pdf"))
+    arguments = ["qpdf", "--decrypt"]
 
-        if password is not None:
-            arguments.extend(["--password=%s" % password])
+    if password is not None:
+        arguments.extend(["--password=%s" % password])
 
-        arguments.extend([filename, temp_out])
-        return arguments, temp_out
+    arguments.extend([filename, temp_out])
+    return ShellRecipe(arguments, temp_out)
 
+
+def decrypt_pdf_recipe_with_password(password: str) -> ShellRecipeMaker:
+    def inner(filename, temp_dir) -> ShellRecipe:
+        return get_decrypt_pdf_recipe(filename, temp_dir, password)
+
+    return inner
+
+
+def decrypt_pdf(
+    filename: str | Path, password: Optional[str] = None, timeout: int = 50
+) -> Optional[bytes]:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        arguments, temp_out = get_decrypt_pdf_recipe(filename, temp_dir, password)
+        resulting_bytes = shell_call(
+            arguments,
+            temp_dir,
+            temp_out,
+            timeout=timeout,
+            successful_returncodes=[0, 3],  # qpdf returns 0 on success and 3 on warning
+        )
+        return resulting_bytes
+
+
+def decrypt_pdf_in_place(filename: str, password: Optional[str] = None, timeout=50):
     return run_command_overwrite(
         filename,
-        argument_func,
+        decrypt_pdf_recipe_with_password(password),
         timeout=timeout,
         successful_returncodes=[0, 3],  # qpdf returns 0 on success and 3 on warning
     )

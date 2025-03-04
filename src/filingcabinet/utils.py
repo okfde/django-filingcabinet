@@ -1,12 +1,13 @@
 import os
 import tempfile
 from contextlib import contextmanager
+from typing import Generator
 
 from django.core.files.storage import default_storage
 
 
 @contextmanager
-def get_local_file(path, storage=default_storage):
+def get_local_file(path, storage=default_storage) -> Generator[str, None, None]:
     _, extension = os.path.splitext(path)
     local_file_path = None
     try:
