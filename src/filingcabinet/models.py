@@ -23,7 +23,6 @@ from .settings import (
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL,
 )
 from .storage import OverwriteStorage
-from .utils import get_local_file
 from .validators import validate_settings_schema
 
 
@@ -303,6 +302,8 @@ class AbstractDocument(models.Model):
         return ""
 
     def get_local_file(self):
+        from .utils import get_local_file
+
         return get_local_file(self.get_file_path())
 
     def get_document_filename(self):
