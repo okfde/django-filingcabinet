@@ -17,9 +17,7 @@ from PIL import Image as PILImage
 
 from . import get_document_model
 from .models import (
-    CollectionDirectory,
     CollectionDocument,
-    DocumentCollection,
     Page,
     PageAnnotation,
     get_page_annotation_filename,
@@ -34,6 +32,7 @@ from .pdf_utils import (
 )
 from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT, TESSERACT_DATA_PATH
 from .tasks import convert_images_to_webp_task, process_document_task
+from .utils import ensure_directory_exists, get_existing_directories
 
 try:
     from easy_thumbnails.files import get_thumbnailer
@@ -259,9 +258,10 @@ def trigger_process_document_task(doc_pk):
     return trigger
 
 
-class DocumentStorer:
-    ZIP_BLOCK_LIST = {"__MACOSX"}
+ZIP_BLOCK_LIST = {"__MACOSX"}
 
+
+class DocumentStorer:
     def __init__(self, user, public=False, collection=None, tags=None):
         self.user = user
         self.public = public
@@ -307,7 +307,7 @@ class DocumentStorer:
                     continue
                 path = PurePath(zip_info.filename)
                 parts = path.parts
-                if parts[0] in self.ZIP_BLOCK_LIST:
+                if parts[0] in ZIP_BLOCK_LIST:
                     continue
                 if path.suffix == ".pdf":
                     zip_paths.append(path)
@@ -318,38 +318,13 @@ class DocumentStorer:
             doc_paths = remove_common_root_path(zip_paths)
             directories = get_existing_directories(self.collection)
             for doc_path, zip_path in zip(doc_paths, zip_paths, strict=False):
-                self.ensure_directory_exists(doc_path, directories)
+                directories = ensure_directory_exists(
+                    self.collection, directories, doc_path, self.user
+                )
+
                 directory = directories.get(doc_path.parent)
                 file_obj = BytesIO(zf.read(str(zip_path)))
                 self.create_from_file(file_obj, doc_path.name, directory=directory)
-
-    def ensure_directory_exists(self, path, directories):
-        for parent_path in reversed(path.parents):
-            if str(parent_path) == ".":
-                continue
-            if parent_path not in directories:
-                parent_parent_path = parent_path.parent
-                parent_parent_dir = directories.get(parent_parent_path)
-                directory = CollectionDirectory(
-                    name=PurePath(parent_path).name,
-                    user=self.user,
-                    collection=self.collection,
-                )
-                if parent_parent_dir is None:
-                    directory = CollectionDirectory.add_root(instance=directory)
-                else:
-                    directory = parent_parent_dir.add_child(instance=directory)
-                directories[parent_path] = directory
-
-
-def get_existing_directories(collection: DocumentCollection):
-    directories = {}
-    dirs = CollectionDirectory.objects.filter(collection=collection)
-    for dir in dirs:
-        tree_to_root = list(dir.get_ancestors()) + [dir]
-        path = PurePath("/".join([x.name for x in tree_to_root]))
-        directories[path] = dir
-    return directories
 
 
 def remove_common_root_path(paths):
