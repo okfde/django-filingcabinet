@@ -110,7 +110,8 @@ class CollectionDirectorySerializer(serializers.HyperlinkedModelSerializer):
         model = CollectionDirectory
         fields = (
             "id",
-            "resource_uri" "name",
+            "resource_uri",
+            "name",
             "created_at",
             "updated_at",
             "documents",
@@ -135,7 +136,9 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     document_directory_count = serializers.SerializerMethodField()
     documents_uri = serializers.SerializerMethodField()
     pages_uri = serializers.SerializerMethodField()
+    current_directory = serializers.SerializerMethodField()
     directories = serializers.SerializerMethodField()
+    directory_stack = serializers.SerializerMethodField()
 
     class Meta:
         model = get_documentcollection_model()
@@ -153,7 +156,9 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             "document_directory_count",
             "uid",
             "cover_image",
+            "current_directory",
             "directories",
+            "directory_stack",
             "documents",
             "documents_uri",
             "pages_uri",
@@ -193,12 +198,27 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             reverse("api:page-list"), obj.id, obj.uid
         )
 
+    def get_current_directory(self, obj):
+        parent = self.context.get("parent_directory")
+        if parent:
+            return CollectionDirectoryListSerializer(parent, context=self.context).data
+
     def get_directories(self, obj):
         parent = self.context.get("parent_directory")
         directories = obj.get_directories(parent_directory=parent)
         return CollectionDirectoryListSerializer(
             directories, many=True, context=self.context
         ).data
+
+    def get_directory_stack(self, obj):
+        parent = self.context.get("parent_directory")
+        if parent:
+            directories = obj.get_parent_directories(parent)
+            return CollectionDirectoryListSerializer(
+                directories, many=True, context=self.context
+            ).data
+        else:
+            return []
 
 
 class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
