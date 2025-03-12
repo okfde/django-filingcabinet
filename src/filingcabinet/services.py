@@ -176,7 +176,7 @@ def process_page(doc, pdf, page_number, image):
 
     if not page.corrected:
         text = pdf.get_text_for_page(page_number, image)
-        page.content = text
+        page.content = text.replace("\x00", "\ufffd")
     page.width = dims[0]
     page.height = dims[1]
     logger.info("Making thumbnails page %s of doc %s", page_number, doc.id)
