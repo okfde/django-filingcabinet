@@ -793,6 +793,9 @@ class AbstractDocumentCollection(models.Model):
             return CollectionDirectory.get_root_nodes().filter(collection=self)
         return parent_directory.get_children().filter(collection=self)
 
+    def get_parent_directories(self, directory):
+        return directory.get_ancestors().filter(collection=self)
+
     def get_absolute_url(self):
         if self.slug:
             return reverse(

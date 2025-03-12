@@ -4,7 +4,11 @@ from collections import defaultdict
 from pathlib import Path
 
 from django.http import HttpResponse, StreamingHttpResponse
-from django.shortcuts import Http404, get_object_or_404, redirect
+from django.shortcuts import (
+    Http404,
+    get_object_or_404,
+    redirect,
+)
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, TemplateView
@@ -14,7 +18,7 @@ import zipstream
 from . import get_document_model, get_documentcollection_model
 from .api_views import PageSerializer
 from .forms import get_viewer_preferences
-from .models import CollectionDocument, DocumentPortal
+from .models import CollectionDirectory, CollectionDocument, DocumentPortal
 from .settings import FILINGCABINET_ENABLE_WEBP, FILINGCABINET_MEDIA_PRIVATE_INTERNAL
 
 Document = get_document_model()
@@ -168,10 +172,20 @@ def get_document_collection_context(collection, request):
     context = {"object": collection}
     context["documents"] = collection.ordered_documents
     serializer_klass = collection.get_serializer_class()
+
     api_ctx = {"request": request}
+    try:
+        dir_id = request.GET.get("directory")
+        api_ctx["parent_directory"] = CollectionDirectory.objects.get(
+            id=dir_id, collection=collection
+        )
+    except (ValueError, CollectionDirectory.DoesNotExist):
+        pass
+
     data = serializer_klass(collection, context=api_ctx).data
     context["documentcollection_data"] = json.dumps(data)
     config = get_js_config(request, collection)
+    config["deepUrls"] = True
     context["config"] = json.dumps(config)
     return context
 

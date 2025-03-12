@@ -7,14 +7,14 @@
             <button
               type="button"
               class="btn btn-sm btn-secondary"
-              @click="clearDocument">
+              @click="clearDocument"
+            >
               {{ i18n.backToCollection }}
             </button>
           </div>
           <div
-            v-else-if="
-              collection.zip_download_url && currentDirectory === null
-            ">
+            v-else-if="collection.zip_download_url && currentDirectory === null"
+          >
             <a
               :href="collection.zip_download_url"
               class="btn btn-sm btn-secondary"
@@ -45,19 +45,22 @@
 
         <div
           v-if="!document && allowToggleSearch"
-          class="col-auto order-md-4 ms-auto">
+          class="col-auto order-md-4 ms-auto"
+        >
           <button
             v-if="!showSearch"
             type="button"
             class="ms-2 btn btn-sm btn-secondary"
-            @click="enableSearch">
+            @click="enableSearch"
+          >
             <i class="fa fa-search" />
           </button>
           <button
             v-else
             type="button"
             class="ms-2 btn btn-sm btn-secondary"
-            @click="clearSearch">
+            @click="clearSearch"
+          >
             <i class="fa fa-close" />
           </button>
         </div>
@@ -69,7 +72,8 @@
         :show-search-feed="showSearchFeed"
         :filters="settings.filters"
         @clearsearch="clearSearch"
-        @search="search" />
+        @search="search"
+      />
     </div>
     <div v-if="document" class="collection-document">
       <div class="row">
@@ -79,7 +83,8 @@
             :document-preview="document"
             :page="documentPage"
             :config="config"
-            :defaults="docDefaults" />
+            :defaults="docDefaults"
+          />
         </div>
       </div>
     </div>
@@ -90,14 +95,16 @@
           :key="result.document.id"
           :document="result.document"
           :pages="result.pages"
-          @navigate="navigate" />
+          @navigate="navigate"
+        />
       </template>
       <template v-else>
         <div class="row bg-secondary">
           <div class="col px-0">
             <document-preview-grid
               :documents="searcher.documents"
-              @navigate="navigate" />
+              @navigate="navigate"
+            />
           </div>
         </div>
       </template>
@@ -106,7 +113,8 @@
           <div class="col-auto px-0 pb-5">
             <button
               class="btn btn-secondary my-3"
-              @click="loadMoreSearchResults">
+              @click="loadMoreSearchResults"
+            >
               {{ i18n.loadMore }}
             </button>
           </div>
@@ -121,7 +129,8 @@
               v-if="currentDirectory != null"
               type="button"
               class="list-group-item list-group-item-action list-group-item-dark text-center"
-              @click="selectDirectory()">
+              @click="selectDirectory()"
+            >
               <i class="fa fa-arrow-left float-start" />
               {{ currentDirectory.name }}
             </button>
@@ -130,20 +139,24 @@
               :key="directory.id"
               type="button"
               class="list-group-item list-group-item-action list-group-item-secondary"
-              @click="selectDirectory(directory)">
+              @click="selectDirectory(directory)"
+            >
               {{ directory.name }}
             </button>
           </div>
           <document-preview-grid
             :documents="documents"
             @navigate="navigate"
-            @loadmore="loadMoreDocuments" />
+            @loadmore="loadMoreDocuments"
+          />
           <div
             v-if="shouldPaginate && canPaginate"
-            class="col-auto px-0 pb-5 text-center">
+            class="col-auto px-0 pb-5 text-center"
+          >
             <button
               class="btn btn-secondary my-3"
-              @click.prevent="() => loadMoreDocuments()">
+              @click.prevent="() => loadMoreDocuments()"
+            >
               {{ i18n.loadMore }}
             </button>
           </div>
@@ -193,20 +206,30 @@ export default {
     }
   },
   data() {
+    const queryParams = new URLSearchParams(window.location.search)
+
     const documents = []
     const directories = []
     let collection = {
       documents,
       directories
     }
+    let directoryStack = []
+    let currentDirectory = null
+    let document = null
     if (this.documentCollection) {
       collection = this.documentCollection
+      directoryStack = collection.directory_stack
+      currentDirectory = collection.current_directory
+      document = collection.documents.find(
+        (d) => d.id === parseInt(queryParams.get('document'), 10)
+      )
     }
     const shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
     const settings = collection.settings || {}
     const preferences = settings.preferences || {}
     return {
-      document: null,
+      document,
       collection,
       settings,
       showSearch: preferences.showSearch ?? false,
@@ -214,8 +237,8 @@ export default {
       showSearchFeed: preferences.showSearchFeed ?? false,
       searcher: null,
       documentPage: 1,
-      currentDirectory: null,
-      directoryStack: [],
+      currentDirectory,
+      directoryStack,
       shouldPaginate,
       documents: this.makeDocuments(collection, shouldPaginate),
       directories: collection.directories,
@@ -541,7 +564,30 @@ export default {
       }
       this.currentDirectory =
         this.directoryStack[this.directoryStack.length - 1] || null
+
       this.getCollectionData()
+    },
+    updateHistoryState() {
+      if (this.config.deepUrls) {
+        const params = new URLSearchParams()
+        if (this.currentDirectory)
+          params.append('directory', this.currentDirectory.id)
+        if (this.document) params.append('document', this.document.id)
+
+        window.history.replaceState(
+          {},
+          '',
+          params.size == 0 ? '' : `?${params}`
+        )
+      }
+    }
+  },
+  watch: {
+    currentDirectory() {
+      this.updateHistoryState()
+    },
+    document() {
+      this.updateHistoryState()
     }
   }
 }
