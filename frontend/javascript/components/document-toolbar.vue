@@ -2,7 +2,8 @@
   <div class="row py-2 bg-dark toolbar-row">
     <div
       v-if="preferences.showSidebarToggle || preferences.showOutlineToggle"
-      class="col-auto px-1 px-sm-2">
+      class="col-auto px-1 px-sm-2"
+    >
       <div class="btn-group" role="group">
         <button
           v-if="preferences.showSidebarToggle"
@@ -10,27 +11,31 @@
           class="btn btn-sm btn-secondary"
           :class="{ active: preferences.showSidebar }"
           :disabled="!!searcher"
-          @click="toggleShowSidebar">
+          @click="toggleShowSidebar"
+        >
           <i
             class="fa"
             :class="{
               'fa-toggle-left': preferences.showSidebar,
               'fa-toggle-right': !preferences.showSidebar
-            }" />
+            }"
+          />
         </button>
         <button
           v-if="preferences.showOutlineToggle"
           type="button"
           class="btn btn-sm btn-secondary"
           :class="{ active: preferences.showOutline }"
-          @click="toggleShowOutline">
+          @click="toggleShowOutline"
+        >
           <i class="fa fa-list-ul" />
         </button>
       </div>
     </div>
     <div
       v-if="preferences.showPageNumberInput"
-      class="col col-md-auto pe-0 ps-1 px-sm-2">
+      class="col col-md-auto pe-0 ps-1 px-sm-2"
+    >
       <div class="input-group input-group-sm">
         <input
           v-model="page"
@@ -38,7 +43,8 @@
           class="page-number-input form-control bg-light form-control-sm"
           min="1"
           :max="document.num_pages"
-          @change="submitChange" />
+          @change="submitChange"
+        />
         <span class="d-none d-sm-inline input-group-text"
           >/ {{ document.num_pages }}</span
         >
@@ -46,12 +52,16 @@
     </div>
     <div
       v-if="preferences.showTextToggle"
-      class="col col-md-auto ps-0 pe-1 px-sm-2">
+      class="col col-md-auto ps-0 pe-1 px-sm-2"
+    >
       <div class="btn-group" role="group">
         <button
           class="btn btn-sm btn-secondary"
           :class="{ 'btn-light': preferences.showDocumentProperties }"
-          @click="showInfo">
+          @click="showInfo"
+          :title="i18n.info"
+          data-bs-toggle="tooltip"
+        >
           <i class="fa fa-info-circle" />
           <span class="visually-hidden">{{ i18n.info }}</span>
         </button>
@@ -59,7 +69,10 @@
           type="button"
           class="btn btn-sm btn-secondary"
           :class="{ 'btn-light': preferences.showText }"
-          @click="toggleShowText">
+          @click="toggleShowText"
+          :title="i18n.showText"
+          data-bs-toggle="tooltip"
+        >
           <i class="fa fa-file-text" />
           <span class="visually-hidden">{{ i18n.showText }}</span>
         </button>
@@ -68,17 +81,21 @@
           :href="document.file_url"
           rel="noopener"
           class="btn btn-sm btn-secondary"
-          @click="download">
+          @click="download"
+          :title="i18n.downloadPDF"
+          data-bs-toggle="tooltip"
+        >
           <i class="fa fa-download" />
           <span class="visually-hidden">{{ i18n.downloadPDF }}</span>
         </a>
-        <button
-          rel="noopener"
+        <CopyButton
           class="btn btn-sm btn-secondary"
-          @click="copyDocumentLink">
+          :copy-text="document.site_url"
+          :title="i18n.copyDocumentLink"
+        >
           <i class="fa fa-link" />
           <span class="visually-hidden">{{ i18n.copyDocumentLink }}</span>
-        </button>
+        </CopyButton>
       </div>
     </div>
     <div v-if="preferences.showZoom" class="col col-md-auto px-1 px-sm-2">
@@ -87,7 +104,10 @@
           type="button"
           class="btn btn-sm btn-secondary"
           :disabled="!canZoomOut"
-          @click="$emit('zoomout')">
+          @click="$emit('zoomout')"
+          :title="i18n.zoomOut"
+          data-bs-toggle="tooltip"
+        >
           <i class="fa fa-search-minus" />
           <span class="visually-hidden">{{ i18n.zoomOut }}</span>
         </button>
@@ -95,7 +115,10 @@
           type="button"
           class="btn btn-sm btn-secondary"
           :disabled="!canZoomIn"
-          @click="$emit('zoomin')">
+          @click="$emit('zoomin')"
+          :title="i18n.zoomIn"
+          data-bs-toggle="tooltip"
+        >
           <i class="fa fa-search-plus" />
           <span class="visually-hidden">{{ i18n.zoomIn }}</span>
         </button>
@@ -103,25 +126,31 @@
     </div>
     <div
       v-if="preferences.showSearch"
-      class="col col-sm-auto px-1 px-sm-2 ms-auto text-end">
+      class="col col-sm-auto px-1 px-sm-2 ms-auto text-end"
+    >
       <button
         type="button"
         class="btn btn-sm btn-secondary"
         :class="{ 'btn-light': preferences.showSearchbar }"
-        @click="toggleShowSearchbar">
+        @click="toggleShowSearchbar"
+        :title="i18n.showSearchbar"
+        data-bs-toggle="tooltip"
+      >
         <i class="fa fa-search" />
         <span class="visually-hidden">{{ i18n.showSearchbar }}</span>
       </button>
     </div>
     <div
       v-if="preferences.showAnnotationsToggle"
-      class="col-auto px-1 px-sm-2 text-end">
+      class="col-auto px-1 px-sm-2 text-end"
+    >
       <div class="btn-group" role="group">
         <button
           type="button"
           class="btn btn-sm btn-secondary"
           :class="{ 'btn-light': preferences.showAnnotations }"
-          @click="toggleShowAnnotations">
+          @click="toggleShowAnnotations"
+        >
           <i class="fa fa-commenting-o" />
           <span
             v-if="
@@ -129,7 +158,8 @@
               annotationCount &&
               annotationCount > 0
             "
-            class="badge text-bg-light rounded-pill bg-annotation-count">
+            class="badge text-bg-light rounded-pill bg-annotation-count"
+          >
             {{ annotationCount }}
             <span class="visually-hidden">{{ i18n.annotations }}</span>
           </span>
@@ -146,6 +176,7 @@
 <script>
 import { Tooltip } from 'bootstrap'
 import { triggerDownload } from '../lib/utils.js'
+import CopyButton from './copy-button.vue'
 
 export default {
   name: 'DocumentToolbar',
@@ -191,6 +222,7 @@ export default {
     'zoomin',
     'zoomout'
   ],
+  components: { CopyButton },
   data() {
     return {
       storedPage: this.currentPage
@@ -289,26 +321,17 @@ export default {
         this.downloadByUrl(filename)
       }
     },
-    copyDocumentLink(e) {
-      const showPopup = (text) => {
-        const tooltip = new Tooltip(e.target, {
-          title: text,
-          trigger: 'manual'
-        })
-        tooltip.show()
-        setTimeout(() => tooltip.hide(), 2000)
-      }
-      navigator.clipboard.writeText(this.document.site_url).then(
-        () => showPopup('Copied!'),
-        () => showPopup('Failed to copy!')
-      )
-    },
     downloadByUrl(filename) {
       triggerDownload(this.document.file_url, filename)
     },
     showInfo() {
       this.$emit('showinfo')
     }
+  },
+  mounted() {
+    this.$el.querySelectorAll("[data-bs-toggle='tooltip']").forEach((el) => {
+      new Tooltip(el)
+    })
   }
 }
 </script>
