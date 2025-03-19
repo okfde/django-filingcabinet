@@ -675,6 +675,13 @@ class CollectionDirectory(MP_Node):
     def __str__(self):
         return self.name
 
+    def get_path_to_root(self, max_depth: int = 0) -> list[str]:
+        ancestors = self.get_ancestors().filter(depth__gte=max_depth)
+        return [
+            *(ance.name for ance in ancestors),
+            self.name,
+        ]
+
 
 class CollectionDocument(models.Model):
     collection = models.ForeignKey(
