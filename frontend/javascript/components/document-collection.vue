@@ -285,6 +285,22 @@ export default {
     }
   },
   created() {
+    const queryParams = new URLSearchParams(window.location.search)
+
+    if (queryParams.has('document')) {
+      this.document = this.collection.documents.find(
+        (d) => d.id === parseInt(queryParams.get('document'), 10)
+      )
+
+      if (!this.document) {
+        getData(
+          `${this.config.urls.documentApiUrl}${queryParams.get('document')}/`
+        ).then((doc) => {
+          this.document = doc
+        })
+      }
+    }
+
     if (!this.documentCollection.id && this.documentCollection.resource_uri) {
       this.getCollectionData()
     }
