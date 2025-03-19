@@ -88,6 +88,7 @@ def get_js_config(request, obj=None):
             "documents": _("documents"),
             "areShown": _("are shown"),
             "downloadPDF": _("Download PDF"),
+            "downloadZIP": _("Download ZIP"),
             "info": _("Document Info"),
             "author": _("Author"),
             "publicationDate": _("publication date"),
@@ -178,8 +179,8 @@ def get_document_collection_context(collection, request):
     api_ctx = {"request": request}
     try:
         dir_id = request.GET.get("directory")
-        api_ctx["parent_directory"] = CollectionDirectory.objects.get(
-            id=dir_id, collection=collection
+        context["parent_directory"] = api_ctx["parent_directory"] = (
+            CollectionDirectory.objects.get(id=dir_id, collection=collection)
         )
     except (ValueError, CollectionDirectory.DoesNotExist):
         pass
@@ -251,10 +252,24 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
         return context
 
     def render_to_response(self, context):
+        if "parent_directory" in context:
+            root_directory = context["parent_directory"]
+            descendants = root_directory.get_descendants()
+            coll_docs = CollectionDocument.objects.filter(
+                collection=self.object,
+                document__pending=False,
+                directory__in=[*descendants, root_directory],
+            )
+            max_depth = root_directory.depth + 1  # exclude current directory
+        else:
+            root_directory = None
+            coll_docs = CollectionDocument.objects.filter(
+                collection=self.object, document__pending=False
+            )
+            max_depth = 0
+
         archive_stream = zipstream.ZipFile(mode="w", allowZip64=True)
-        coll_docs = CollectionDocument.objects.filter(
-            collection=self.object, document__pending=False
-        )
+
         directory_dirname_map = {}
         filename_counter = defaultdict(int)
         for doc in coll_docs:
@@ -265,12 +280,9 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
             if not doc_filename_stem:
                 doc_filename_stem = "unnamed"
             doc_filename = doc_filename_stem + doc_ext
-            if doc.directory is not None:
+            if doc.directory is not None and doc.directory != root_directory:
                 if doc.directory.pk not in directory_dirname_map:
-                    path_to_root = [
-                        *(x.name for x in doc.directory.get_ancestors()),
-                        doc.directory.name,
-                    ]
+                    path_to_root = doc.directory.get_path_to_root(max_depth)
                     dirname = os.path.join(*path_to_root)
                     directory_dirname_map[doc.directory.pk] = dirname
                 else:

@@ -12,16 +12,16 @@
               {{ i18n.backToCollection }}
             </button>
           </div>
-          <div
-            v-else-if="collection.zip_download_url && currentDirectory === null"
+          <a
+            v-else-if="zipDownload"
+            :href="zipDownload"
+            class="btn btn-sm btn-secondary"
+            :title="i18n.downloadZIP"
+            data-bs-toggle="tooltip"
           >
-            <a
-              :href="collection.zip_download_url"
-              class="btn btn-sm btn-secondary"
-              ><i class="fa fa-download"
-            /></a>
-          </div>
-        </div>
+            <i class="fa fa-download" />
+            <span class="sr-only">{{ i18n.downloadZIP }}</span>
+          </a>
         <div class="col-auto order-md-3 ms-auto">
           <span class="text-white d-inline-block text-truncate">
             <template v-if="document">
@@ -168,6 +168,7 @@
 
 <script>
 import { nextTick } from 'vue'
+import { Tooltip } from 'bootstrap'
 
 import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
 import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
@@ -282,6 +283,17 @@ export default {
       return new Intl.NumberFormat(document.documentElement.lang, {
         style: 'decimal'
       }).format(this.collection.document_count)
+    },
+    zipDownload() {
+      if (this.collection.zip_download_url) {
+        if (this.currentDirectory) {
+          return `${this.collection.zip_download_url}?directory=${this.currentDirectory.id}`
+        }
+
+        return this.collection.zip_download_url
+      }
+
+      return false
     }
   },
   created() {
@@ -313,6 +325,10 @@ export default {
     ) {
       this.loadMoreDocuments(0)
     }
+
+    this.$el.querySelectorAll("[data-bs-toggle='tooltip']").forEach((el) => {
+      new Tooltip(el)
+    })
   },
   methods: {
     getCollectionData() {
