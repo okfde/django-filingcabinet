@@ -2,6 +2,7 @@ import json
 import os.path
 from collections import defaultdict
 from pathlib import Path
+from typing import override
 
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import (
@@ -60,6 +61,7 @@ def get_js_config(request, obj=None):
     context = {
         "urls": {
             "pageAnnotationApiUrl": reverse("api:pageannotation-list"),
+            "documentApiUrl": reverse("api:document-list"),
         },
         "i18n": {
             "loading": _("Loading..."),
@@ -195,6 +197,19 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     template_name = "filingcabinet/documentcollection_detail.html"
     redirect_url_name = "filingcabinet:document-collection"
     redirect_short_url_name = "filingcabinet:document-collection_short"
+
+    @override
+    def get(self, request, *args, **kwargs):
+        if "document" in request.GET:
+            try:
+                CollectionDocument.objects.get(
+                    document_id=request.GET.get("document"), collection_id=kwargs["pk"]
+                )
+            except (CollectionDocument.DoesNotExist, ValueError):
+                # drop the query params
+                return redirect(request.path)
+
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
