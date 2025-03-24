@@ -1,5 +1,7 @@
 from django.template.defaultfilters import slugify
 
+import markdown
+import nh3
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
@@ -92,14 +94,28 @@ class UpdateDocumentSerializer(serializers.ModelSerializer):
 
 
 class CollectionDirectoryListSerializer(serializers.ModelSerializer):
+    description = serializers.SerializerMethodField()
+
     class Meta:
         model = CollectionDirectory
         fields = (
             "id",
             "name",
+            "description",
+            "depth",
             "created_at",
             "updated_at",
         )
+
+    def get_description(self, obj: CollectionDirectory) -> str:
+        if not obj.description:
+            return ""
+
+        authorized_tags = {"p", "strong", "em", "ul", "ol", "li", "a"}
+
+        html_output = markdown.markdown(obj.description)
+        safe_html_output = nh3.clean(html_output, tags=authorized_tags)
+        return safe_html_output
 
 
 class CollectionDirectorySerializer(serializers.HyperlinkedModelSerializer):
