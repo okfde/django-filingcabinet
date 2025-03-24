@@ -1,4 +1,7 @@
 from django.db.models import BooleanField, Case, Count, Q, Value, When
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+from django.views.decorators.vary import vary_on_headers
 
 from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
@@ -197,6 +200,11 @@ class DocumentCollectionViewSet(
 
         ctx.update({"parent_directory": parent_directory})
         return ctx
+
+    @method_decorator(cache_control(max_age=60 * 60 * 24))
+    @method_decorator(vary_on_headers("Cookie", "Authorization"))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
     @action(detail=False, methods=["get"])
     def oembed(self, request):
