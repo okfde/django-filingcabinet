@@ -655,6 +655,7 @@ class CollectionDirectory(MP_Node):
     collection = models.ForeignKey(
         FILINGCABINET_DOCUMENTCOLLECTION_MODEL, on_delete=models.CASCADE
     )
+    description = models.TextField(blank=True, help_text=_("Markdown is supported"))
     created_at = models.DateTimeField(_("created at"), default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now, null=True)
 

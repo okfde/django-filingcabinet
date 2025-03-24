@@ -18,6 +18,8 @@ dependencies = [
   "celery",
   "feedgen",
   "zipstream",
+  "markdown>=3.7",
+  "nh3>=0.2.21",
 ]
 readme = "README.md"
 requires-python = ">=3.10"
