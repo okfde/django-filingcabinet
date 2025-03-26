@@ -2,8 +2,8 @@
   <div>
     <div ref="toolbar" class="collection-toolbar">
       <div class="row py-2 bg-dark">
-        <div class="col-4 col-md-3 d-flex gap-2">
-          <div v-if="document" class="btn-group" role="group">
+        <div class="col-4 col-md-3 d-flex gap-2" role="group">
+          <template v-if="document">
             <button
               type="button"
               class="btn btn-sm btn-secondary"
@@ -11,27 +11,41 @@
             >
               {{ i18n.backToCollection }}
             </button>
-          </div>
+          </template>
 
-          <a
-            v-else-if="zipDownload"
-            :href="zipDownload"
-            class="btn btn-sm btn-secondary"
-            :title="i18n.downloadZIP"
-            data-bs-toggle="tooltip"
-          >
-            <i class="fa fa-download" />
-            <span class="sr-only">{{ i18n.downloadZIP }}</span>
-          </a>
+          <template v-else>
+            <button
+              v-if="currentDirectory"
+              type="button"
+              class="btn btn-sm btn-secondary"
+              :title="i18n.upOneDir"
+              data-bs-toggle="tooltip"
+              @click="selectDirectory(parentDirectory)"
+            >
+              <i class="fa fa-toggle-up" />
+              <span class="sr-only">{{ i18n.upOneDir }}</span>
+            </button>
 
-          <CopyButton
-            v-if="config.deepUrls && !document"
-            :title="i18n.copyCollectionLink"
-            :copy-text="queryUrl.toString()"
-          >
-            <i class="fa fa-link" />
-            <span class="visually-hidden">{{ i18n.copyCollectionLink }}</span>
-          </CopyButton>
+            <a
+              v-if="zipDownload"
+              :href="zipDownload"
+              class="btn btn-sm btn-secondary"
+              :title="i18n.downloadZIP"
+              data-bs-toggle="tooltip"
+            >
+              <i class="fa fa-download" />
+              <span class="sr-only">{{ i18n.downloadZIP }}</span>
+            </a>
+
+            <CopyButton
+              v-if="config.deepUrls"
+              :title="i18n.copyCollectionLink"
+              :copy-text="queryUrl.toString()"
+            >
+              <i class="fa fa-link" />
+              <span class="visually-hidden">{{ i18n.copyCollectionLink }}</span>
+            </CopyButton>
+          </template>
         </div>
 
         <div class="col-auto order-md-3 ms-auto">
@@ -134,18 +148,29 @@
       </div>
     </div>
     <div v-show="!document && !searcher" class="document-collection">
-      <div class="row bg-secondary">
-        <div class="col px-0">
+      <div class="row text-bg-secondary">
+        <div class="col px-0 pt-2">
+          <nav class="px-3 mb-2 text-white d-flex gap-2">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="#!" @click.prevent="selectDirectory()">
+                  <i class="fa fa-folder" />
+                  <span class="sr-only">{{ i18n.toRoot }}</span>
+                </a>
+              </li>
+              <li
+                v-for="(directory, i) in directoryStack"
+                :key="directory.id"
+                class="breadcrumb-item"
+                :class="{ active: i === directoryStack.length - 1 }"
+              >
+                <a href="#!" @click.prevent="selectDirectory(directory)">
+                  {{ directory.name }}
+                </a>
+              </li>
+            </ol>
+          </nav>
           <div class="list-group list-group-flush">
-            <button
-              v-if="currentDirectory != null"
-              type="button"
-              class="list-group-item list-group-item-action list-group-item-dark text-center"
-              @click="selectDirectory()"
-            >
-              <i class="fa fa-arrow-left float-start" />
-              {{ currentDirectory.name }}
-            </button>
             <button
               v-for="directory in directories"
               :key="directory.id"
@@ -306,6 +331,9 @@ export default {
 
       return false
     },
+    parentDirectory() {
+      return this.directoryStack[this.directoryStack.length - 2]
+    },
     queryParams() {
       const params = new URLSearchParams()
 
@@ -374,12 +402,15 @@ export default {
       )
       url.search = params
 
-      getData(url).then((docCollection) => {
+      return getData(url).then((docCollection) => {
         this.collection = docCollection
         this.documentsUri = docCollection.documents_uri
         this.documentOffsets = this.makeOffsets(docCollection)
         this.documents = this.makeDocuments(docCollection)
         this.directories = docCollection.directories
+        this.directoryStack = this.collection.directory_stack
+        if (this.currentDirectory)
+          this.directoryStack.push(this.currentDirectory)
         if (!this.settings) {
           this.settings = docCollection.settings
         }
@@ -615,14 +646,7 @@ export default {
       )
     },
     selectDirectory(directory) {
-      if (directory) {
-        this.directoryStack.push(directory)
-      } else {
-        this.directoryStack.pop()
-      }
-      this.currentDirectory =
-        this.directoryStack[this.directoryStack.length - 1] || null
-
+      this.currentDirectory = directory
       this.getCollectionData()
     },
     updateHistoryState() {
