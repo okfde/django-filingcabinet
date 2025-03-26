@@ -2,8 +2,8 @@
   <div>
     <div ref="toolbar" class="collection-toolbar">
       <div class="row py-2 bg-dark">
-        <div class="col-4 col-md-3">
-          <div v-if="document" class="btn-group" role="group">
+        <div class="col-4 col-md-3 d-flex gap-2" role="group">
+          <template v-if="document">
             <button
               type="button"
               class="btn btn-sm btn-secondary"
@@ -11,17 +11,43 @@
             >
               {{ i18n.backToCollection }}
             </button>
-          </div>
-          <div
-            v-else-if="collection.zip_download_url && currentDirectory === null"
-          >
-            <a
-              :href="collection.zip_download_url"
+          </template>
+
+          <template v-else>
+            <button
+              v-if="currentDirectory"
+              type="button"
               class="btn btn-sm btn-secondary"
-              ><i class="fa fa-download"
-            /></a>
-          </div>
+              :title="i18n.upOneDir"
+              data-bs-toggle="tooltip"
+              @click="selectDirectory(parentDirectory)"
+            >
+              <i class="fa fa-toggle-up" />
+              <span class="sr-only">{{ i18n.upOneDir }}</span>
+            </button>
+
+            <a
+              v-if="zipDownload"
+              :href="zipDownload"
+              class="btn btn-sm btn-secondary"
+              :title="i18n.downloadZIP"
+              data-bs-toggle="tooltip"
+            >
+              <i class="fa fa-download" />
+              <span class="sr-only">{{ i18n.downloadZIP }}</span>
+            </a>
+
+            <CopyButton
+              v-if="config.deepUrls"
+              :title="i18n.copyCollectionLink"
+              :copy-text="queryUrl.toString()"
+            >
+              <i class="fa fa-link" />
+              <span class="visually-hidden">{{ i18n.copyCollectionLink }}</span>
+            </CopyButton>
+          </template>
         </div>
+
         <div class="col-auto order-md-3 ms-auto">
           <span class="text-white d-inline-block text-truncate">
             <template v-if="document">
@@ -122,18 +148,35 @@
       </div>
     </div>
     <div v-show="!document && !searcher" class="document-collection">
-      <div class="row bg-secondary">
-        <div class="col px-0">
+      <div class="row text-bg-secondary">
+        <div class="col px-0 pt-2">
+          <nav class="px-3 mb-2 text-white d-flex gap-2">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a href="#!" @click.prevent="selectDirectory()">
+                  <i class="fa fa-folder" />
+                  <span class="sr-only">{{ i18n.toRoot }}</span>
+                </a>
+              </li>
+              <li
+                v-for="(directory, i) in directoryStack"
+                :key="directory.id"
+                class="breadcrumb-item"
+                :class="{ active: i === directoryStack.length - 1 }"
+              >
+                <a href="#!" @click.prevent="selectDirectory(directory)">
+                  {{ directory.name }}
+                </a>
+              </li>
+            </ol>
+          </nav>
+
+          <div class="d-flex px-3" v-if="currentDirectory?.description">
+            <i class="fa fa-info-circle mt-1 me-2"></i>
+            <div v-html="currentDirectory.description" />
+          </div>
+
           <div class="list-group list-group-flush">
-            <button
-              v-if="currentDirectory != null"
-              type="button"
-              class="list-group-item list-group-item-action list-group-item-dark text-center"
-              @click="selectDirectory()"
-            >
-              <i class="fa fa-arrow-left float-start" />
-              {{ currentDirectory.name }}
-            </button>
             <button
               v-for="directory in directories"
               :key="directory.id"
@@ -168,6 +211,7 @@
 
 <script>
 import { nextTick } from 'vue'
+import { Tooltip } from 'bootstrap'
 
 import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
 import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
@@ -175,6 +219,7 @@ import DocumentPreviewGrid from './document-preview-grid.vue'
 import DocumentViewer from './document-viewer.vue'
 
 import { getData } from '../lib/utils.js'
+import CopyButton from './copy-button.vue'
 
 const DOCUMENTS_API_LIMIT = 50
 const MAX_SCROLL_DOCS = DOCUMENTS_API_LIMIT * 100
@@ -190,7 +235,8 @@ export default {
     DocumentPreviewGrid,
     DocumentViewer,
     DocumentCollectionSearchbar,
-    DocumentCollectionSearchResults
+    DocumentCollectionSearchResults,
+    CopyButton
   },
   props: {
     documentCollection: {
@@ -206,8 +252,6 @@ export default {
     }
   },
   data() {
-    const queryParams = new URLSearchParams(window.location.search)
-
     const documents = []
     const directories = []
     let collection = {
@@ -221,10 +265,9 @@ export default {
       collection = this.documentCollection
       directoryStack = collection.directory_stack
       currentDirectory = collection.current_directory
-      document = collection.documents.find(
-        (d) => d.id === parseInt(queryParams.get('document'), 10)
-      )
+      directoryStack.push(currentDirectory)
     }
+
     const shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
     const settings = collection.settings || {}
     const preferences = settings.preferences || {}
@@ -282,6 +325,35 @@ export default {
       return new Intl.NumberFormat(document.documentElement.lang, {
         style: 'decimal'
       }).format(this.collection.document_count)
+    },
+    zipDownload() {
+      if (this.collection.zip_download_url) {
+        if (this.currentDirectory) {
+          return `${this.collection.zip_download_url}?directory=${this.currentDirectory.id}`
+        }
+
+        return this.collection.zip_download_url
+      }
+
+      return false
+    },
+    parentDirectory() {
+      return this.directoryStack[this.directoryStack.length - 2]
+    },
+    queryParams() {
+      const params = new URLSearchParams()
+
+      if (this.currentDirectory)
+        params.append('directory', this.currentDirectory.id)
+
+      if (this.document) params.append('document', this.document.id)
+
+      return params
+    },
+    queryUrl() {
+      const url = new URL(window.location.href)
+      url.search = this.queryParams
+      return url
     }
   },
   created() {
@@ -313,6 +385,10 @@ export default {
     ) {
       this.loadMoreDocuments(0)
     }
+
+    this.$el.querySelectorAll("[data-bs-toggle='tooltip']").forEach((el) => {
+      new Tooltip(el)
+    })
   },
   methods: {
     getCollectionData() {
@@ -332,12 +408,15 @@ export default {
       )
       url.search = params
 
-      getData(url).then((docCollection) => {
+      return getData(url).then((docCollection) => {
         this.collection = docCollection
         this.documentsUri = docCollection.documents_uri
         this.documentOffsets = this.makeOffsets(docCollection)
         this.documents = this.makeDocuments(docCollection)
         this.directories = docCollection.directories
+        this.directoryStack = this.collection.directory_stack
+        if (this.currentDirectory)
+          this.directoryStack.push(this.currentDirectory)
         if (!this.settings) {
           this.settings = docCollection.settings
         }
@@ -573,27 +652,15 @@ export default {
       )
     },
     selectDirectory(directory) {
-      if (directory) {
-        this.directoryStack.push(directory)
-      } else {
-        this.directoryStack.pop()
-      }
-      this.currentDirectory =
-        this.directoryStack[this.directoryStack.length - 1] || null
-
+      this.currentDirectory = directory
       this.getCollectionData()
     },
     updateHistoryState() {
       if (this.config.deepUrls) {
-        const params = new URLSearchParams()
-        if (this.currentDirectory)
-          params.append('directory', this.currentDirectory.id)
-        if (this.document) params.append('document', this.document.id)
-
         window.history.replaceState(
           {},
           '',
-          params.size == 0 ? '' : `?${params}`
+          this.queryParams.size == 0 ? '' : `?${this.queryParams}`
         )
       }
     }
@@ -605,6 +672,9 @@ export default {
     document() {
       this.updateHistoryState()
     }
+  },
+  provide() {
+    return { config: this.config, i18n: this.config.i18n }
   }
 }
 </script>
