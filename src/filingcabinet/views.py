@@ -89,6 +89,8 @@ def get_js_config(request, obj=None):
             "areShown": _("are shown"),
             "downloadPDF": _("Download PDF"),
             "downloadZIP": _("Download ZIP"),
+            "upOneDir": _("Up one directory"),
+            "toRoot": _("To root directory"),
             "info": _("Document Info"),
             "author": _("Author"),
             "publicationDate": _("publication date"),
