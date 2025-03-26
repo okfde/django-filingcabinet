@@ -170,6 +170,12 @@
               </li>
             </ol>
           </nav>
+
+          <div class="d-flex px-3" v-if="currentDirectory?.description">
+            <i class="fa fa-info-circle mt-1 me-2"></i>
+            <div v-html="currentDirectory.description" />
+          </div>
+
           <div class="list-group list-group-flush">
             <button
               v-for="directory in directories"
