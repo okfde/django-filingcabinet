@@ -149,8 +149,11 @@
     </div>
     <div v-show="!document && !searcher" class="document-collection">
       <div class="row text-bg-secondary">
-        <div class="col px-0 pt-2">
-          <nav class="px-3 mb-2 text-white d-flex gap-2">
+        <div class="col px-0">
+          <nav
+            class="px-3 my-2 text-white d-flex gap-2"
+            v-if="currentDirectory"
+          >
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
                 <a href="#!" @click.prevent="selectDirectory()">
@@ -660,7 +663,9 @@ export default {
         window.history.replaceState(
           {},
           '',
-          this.queryParams.size == 0 ? '' : `?${this.queryParams}`
+          this.queryParams.size == 0
+            ? window.location.pathname
+            : `?${this.queryParams}`
         )
       }
     }
