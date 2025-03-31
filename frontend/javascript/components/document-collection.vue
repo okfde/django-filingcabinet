@@ -268,7 +268,7 @@ export default {
       collection = this.documentCollection
       directoryStack = collection.directory_stack
       currentDirectory = collection.current_directory
-      directoryStack.push(currentDirectory)
+      if (currentDirectory) directoryStack.push(currentDirectory)
     }
 
     const shouldPaginate = collection.document_directory_count > MAX_SCROLL_DOCS
