@@ -57,8 +57,9 @@ class AuthMixin:
         return self.model.objects.get_authenticated_queryset(self.request)
 
 
-def get_js_config(request, obj=None):
+def get_js_config(request, obj=None, deep_urls=False):
     context = {
+        "deepUrls": deep_urls,
         "urls": {
             "pageAnnotationApiUrl": reverse("api:pageannotation-list"),
             "documentApiUrl": reverse("api:document-list"),
@@ -176,7 +177,7 @@ class DocumentEmbedView(DocumentView):
     redirect_short_url_name = "filingcabinet:document-detail_embed_short"
 
 
-def get_document_collection_context(collection, request):
+def get_document_collection_context(collection, request, deep_urls=False):
     context = {"object": collection}
     context["documents"] = collection.ordered_documents
     serializer_klass = collection.get_serializer_class()
@@ -192,8 +193,7 @@ def get_document_collection_context(collection, request):
 
     data = serializer_klass(collection, context=api_ctx).data
     context["documentcollection_data"] = json.dumps(data)
-    config = get_js_config(request, collection)
-    config["deepUrls"] = True
+    config = get_js_config(request, collection, deep_urls)
     context["config"] = json.dumps(config)
     return context
 
@@ -220,7 +220,9 @@ class DocumentCollectionView(AuthMixin, PkSlugMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context.update(get_document_collection_context(self.object, self.request))
+        context.update(
+            get_document_collection_context(self.object, self.request, deep_urls=True)
+        )
         return context
 
 
