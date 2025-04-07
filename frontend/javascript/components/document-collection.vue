@@ -80,6 +80,7 @@
             @click="enableSearch"
           >
             <i class="fa fa-search" />
+            <span class="sr-only">{{ i18n.search }}</span>
           </button>
           <button
             v-else
@@ -88,6 +89,7 @@
             @click="clearSearch"
           >
             <i class="fa fa-close" />
+            <span class="sr-only">{{ i18n.clear }}</span>
           </button>
         </div>
       </div>
