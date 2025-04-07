@@ -158,7 +158,12 @@
           >
             <ol class="breadcrumb">
               <li class="breadcrumb-item">
-                <a href="#!" @click.prevent="selectDirectory()">
+                <a
+                  href="#!"
+                  @click.prevent="selectDirectory()"
+                  :title="i18n.toRoot"
+                  data-bs-toggle="tooltip"
+                >
                   <i class="fa fa-folder" />
                   <span class="sr-only">{{ i18n.toRoot }}</span>
                 </a>
@@ -391,9 +396,7 @@ export default {
       this.loadMoreDocuments(0)
     }
 
-    this.$el.querySelectorAll("[data-bs-toggle='tooltip']").forEach((el) => {
-      new Tooltip(el)
-    })
+    this.updateTooltips()
   },
   methods: {
     getCollectionData() {
@@ -670,11 +673,17 @@ export default {
             : `?${this.queryParams}`
         )
       }
+    },
+    updateTooltips() {
+      this.$el
+        .querySelectorAll("[data-bs-toggle='tooltip']")
+        .forEach((el) => Tooltip.getOrCreateInstance(el))
     }
   },
   watch: {
     currentDirectory() {
       this.updateHistoryState()
+      this.updateTooltips()
     },
     document() {
       this.updateHistoryState()
