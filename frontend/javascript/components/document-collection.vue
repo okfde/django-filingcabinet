@@ -181,7 +181,10 @@
             </ol>
           </nav>
 
-          <div class="d-flex px-3" v-if="currentDirectory?.description">
+          <div
+            class="d-flex px-3 dir-description"
+            v-if="currentDirectory?.description"
+          >
             <i class="fa fa-info-circle mt-1 me-2"></i>
             <div v-html="currentDirectory.description" />
           </div>
@@ -695,4 +698,14 @@ export default {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/variables';
+
+.dir-description :deep(a) {
+  --#{$prefix}link-color-rgb: var(--#{$prefix}light-rgb);
+  --#{$prefix}link-hover-color-rgb: var(--#{$prefix}light-rgb);
+  text-decoration: underline;
+}
+</style>
