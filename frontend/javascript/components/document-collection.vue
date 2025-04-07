@@ -23,7 +23,7 @@
               @click="selectDirectory(parentDirectory)"
             >
               <i class="fa fa-toggle-up" />
-              <span class="sr-only">{{ i18n.upOneDir }}</span>
+              <span class="visually-hidden">{{ i18n.upOneDir }}</span>
             </button>
 
             <a
@@ -34,7 +34,7 @@
               data-bs-toggle="tooltip"
             >
               <i class="fa fa-download" />
-              <span class="sr-only">{{ i18n.downloadZIP }}</span>
+              <span class="visually-hidden">{{ i18n.downloadZIP }}</span>
             </a>
 
             <CopyButton
@@ -80,7 +80,7 @@
             @click="enableSearch"
           >
             <i class="fa fa-search" />
-            <span class="sr-only">{{ i18n.search }}</span>
+            <span class="visually-hidden">{{ i18n.search }}</span>
           </button>
           <button
             v-else
@@ -89,7 +89,7 @@
             @click="clearSearch"
           >
             <i class="fa fa-close" />
-            <span class="sr-only">{{ i18n.clear }}</span>
+            <span class="visually-hidden">{{ i18n.clear }}</span>
           </button>
         </div>
       </div>
@@ -165,7 +165,7 @@
                   data-bs-toggle="tooltip"
                 >
                   <i class="fa fa-folder" />
-                  <span class="sr-only">{{ i18n.toRoot }}</span>
+                  <span class="visually-hidden">{{ i18n.toRoot }}</span>
                 </a>
               </li>
               <li
