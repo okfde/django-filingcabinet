@@ -830,8 +830,13 @@ class AbstractDocumentCollection(models.Model):
         return getattr(settings, "SITE_URL", "") + path
 
     def get_cover_image(self):
+        prefetched_docs = getattr(self, "prefetched_documents", None)
+        if prefetched_docs is not None:
+            docs = prefetched_docs
+        else:
+            docs = self.ordered_documents
         try:
-            document = self.ordered_documents[0]
+            document = docs[0]
             return document.get_cover_image()
         except IndexError:
             return None

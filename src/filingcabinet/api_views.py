@@ -1,4 +1,12 @@
-from django.db.models import BooleanField, Case, Count, Q, Value, When
+from django.db.models import (
+    BooleanField,
+    Case,
+    Count,
+    Prefetch,
+    Q,
+    Value,
+    When,
+)
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
@@ -164,21 +172,75 @@ class DocumentCollectionViewSet(
         except (KeyError, AttributeError):
             return DocumentCollectionSerializer
 
-    def get_queryset(self):
+    def get_base_queryset(self):
         if self.action == "list":
             cond = Q(public=True, listed=True)
         else:
             cond = Q(public=True)
         if self.request.user.is_authenticated:
             cond |= Q(user=self.request.user)
-        qs = DocumentCollection.objects.filter(cond)
+        return DocumentCollection.objects.filter(cond)
+
+    def get_queryset(self):
+        qs = self.get_base_queryset()
         qs = qs.annotate(document_count=Count("documents"))
-        # TODO: annotate doc count for directory for performance
-        # qs = qs.annotate(document_directory_count=Count(
-        #     'documents', filter=Q(filingcabinet)
-        # ))
-        qs = qs.prefetch_related("documents")
+
+        self.parent_directory_id = None
+        if self.action == "retrieve" and self.request is not None:
+            try:
+                self.parent_directory_id = int(self.request.GET.get("directory", ""))
+            except ValueError:
+                pass
+
+        qs = qs.annotate(
+            document_directory_count=Count(
+                "documents",
+                filter=Q(
+                    filingcabinet_collectiondocument__directory=self.parent_directory_id
+                ),
+            )
+        )
+        if self.parent_directory_id is None:
+            # Only prefetch documents for root
+            # so prefetch can be used for cover image
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "documents",
+                    queryset=Document.objects.filter(
+                        filingcabinet_collectiondocument__directory=None
+                    ).order_by(
+                        "filingcabinet_collectiondocument__order",
+                        "filingcabinet_collectiondocument__id",
+                    ),
+                    to_attr="prefetched_documents",
+                )
+            )
+
+            # Only prefetch root directories
+            qs = qs.prefetch_related(
+                Prefetch(
+                    "collectiondirectory_set",
+                    queryset=CollectionDirectory.get_root_nodes(),
+                    to_attr="prefetched_directories",
+                )
+            )
+
         return qs
+
+    def get_object(self):
+        obj = super().get_object()
+
+        self.parent_directory = None
+        if self.parent_directory_id:
+            try:
+                # request is not available when called from manage.py generateschema
+                self.parent_directory = CollectionDirectory.objects.get(
+                    id=self.parent_directory_id, collection=obj
+                )
+            except CollectionDirectory.DoesNotExist:
+                pass
+
+        return obj
 
     def get_serializer_context(self):
         """
@@ -188,17 +250,7 @@ class DocumentCollectionViewSet(
         if self.action != "retrieve":
             return ctx
 
-        # FIXME: check if directory is part of this collection
-        parent_directory = None
-        try:
-            # request is not available when called from manage.py generateschema
-            if self.request is not None:
-                dir_id = int(self.request.GET.get("directory", ""))
-                parent_directory = CollectionDirectory.objects.get(id=dir_id)
-        except (ValueError, CollectionDirectory.DoesNotExist):
-            pass
-
-        ctx.update({"parent_directory": parent_directory})
+        ctx.update({"parent_directory": self.parent_directory})
         return ctx
 
     @method_decorator(cache_control(max_age=60 * 60 * 24))
