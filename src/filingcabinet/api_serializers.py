@@ -6,7 +6,13 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 from . import get_document_model, get_documentcollection_model
-from .models import CollectionDirectory, DocumentPortal, Page, PageAnnotation
+from .models import (
+    CollectionDirectory,
+    CollectionDocument,
+    DocumentPortal,
+    Page,
+    PageAnnotation,
+)
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -191,15 +197,17 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
         parent = self.context.get("parent_directory")
         if hasattr(obj, "document_directory_count"):
             return obj.document_directory_count
-        return (
-            obj.documents.all()
-            .filter(filingcabinet_collectiondocument__directory=parent)
-            .count()
-        )
+        return CollectionDocument.objects.filter(
+            collection=obj, directory=parent
+        ).count()
 
     def get_documents(self, obj):
-        parent = self.context.get("parent_directory")
-        docs = obj.get_documents(directory=parent)[:MAX_COLLECTION_DOCS]
+        prefetched_docs = getattr(obj, "prefetched_documents", None)
+        if prefetched_docs is not None:
+            docs = prefetched_docs[:MAX_COLLECTION_DOCS]
+        else:
+            parent = self.context.get("parent_directory")
+            docs = obj.get_documents(directory=parent)[:MAX_COLLECTION_DOCS]
         return Document.get_serializer_class()(
             docs, many=True, context=self.context
         ).data
@@ -220,8 +228,10 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             return CollectionDirectoryListSerializer(parent, context=self.context).data
 
     def get_directories(self, obj):
-        parent = self.context.get("parent_directory")
-        directories = obj.get_directories(parent_directory=parent)
+        directories = getattr(obj, "prefetched_directories", None)
+        if directories is None:
+            parent = self.context.get("parent_directory")
+            directories = obj.get_directories(parent_directory=parent)
         return CollectionDirectoryListSerializer(
             directories, many=True, context=self.context
         ).data
