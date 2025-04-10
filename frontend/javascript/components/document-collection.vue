@@ -340,7 +340,7 @@ export default {
       }).format(this.collection.document_count)
     },
     zipDownload() {
-      if (this.collection.zip_download_url) {
+      if (this.collection?.zip_download_url) {
         if (this.currentDirectory) {
           return `${this.collection.zip_download_url}?directory=${this.currentDirectory.id}`
         }
