@@ -3,7 +3,6 @@ function getData(url = '', headers = {}, signal = undefined) {
   return window
     .fetch(url, {
       method: 'GET',
-      cache: 'no-cache',
       signal,
       credentials: 'same-origin',
       headers: {
