@@ -2,7 +2,7 @@
   <div ref="document" class="document" :style="documentStyle">
     <div ref="toolbar" class="toolbar">
       <div ref="toolbarBars">
-        <document-toolbar
+        <DocumentToolbar
           v-if="preferences.showToolbar"
           :document="document"
           :pdf-document="pdfDocument"
@@ -23,7 +23,7 @@
           "
         />
         <transition name="slidedown">
-          <document-searchbar
+          <DocumentSearchbar
             v-if="preferences.showSearchbar"
             :searcher="searcher"
             :search-index="searchIndex"
@@ -35,7 +35,7 @@
           />
         </transition>
         <transition name="slidedown">
-          <document-properties
+          <DocumentProperties
             v-if="preferences.showDocumentProperties"
             :document="document"
             @close="preferences.showDocumentProperties = false"
@@ -51,7 +51,7 @@
             'bg-secondary': !!preferences.showSearchResults
           }"
         >
-          <document-search-sidebar
+          <DocumentSearchSidebar
             v-if="preferences.showSearchResults"
             :document-pages="document.pages"
             :pages="pagesWithMatches"
@@ -59,7 +59,7 @@
             :height="sidebarContentHeight"
             @navigate="navigate"
           />
-          <document-outline-sidebar
+          <DocumentOutlineSidebar
             v-else-if="preferences.showOutline"
             :outline="document.outline"
             :height="sidebarContentHeight"
@@ -87,7 +87,7 @@
           :style="sidebarStyle"
         >
           <div class="sidebar-content" :style="sidebarContentStyle">
-            <document-search-sidebar
+            <DocumentSearchSidebar
               v-if="preferences.showSearchResults"
               :document-pages="document.pages"
               :pages="pagesWithMatches"
@@ -95,13 +95,13 @@
               :height="sidebarContentHeight"
               @navigate="navigate"
             />
-            <document-outline-sidebar
+            <DocumentOutlineSidebar
               v-else-if="preferences.showOutline"
               :outline="document.outline"
               :height="sidebarContentHeight"
               @navigate="navigate"
             />
-            <document-preview-sidebar
+            <DocumentPreviewSidebar
               v-else
               :pages="document.pages"
               :image-formats="supportedImageFormats"
@@ -120,7 +120,7 @@
           '-sm': isSmallScreen
         }"
       >
-        <document-pages
+        <DocumentPages
           :document="document"
           :pages="document.pages"
           :pdf-document="pdfDocument"

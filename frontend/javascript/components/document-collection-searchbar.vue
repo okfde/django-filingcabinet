@@ -18,7 +18,7 @@
                 @keydown.enter="runSearch" />
             </div>
           </div>
-          <document-filter
+          <DocumentFilter
             v-for="filter in filters"
             :key="filter.id"
             :filter="filter"
@@ -93,7 +93,7 @@
       </div>
       <div v-if="hasFacets" class="row d-flex mb-2">
         <div v-for="facet in facetList" :key="facet.key" class="col-4">
-          <document-facet
+          <DocumentFacet
             :values="facet.values"
             :filter="facet.filter"
             :value="facet.value"

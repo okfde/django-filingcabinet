@@ -36,7 +36,7 @@
       </div>
     </div>
     <div v-if="!showAnnotationForm">
-      <page-annotation
+      <PageAnnotation
         v-for="annotation in annotations"
         :key="annotation.id"
         :annotation="annotation"

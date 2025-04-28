@@ -12,7 +12,7 @@
     </div>
     <div class="row bg-secondary">
       <div v-for="page in pages" :key="page.number" class="col-sm-4 col-md-3">
-        <document-preview
+        <DocumentPreview
           :document="document"
           :page="page.number"
           :highlight="page.query_highlight"

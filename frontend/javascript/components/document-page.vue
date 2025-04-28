@@ -77,7 +77,7 @@
             "
             class="annotation-overlay-container"
             :style="imageOverlayStyle">
-            <page-annotation-overlay
+            <PageAnnotationOverlay
               v-for="annotation in annotationsWithRect"
               :key="annotation.id"
               :page="page"
@@ -93,7 +93,7 @@
     </div>
 
     <div v-if="showAnnotations" class="col-4 bg-light annotation-sidebar">
-      <page-annotations
+      <PageAnnotations
         :annotations="annotations"
         :page="page"
         :current-annotation="currentAnnotation"
