@@ -2,7 +2,6 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 
-// eslint-disable-next-line no-undef
 const outputDir = resolve(__dirname, 'build')
 
 // https://vitejs.dev/config/
@@ -20,7 +19,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         entry: 'frontend/javascript/entry.js',
-        fcdownloader: 'frontend/javascript/fcdownloader.js',
+        fcdownloader: 'frontend/javascript/fcdownloader.js'
       },
       output: {
         sourcemap: true,
