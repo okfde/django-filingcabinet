@@ -17,6 +17,6 @@ repos:
       - id: eslint
         name: eslint
         language: node
-        files: \.(js|vue)?$
-        entry: pnpx eslint
+        files: \.(js|ts|vue)?$
+        entry: pnpm lint
         args: [--no-warn-ignored]
