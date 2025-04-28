@@ -8,7 +8,7 @@
       :items="pages"
       key-field="number"
       :item-size="116">
-      <document-search-preview
+      <DocumentSearchPreview
         :key="item.number"
         :matches="item"
         :page="documentPages[item.number - 1]"

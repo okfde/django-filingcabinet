@@ -10,7 +10,7 @@
       :emit-update="true"
       :buffer="buffer"
       @update="updateCurrentPage">
-      <document-page
+      <DocumentPage
         :key="item.number"
         :page="item"
         :pdf-document="pdfDocument"

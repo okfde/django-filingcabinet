@@ -7,7 +7,7 @@
       key-field="number"
       size-field="smallSize"
       :emit-update="true">
-      <document-preview-page
+      <DocumentPreviewPage
         :key="item.number"
         :page="item"
         :image-formats="imageFormats"

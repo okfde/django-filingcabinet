@@ -93,7 +93,7 @@
           </button>
         </div>
       </div>
-      <document-collection-searchbar
+      <DocumentCollectionSearchbar
         v-if="showSearch && !document"
         :searcher="searcher"
         :directory="currentDirectory"
@@ -106,7 +106,7 @@
     <div v-if="document" class="collection-document">
       <div class="row">
         <div class="col-12 px-0">
-          <document-viewer
+          <DocumentViewer
             :document-url="document.resource_uri"
             :document-preview="document"
             :page="documentPage"
@@ -118,7 +118,7 @@
     </div>
     <div v-if="!document && searcher">
       <template v-if="searcher.term">
-        <document-collection-search-results
+        <DocumentCollectionSearchResults
           v-for="result in searcher.results"
           :key="result.document.id"
           :document="result.document"
@@ -129,7 +129,7 @@
       <template v-else>
         <div class="row bg-secondary">
           <div class="col px-0">
-            <document-preview-grid
+            <DocumentPreviewGrid
               :documents="searcher.documents"
               @navigate="navigate"
             />
@@ -200,7 +200,7 @@
               {{ directory.name }}
             </button>
           </div>
-          <document-preview-grid
+          <DocumentPreviewGrid
             :documents="documents"
             @navigate="navigate"
             @loadmore="loadMoreDocuments"
@@ -273,7 +273,7 @@ export default {
     }
     let directoryStack = []
     let currentDirectory = null
-    let document = null
+    const document = null
     if (this.documentCollection) {
       collection = this.documentCollection
       directoryStack = collection.directory_stack

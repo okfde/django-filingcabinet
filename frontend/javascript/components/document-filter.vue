@@ -37,7 +37,7 @@
     </template>
     <template v-if="filter.type == 'daterange'">
       <div class="col-sm-9 col-md-10">
-        <document-date-range-filter
+        <DocumentDateRangeFilter
           :value="value || {}"
           :filter="filter"
           @submit="submit"

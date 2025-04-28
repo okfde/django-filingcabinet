@@ -14,7 +14,7 @@
           v-for="document in item.documents"
           :key="document.id"
           class="col-md-4 col-lg-3">
-          <document-preview :document="document" @navigate="navigate" />
+          <DocumentPreview :document="document" @navigate="navigate" />
         </div>
       </div>
     </RecycleScroller>
