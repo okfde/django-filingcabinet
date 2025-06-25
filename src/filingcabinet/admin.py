@@ -17,7 +17,6 @@ from treebeard.forms import movenodeform_factory
 from . import get_document_model
 from .admin_utils import NullFilter
 from .models import CollectionDirectory, Page
-from .services import create_documents_from_files
 
 
 class DocumentPortalAdmin(admin.ModelAdmin):
@@ -179,6 +178,8 @@ class DocumentBaseAdmin(admin.ModelAdmin):
             doc.process_document()
 
     def upload_documents(self, request):
+        from .services import create_documents_from_files
+
         if not request.method == "POST":
             raise PermissionDenied
         if not self.has_change_permission(request):
