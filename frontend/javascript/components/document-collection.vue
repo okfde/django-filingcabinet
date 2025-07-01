@@ -223,8 +223,8 @@
 </template>
 
 <script>
-import { nextTick } from 'vue'
 import { Tooltip } from 'bootstrap'
+import { nextTick } from 'vue'
 
 import DocumentCollectionSearchbar from './document-collection-searchbar.vue'
 import DocumentCollectionSearchResults from './document-collection-searchresults.vue'
