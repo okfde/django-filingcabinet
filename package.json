@@ -20,7 +20,7 @@
     "bootstrap": "^5.3.0",
     "font-awesome": "^4.7.0",
     "intersection-observer": "^0.12.2",
-    "pdfjs-dist": "^2.9.359",
+    "pdfjs-dist": "====2.16.105",
     "vue": "^3.5.13",
     "vue-virtual-scroller": "^2.0.0-alpha.1"
   },
