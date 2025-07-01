@@ -110,7 +110,7 @@
 import PageAnnotations from './document-annotations.vue'
 import PageAnnotationOverlay from './document-page-annotationoverlay.vue'
 
-import { FilingcabinetLinkService } from '../lib/pdfjs-utils.js'
+import { LinkTarget, PDFLinkService } from 'pdfjs-dist/lib/web/pdf_link_service.js'
 import { toRaw } from 'vue'
 
 const PAGE_SIZES = {
@@ -454,8 +454,8 @@ export default {
       if (pdfAnnotations.length === 0) {
         return
       }
-      const linkService = new FilingcabinetLinkService({
-        externalLinkTarget: 2,
+      const linkService = new PDFLinkService({
+        externalLinkTarget: LinkTarget.BLANK,
         externalLinkRel: 'noopener nofollow noreferrer',
         externalLinkEnabled: true
       })
