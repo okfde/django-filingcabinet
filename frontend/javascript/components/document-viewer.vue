@@ -834,6 +834,9 @@ export default {
           console.warn(err)
         })
     }
+  },
+  provide() {
+    return { config: this.config, i18n: this.config.i18n }
   }
 }
 </script>
