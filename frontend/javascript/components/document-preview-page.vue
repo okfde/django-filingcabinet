@@ -1,13 +1,12 @@
 <template>
   <a :href="pageAnchor" class="document-preview-page" @click.prevent="navigate">
-    <picture>
+    <picture v-if="page.image_url">
       <source
         v-for="format in imageFormats"
         :key="format"
         :srcset="imageUrl.replace(/\.png/, '.png.' + format)"
         :type="'image/' + format" />
       <img
-        v-if="page.image_url"
         v-show="imageLoaded"
         ref="image"
         :src="imageUrl"
