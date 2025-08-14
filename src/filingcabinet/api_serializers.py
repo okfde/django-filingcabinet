@@ -64,6 +64,20 @@ class DocumentSerializer(serializers.HyperlinkedModelSerializer):
             "data",
             "pages_uri",
         )
+        read_only_fields = (
+            "slug",
+            "published_at",
+            "num_pages",
+            "public",
+            "listed",
+            "allow_annotation",
+            "pending",
+            "file_size",
+            "outline",
+            "properties",
+            "uid",
+            "data",
+        )
 
     def get_pages_uri(self, obj):
         extra = ""
@@ -112,6 +126,11 @@ class CollectionDirectoryListSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        read_only_fields = (
+            "depth",
+            "created_at",
+            "updated_at",
+        )
 
     def get_description(self, obj: CollectionDirectory) -> str:
         if not obj.description:
@@ -138,6 +157,10 @@ class CollectionDirectorySerializer(serializers.HyperlinkedModelSerializer):
             "updated_at",
             "documents",
             "directories",
+        )
+        read_only_fields = (
+            "created_at",
+            "updated_at",
         )
 
 
@@ -186,6 +209,14 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
             "pages_uri",
             "settings",
             "zip_download_url",
+        )
+        read_only_fields = (
+            "public",
+            "listed",
+            "created_at",
+            "updated_at",
+            "uid",
+            "settings",
         )
 
     def get_document_count(self, obj):
@@ -273,8 +304,15 @@ class PageAnnotationSerializer(serializers.HyperlinkedModelSerializer):
             "document",
             "number",
         )
+        read_only_fields = (
+            "timestamp",
+            "can_delete",
+            "highlight",
+            "image",
+        )
 
 
+# TODO: refactor this to a single serializer
 class CreatePageAnnotationSerializer(serializers.Serializer):
     document = serializers.PrimaryKeyRelatedField(queryset=Document.objects.none())
     page_number = serializers.IntegerField()
@@ -369,6 +407,10 @@ class DocumentPortalSerializer(serializers.HyperlinkedModelSerializer):
             "documents",
             "documents_uri",
             "pages_uri",
+            "settings",
+        )
+        read_only_fields = (
+            "created_at",
             "settings",
         )
 
