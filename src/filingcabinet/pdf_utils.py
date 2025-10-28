@@ -397,7 +397,16 @@ def run_ocr(
             str(output_file),
         ]
         try:
-            output_bytes = shell_call(arguments, outpath, output_file, timeout=timeout)
+            output_bytes = shell_call(
+                arguments,
+                outpath,
+                output_file,
+                timeout=timeout,
+                successful_returncodes=[
+                    0,
+                    10,  # https://ocrmypdf.readthedocs.io/en/v10.2.0/api.html#ocrmypdf.exceptions.ExitCode.pdfa_conversion_failed
+                ],
+            )
             return output_bytes
         except Exception as err:
             logger.error("Error during PDF OCR: %s", err)
