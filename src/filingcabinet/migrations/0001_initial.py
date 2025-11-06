@@ -11,9 +11,9 @@ from django.conf import settings
 from django.db import migrations, models
 
 import taggit.managers
-
 import filingcabinet.models
-import filingcabinet.storage
+
+from django.core.files.storage import FileSystemStorage
 
 
 class Migration(migrations.Migration):
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                     models.FileField(
                         blank=True,
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=filingcabinet.models.get_document_path,
                     ),
                 ),
@@ -96,7 +96,7 @@ class Migration(migrations.Migration):
                     "image",
                     models.ImageField(
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=functools.partial(
                             filingcabinet.models.get_page_filename,
                             *(),
@@ -108,7 +108,7 @@ class Migration(migrations.Migration):
                     "image_large",
                     models.ImageField(
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=functools.partial(
                             filingcabinet.models.get_page_filename,
                             *(),
@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
                     "image_normal",
                     models.ImageField(
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=functools.partial(
                             filingcabinet.models.get_page_filename,
                             *(),
@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
                     "image_small",
                     models.ImageField(
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=functools.partial(
                             filingcabinet.models.get_page_filename,
                             *(),
@@ -175,7 +175,7 @@ class Migration(migrations.Migration):
                     models.ImageField(
                         blank=True,
                         max_length=255,
-                        storage=filingcabinet.storage.OverwriteStorage(),
+                        storage=FileSystemStorage(allow_overwrite=True),
                         upload_to=filingcabinet.models.get_page_annotation_filename,
                     ),
                 ),

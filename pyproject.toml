@@ -2,7 +2,7 @@
 name = "django-filingcabinet"
 version = "0.0.1"
 dependencies = [
-  "Django",
+  "Django>=5.1",
   "wand",
   "pypdf",
   "PyCryptodome",
@@ -22,7 +22,7 @@ dependencies = [
   "nh3>=0.2.21",
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { text = "MIT" }
 
 [project.optional-dependencies]
