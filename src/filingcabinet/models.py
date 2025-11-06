@@ -7,6 +7,7 @@ import uuid
 from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.core.files.base import File
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import Resolver404, resolve, reverse
 from django.utils import timezone
@@ -22,7 +23,6 @@ from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL,
 )
-from .storage import OverwriteStorage
 from .validators import validate_settings_schema
 
 
@@ -171,7 +171,7 @@ class AbstractDocument(models.Model):
 
     pdf_file = models.FileField(
         max_length=255,
-        storage=OverwriteStorage(),
+        storage=FileSystemStorage(allow_overwrite=True),
         upload_to=get_document_path,
         blank=True,
     )
@@ -520,17 +520,23 @@ class Page(models.Model):
 
     image = models.ImageField(
         max_length=255,
-        storage=OverwriteStorage(),
+        storage=FileSystemStorage(allow_overwrite=True),
         upload_to=functools.partial(get_page_filename, size="original"),
     )
     image_large = models.ImageField(
-        max_length=255, storage=OverwriteStorage(), upload_to=UPLOAD_FUNCS["large"]
+        max_length=255,
+        storage=FileSystemStorage(allow_overwrite=True),
+        upload_to=UPLOAD_FUNCS["large"],
     )
     image_normal = models.ImageField(
-        max_length=255, storage=OverwriteStorage(), upload_to=UPLOAD_FUNCS["normal"]
+        max_length=255,
+        storage=FileSystemStorage(allow_overwrite=True),
+        upload_to=UPLOAD_FUNCS["normal"],
     )
     image_small = models.ImageField(
-        max_length=255, storage=OverwriteStorage(), upload_to=UPLOAD_FUNCS["small"]
+        max_length=255,
+        storage=FileSystemStorage(allow_overwrite=True),
+        upload_to=UPLOAD_FUNCS["small"],
     )
 
     class Meta:
@@ -620,7 +626,7 @@ class PageAnnotation(models.Model):
     highlight = models.TextField(blank=True)
     image = models.ImageField(
         upload_to=get_page_annotation_filename,
-        storage=OverwriteStorage(),
+        storage=FileSystemStorage(allow_overwrite=True),
         max_length=255,
         blank=True,
     )
