@@ -384,6 +384,7 @@ class DocumentCollectionBaseAdmin(admin.ModelAdmin):
             document_count=Count("documents"),
             ready_document_count=Count("documents", filter=Q(documents__pending=False)),
         )
+        qs = qs.prefetch_related("user")
         return qs
 
     def get_document_count(self, obj):
