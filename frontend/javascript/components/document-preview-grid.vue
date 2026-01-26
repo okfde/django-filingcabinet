@@ -62,6 +62,9 @@ export default {
     },
     documentRows() {
       const rows = []
+      if (this.documents.length === 0) {
+        return rows
+      }
       for (let i = 0; i < this.documents.length; i += this.colCount) {
         const rowDocs = this.documents.slice(i, i + this.colCount)
         rows.push({
