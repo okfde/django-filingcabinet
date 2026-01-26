@@ -1,7 +1,6 @@
 from django.db.models import (
     BooleanField,
     Case,
-    Count,
     Prefetch,
     Q,
     Value,
@@ -183,7 +182,6 @@ class DocumentCollectionViewSet(
 
     def get_queryset(self):
         qs = self.get_base_queryset()
-        qs = qs.annotate(document_count=Count("documents"))
 
         self.parent_directory_id = None
         if self.action == "retrieve" and self.request is not None:
@@ -192,14 +190,6 @@ class DocumentCollectionViewSet(
             except ValueError:
                 pass
 
-        qs = qs.annotate(
-            document_directory_count=Count(
-                "documents",
-                filter=Q(
-                    filingcabinet_collectiondocument__directory=self.parent_directory_id
-                ),
-            )
-        )
         if self.parent_directory_id is None:
             # Only prefetch documents for root
             # so prefetch can be used for cover image

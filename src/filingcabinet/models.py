@@ -792,15 +792,20 @@ class AbstractDocumentCollection(models.Model):
             .order_by("filingcabinet_collectiondocument__order")
         )
 
-    def get_authenticated_documents(self, request, directory=None):
+    def get_authenticated_documents(self, request, directory=False):
         from . import get_document_model
+
+        filter_kwargs = {}
+        # Detect if we are filtering by root directory (None), a specific directory or not at all
+        if directory is not False:
+            filter_kwargs = {"filingcabinet_collectiondocument__directory": directory}
 
         return (
             get_document_model()
             .objects.get_authenticated_queryset(request)
             .filter(
                 filingcabinet_collectiondocument__collection=self,
-                filingcabinet_collectiondocument__directory=directory,
+                **filter_kwargs,
             )
             .order_by("filingcabinet_collectiondocument__order")
         )
