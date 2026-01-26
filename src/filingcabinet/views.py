@@ -261,19 +261,13 @@ class DocumentCollectionZipDownloadView(AuthMixin, PkSlugMixin, DetailView):
     def render_to_response(self, context):
         if "parent_directory" in context:
             root_directory = context["parent_directory"]
-            descendants = root_directory.get_descendants()
-            coll_docs = CollectionDocument.objects.filter(
-                collection=self.object,
-                document__pending=False,
-                directory__in=[*descendants, root_directory],
-            )
             max_depth = root_directory.depth + 1  # exclude current directory
         else:
             root_directory = None
-            coll_docs = CollectionDocument.objects.filter(
-                collection=self.object, document__pending=False
-            )
             max_depth = 0
+        coll_docs = self.object.get_authenticated_collection_documents(
+            self.request, directory=root_directory
+        )
 
         archive_stream = zipstream.ZipFile(mode="w", allowZip64=True)
 

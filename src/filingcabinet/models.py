@@ -792,6 +792,23 @@ class AbstractDocumentCollection(models.Model):
             .order_by("filingcabinet_collectiondocument__order")
         )
 
+    def get_authenticated_collection_documents(self, request, directory=None):
+        from . import get_document_model
+
+        directories = CollectionDirectory.get_tree(parent=directory)
+        allowed_documents = get_document_model().objects.get_authenticated_queryset(
+            request
+        )
+        filter_kwargs = {}
+        if directory is not None:
+            filter_kwargs = {"directory__in": directories}
+        return CollectionDocument.objects.filter(
+            collection=self,
+            document__pending=False,
+            document__in=allowed_documents,
+            **filter_kwargs,
+        )
+
     @property
     def root_directories(self):
         if not hasattr(self, "_root_directories"):
