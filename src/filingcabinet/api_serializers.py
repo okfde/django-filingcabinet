@@ -8,7 +8,6 @@ from rest_framework.reverse import reverse
 from . import get_document_model, get_documentcollection_model
 from .models import (
     CollectionDirectory,
-    CollectionDocument,
     DocumentPortal,
     Page,
     PageAnnotation,
@@ -221,24 +220,31 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_document_count(self, obj):
         if hasattr(obj, "document_count"):
+            # Possibly prefetched in DocumentCollectionViewSet.get_queryset
             return obj.document_count
-        return obj.documents.all().count()
+        return obj.get_authenticated_documents(
+            self.context["request"],
+        ).count()
 
     def get_document_directory_count(self, obj):
         parent = self.context.get("parent_directory")
         if hasattr(obj, "document_directory_count"):
+            # Possibly prefetched in DocumentCollectionViewSet.get_queryset
             return obj.document_directory_count
-        return CollectionDocument.objects.filter(
-            collection=obj, directory=parent
+        return obj.get_authenticated_documents(
+            self.context["request"], directory=parent
         ).count()
 
     def get_documents(self, obj):
+        # Possibly prefetched in DocumentCollectionViewSet.get_queryset
         prefetched_docs = getattr(obj, "prefetched_documents", None)
         if prefetched_docs is not None:
             docs = prefetched_docs[:MAX_COLLECTION_DOCS]
         else:
             parent = self.context.get("parent_directory")
-            docs = obj.get_documents(directory=parent)[:MAX_COLLECTION_DOCS]
+            docs = obj.get_authenticated_documents(
+                self.context["request"], directory=parent
+            )[:MAX_COLLECTION_DOCS]
         return Document.get_serializer_class()(
             docs, many=True, context=self.context
         ).data

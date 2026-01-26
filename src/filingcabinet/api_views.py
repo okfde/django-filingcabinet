@@ -206,9 +206,9 @@ class DocumentCollectionViewSet(
             qs = qs.prefetch_related(
                 Prefetch(
                     "documents",
-                    queryset=Document.objects.filter(
-                        filingcabinet_collectiondocument__directory=None
-                    ).order_by(
+                    queryset=Document.objects.get_authenticated_queryset(self.request)
+                    .filter(filingcabinet_collectiondocument__directory=None)
+                    .order_by(
                         "filingcabinet_collectiondocument__order",
                         "filingcabinet_collectiondocument__id",
                     ),

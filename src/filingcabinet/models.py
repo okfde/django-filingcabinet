@@ -792,6 +792,19 @@ class AbstractDocumentCollection(models.Model):
             .order_by("filingcabinet_collectiondocument__order")
         )
 
+    def get_authenticated_documents(self, request, directory=None):
+        from . import get_document_model
+
+        return (
+            get_document_model()
+            .objects.get_authenticated_queryset(request)
+            .filter(
+                filingcabinet_collectiondocument__collection=self,
+                filingcabinet_collectiondocument__directory=directory,
+            )
+            .order_by("filingcabinet_collectiondocument__order")
+        )
+
     def get_authenticated_collection_documents(self, request, directory=None):
         from . import get_document_model
 
