@@ -1,8 +1,11 @@
 from django.db.models import (
     BooleanField,
     Case,
+    Count,
+    OuterRef,
     Prefetch,
     Q,
+    Subquery,
     Value,
     When,
 )
@@ -183,12 +186,34 @@ class DocumentCollectionViewSet(
     def get_queryset(self):
         qs = self.get_base_queryset()
 
+        sub_query_docs = Document.objects.get_authenticated_queryset(
+            self.request
+        ).filter(filingcabinet_collectiondocument__collection=OuterRef("pk"))
+        qs = qs.annotate(
+            document_count=Subquery(
+                sub_query_docs.values("filingcabinet_collectiondocument__collection_id")
+                .annotate(count=Count("*"))
+                .values("count")[:1]
+            )
+        )
+
         self.parent_directory_id = None
         if self.action == "retrieve" and self.request is not None:
             try:
                 self.parent_directory_id = int(self.request.GET.get("directory", ""))
             except ValueError:
                 pass
+
+        qs = qs.annotate(
+            document_directory_count=Subquery(
+                sub_query_docs.filter(
+                    filingcabinet_collectiondocument__directory=self.parent_directory_id
+                )
+                .values("filingcabinet_collectiondocument__collection_id")
+                .annotate(count=Count("*"))
+                .values("count")[:1]
+            )
+        )
 
         if self.parent_directory_id is None:
             # Only prefetch documents for root

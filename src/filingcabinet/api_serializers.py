@@ -220,6 +220,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
 
     def get_document_count(self, obj):
         if hasattr(obj, "document_count"):
+            # Possibly prefetched in DocumentCollectionViewSet.get_queryset
             return obj.document_count
         obj.document_count = obj.get_authenticated_documents(
             self.context["request"],
@@ -229,6 +230,7 @@ class DocumentCollectionSerializer(serializers.HyperlinkedModelSerializer):
     def get_document_directory_count(self, obj):
         parent = self.context.get("parent_directory")
         if hasattr(obj, "document_directory_count"):
+            # Possibly prefetched in DocumentCollectionViewSet.get_queryset
             return obj.document_directory_count
         obj.document_directory_count = obj.get_authenticated_documents(
             self.context["request"], directory=parent
