@@ -26,7 +26,7 @@ def make_collection_and_documents(dummy_user):
             CollectionDirectory.add_root(instance=directory)
 
         for _ in range(MAX_COLLECTION_DOCS + 10):
-            document = DocumentFactory()
+            document = DocumentFactory(public=True)
             CollectionDocument.objects.create(
                 collection=collection,
                 document=document,
@@ -47,7 +47,7 @@ def make_collection_and_documents(dummy_user):
         )
         parent_directory.add_child(instance=directory)
         for _ in range(20):
-            document = DocumentFactory()
+            document = DocumentFactory(public=True)
             CollectionDocument.objects.create(
                 collection=collection,
                 directory=directory,
@@ -94,7 +94,7 @@ def test_documentcollection_api_sql_queries(
 
 
 @pytest.mark.django_db
-def test_documentcollection_counts(client, dummy_user, django_assert_num_queries):
+def test_documentcollection_counts(client, dummy_user):
     collection, directory = make_collection_and_documents(dummy_user)
 
     detail_url = reverse("api:documentcollection-detail", kwargs={"pk": collection.pk})

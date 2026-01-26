@@ -19,7 +19,7 @@ def test_documentcollection_pagination(client, dummy_user):
         CollectionDirectory.add_root(instance=directory)
 
     for _ in range(100):
-        document = DocumentFactory()
+        document = DocumentFactory(public=True)
         CollectionDocument.objects.create(
             collection=collection,
             document=document,
