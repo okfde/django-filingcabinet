@@ -39,13 +39,46 @@ OFFICE_FILETYPES = (
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "text/rtf",
     "application/rtf",
+    "application/vnd.ms-powerpoint",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 )
 OFFICE_EXTENSIONS = (
+    ".rtf",
+    # Word
     ".doc",
+    ".dot",
+    ".wbk",
     ".docx",
     ".docm",
+    ".dotx",
+    ".dotm",
+    ".docb",
     ".odt",
-    ".rtf",
+    # Powerpoint
+    ".pptx",
+    ".pptm",
+    ".ppt",
+    ".potx",
+    ".potm",
+    ".pot",
+    ".ppsx",
+    ".ppsm",
+    ".pps",
+    # Excel
+    ".xlsx",
+    ".xlsm",
+    ".xlsb",
+    ".xltx",
+    ".xltm",
+    ".xls",
+    ".xlt",
+    ".xls",
+    ".xml",
+    ".xml",
+    ".xlam",
+    ".xla",
+    ".xlw",
+    ".xlr",
 )
 
 
