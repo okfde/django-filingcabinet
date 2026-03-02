@@ -4,13 +4,14 @@ from django.template.defaultfilters import slugify
 
 from . import get_document_model, get_documentcollection_model
 from .models import CollectionDocument
-from .pdf_utils import calculcate_content_hash_from_file
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
 
 
 def create_document(pdf_file_obj, metadata, process=True, update=False):
+    from .pdf_utils import calculcate_content_hash_from_file
+
     content_hash = metadata.get("content_hash")
     if content_hash is None:
         content_hash = calculcate_content_hash_from_file(pdf_file_obj)

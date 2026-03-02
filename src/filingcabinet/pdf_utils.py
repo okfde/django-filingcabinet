@@ -20,11 +20,6 @@ from reportlab.pdfgen import canvas
 from wand.color import Color
 from wand.image import Image
 
-try:
-    import pytesseract
-except ImportError:
-    pytesseract = None
-
 from .settings import FILINGCABINET_PAGE_PROCESSING_TIMEOUT
 
 logger = logging.getLogger(__name__)
@@ -291,6 +286,11 @@ class PDFProcessor(object):
             yield self.get_text_for_page(page_no, use_ocr=use_ocr)
 
     def run_ocr_on_image(self, image, timeout=30):
+        try:
+            import pytesseract
+        except ImportError:
+            pytesseract = None
+
         if pytesseract is None:
             return ""
         img_blob = image.make_blob("RGB")
