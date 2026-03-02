@@ -814,8 +814,12 @@ export default {
     loadPDF() {
       import('pdfjs-dist')
         .then((PDFJS) => {
+          const currentModuleUrl = new URL(import.meta.url)
+          const staticOrigin = currentModuleUrl.origin
+          const configuredWorkerUrl = new URL(PDFJSWorkerUrl)
+          const workerUrl = staticOrigin + configuredWorkerUrl.pathname
           this.$root.PDFJS = PDFJS
-          this.$root.PDFJS.GlobalWorkerOptions.workerSrc = PDFJSWorkerUrl
+          this.$root.PDFJS.GlobalWorkerOptions.workerSrc = workerUrl
           console.log('Loaded PDFJS', PDFJSWorkerUrl, this.$root.PDFJS)
           console.log('Loading PDF', this.document.file_url)
           const loadingTask = this.$root.PDFJS.getDocument({
