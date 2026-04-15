@@ -16,7 +16,7 @@ fc-env/
 data/
 static/
 !src/filingcabinet/static
-.venv/
 build
 .coverage
 __pycache__/
+.idea/
