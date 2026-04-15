@@ -19,6 +19,7 @@ from taggit.managers import TaggableManager
 from taggit.models import TaggedItemBase
 from treebeard.mp_tree import MP_Node
 
+from .language import get_default_language, get_language_choices
 from .settings import (
     FILINGCABINET_DOCUMENT_MODEL,
     FILINGCABINET_DOCUMENTCOLLECTION_MODEL,
@@ -202,8 +203,8 @@ class AbstractDocument(models.Model):
     language = models.CharField(
         max_length=10,
         blank=True,
-        default=settings.LANGUAGE_CODE,
-        choices=settings.LANGUAGES,
+        default=get_default_language,
+        choices=get_language_choices,
     )
 
     public = models.BooleanField(default=False)
