@@ -14,7 +14,11 @@ class MP_AddHandler:
         self.stmts = []
 
 
-NUM = NumConv(len(ALPHABET), ALPHABET)
+# inspired by https://github.com/django-cms/django-cms/commit/e0e55e59be84d4a3ee070aefcda7995cc1383afa
+try:
+    NUM = NumConv(len(ALPHABET), ALPHABET)
+except TypeError:
+    NUM = NumConv(ALPHABET)
 
 
 def _int2str(num):
@@ -151,7 +155,6 @@ def move_to_mp(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("filingcabinet", "0025_collectiondirectory_depth_and_more"),
     ]

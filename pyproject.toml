@@ -12,7 +12,7 @@ dependencies = [
   "django-json-widget",
   "jsonschema",
   "django-taggit>=2",
-  "django-treebeard",
+  "django-treebeard>=5",
   "djangorestframework",
   "reportlab",
   "celery",
