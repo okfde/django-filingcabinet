@@ -9,8 +9,10 @@ from .views import (
     DocumentCollectionZipDownloadView,
     DocumentEmbedView,
     DocumentListEmbedView,
+    DocumentPortalDownloadView,
     DocumentPortalEmbedView,
     DocumentPortalView,
+    DocumentPortalZipDownloadView,
     DocumentView,
 )
 
@@ -68,6 +70,19 @@ fc_urlpatterns = [
         ),
         xframe_options_exempt(DocumentPortalEmbedView.as_view()),
         name="document-portal_embed",
+    ),
+    path(
+        pgettext_lazy(
+            "url part",
+            "portal/<slug:slug>/download/",
+        ),
+        DocumentPortalDownloadView.as_view(),
+        name="document-portal_download",
+    ),
+    path(
+        pgettext_lazy("url part", "portal/<slug:slug>/zip/"),
+        DocumentPortalZipDownloadView.as_view(),
+        name="document-portal_zip",
     ),
     path("<int:pk>-<slug:slug>/", DocumentView.as_view(), name="document-detail"),
     path("<int:pk>/", DocumentView.as_view(), name="document-detail_short"),

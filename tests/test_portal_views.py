@@ -36,3 +36,22 @@ def test_portal_detail_slug_behavior(client):
     )
     response = client.get(bad_slug_url)
     assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_portal_embed(document_portal, client):
+    response = client.get(document_portal.get_absolute_domain_embed_url())
+    assert response.status_code == 200
+    assert document_portal.title in response.content.decode("utf-8")
+
+
+@pytest.mark.django_db
+def test_portal_download(document_portal, client):
+    response = client.get(
+        reverse(
+            "filingcabinet:document-portal_download",
+            kwargs={"slug": document_portal.slug},
+        )
+    )
+    assert response.status_code == 200
+    assert document_portal.title in response.content.decode("utf-8")

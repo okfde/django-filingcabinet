@@ -333,9 +333,16 @@ class DocumentCollectionEmbedView(DocumentCollectionView):
 
 
 class DocumentCollectionDownloadView(DocumentCollectionView):
-    template_name = "filingcabinet/documentcollection_detail_download.html"
+    template_name = "filingcabinet/download.html"
     redirect_url_name = "filingcabinet:document-collection_download"
     redirect_short_url_name = "filingcabinet:document-collection_embed_short"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_url"] = reverse(
+            "api:documentcollection-detail", kwargs={"pk": self.object.pk}
+        )
+        return context
 
 
 def get_document_portal_context(portal, request):
@@ -352,8 +359,6 @@ def get_document_portal_context(portal, request):
 
 class DocumentPortalView(DetailView):
     template_name = "filingcabinet/documentportal_detail.html"
-    redirect_url_name = "filingcabinet:document-portal"
-    redirect_short_url_name = "filingcabinet:document-portal_short"
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -369,8 +374,42 @@ class DocumentPortalView(DetailView):
 
 class DocumentPortalEmbedView(DocumentPortalView):
     template_name = "filingcabinet/documentcollection_detail_embed.html"
-    redirect_url_name = "filingcabinet:document-portal_embed"
-    redirect_short_url_name = "filingcabinet:document-portal_embed_short"
+
+
+class DocumentPortalDownloadView(DocumentPortalView):
+    template_name = "filingcabinet/download.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["base_url"] = reverse(
+            "api:documentportal-detail", kwargs={"pk": self.object.pk}
+        )
+        return context
+
+
+class DocumentPortalZipDownloadView(DocumentPortalView):
+    def render_to_response(self, context):
+        documents = context["object"].documents.iterator()
+        archive_stream = zipstream.ZipFile(mode="w", allowZip64=True)
+
+        filename_counter = defaultdict(int)
+        for doc in documents:
+            _, doc_ext = os.path.splitext(doc.get_file_path())
+            doc_filename_stem = doc.title.replace("/", "_").replace("\\", "_").strip()
+            if not doc_filename_stem:
+                doc_filename_stem = "unnamed"
+            doc_filename = doc_filename_stem + doc_ext
+            archive_stream.write(
+                doc.get_file_path(),
+                arcname=ensure_unique_filename(filename_counter, doc_filename),
+            )
+
+        resp = ZipStreamResponse(
+            archive_stream,
+            content_type="application/zip",
+        )
+        resp["Content-Disposition"] = f'attachment; filename="{self.object.slug}.zip"'
+        return resp
 
 
 def get_document_list_context(request):

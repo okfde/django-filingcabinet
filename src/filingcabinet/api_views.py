@@ -23,6 +23,7 @@ from .api_serializers import (
     CreatePageAnnotationSerializer,
     DocumentCollectionSerializer,
     DocumentDetailSerializer,
+    DocumentPortalSerializer,
     DocumentSerializer,
     PageAnnotationSerializer,
     PageSerializer,
@@ -30,7 +31,7 @@ from .api_serializers import (
 )
 from .api_utils import CustomLimitOffsetPagination, make_oembed_response
 from .filters import DocumentFilter, PageDocumentFilterset
-from .models import CollectionDirectory, Page, PageAnnotation
+from .models import CollectionDirectory, DocumentPortal, Page, PageAnnotation
 
 Document = get_document_model()
 DocumentCollection = get_documentcollection_model()
@@ -64,6 +65,20 @@ class CanReadWritePermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return obj.can_read(request)
         return obj.can_write(request)
+
+
+class DocumentPortalViewSet(viewsets.ReadOnlyModelViewSet):
+    pagination_class = CustomLimitOffsetPagination
+    serializer_class = DocumentPortalSerializer
+
+    def get_queryset(self):
+        qs = DocumentPortal.objects.filter(public=True)
+        qs = qs.annotate(document_count=Count("document"))
+        return qs
+
+    @action(detail=False, methods=["get"])
+    def oembed(self, request):
+        return make_oembed_response(request, DocumentPortal)
 
 
 class DocumentViewSet(
