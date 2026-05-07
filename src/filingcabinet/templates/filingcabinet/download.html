@@ -6,7 +6,7 @@
 {% block body %}
     <div class="container mt-3">
         <h2>{{ object.title }}</h2>
-        <div data-fcdownload="{% url 'api:documentcollection-detail' pk=object.id %}">
+        <div data-fcdownload="{{ base_url }}">
             <div class="progress"
                  role="progressbar"
                  aria-label="Basic example"

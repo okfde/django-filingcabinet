@@ -8,6 +8,7 @@ from rest_framework.routers import DefaultRouter
 
 from filingcabinet.api_views import (
     DocumentCollectionViewSet,
+    DocumentPortalViewSet,
     DocumentViewSet,
     PageAnnotationViewSet,
     PageViewSet,
@@ -19,6 +20,7 @@ from . import base_admin  # noqa
 api_router = DefaultRouter()
 
 api_router.register(r"document", DocumentViewSet, basename="document")
+api_router.register(r"documentportal", DocumentPortalViewSet, basename="documentportal")
 api_router.register(
     r"documentcollection", DocumentCollectionViewSet, basename="documentcollection"
 )

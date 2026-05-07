@@ -27,6 +27,60 @@ from .settings import (
 from .validators import validate_settings_schema
 
 
+class AuthQuerysetMixin:
+    def get_authenticated_queryset(self, request):
+        qs = self.get_queryset()
+        cond = models.Q(public=True)
+        if request.user.is_authenticated:
+            if request.user.is_superuser:
+                return qs
+            cond |= models.Q(user=request.user)
+        return qs.filter(cond)
+
+
+class OEmbedManagerMixin:
+    def filter_public(self, **kwargs):
+        return self.get_queryset().filter(
+            models.Q(public=True, listed=True)
+            | models.Q(public=True, slug=kwargs.get("slug", ""))
+        )
+
+    def get_public_via_url(self, url):
+        result = urllib.parse.urlparse(url)
+        try:
+            match = resolve(result.path)
+        except Resolver404:
+            return None
+        pk = match.kwargs.get("pk")
+        if pk is None:
+            return None
+        try:
+            # either listed or known by slug
+            return self.filter_public(**match.kwargs).get(id=pk)
+        except self.model.DoesNotExist:
+            return None
+
+
+class DocumentPortalManager(models.Manager):
+    def filter_public(self, **kwargs):
+        return self.get_queryset().filter(public=True)
+
+    def get_public_via_url(self, url):
+        result = urllib.parse.urlparse(url)
+        try:
+            match = resolve(result.path)
+        except Resolver404:
+            return None
+        slug = match.kwargs.get("slug")
+        if slug is None:
+            return None
+        try:
+            # either listed or known by slug
+            return self.filter_public().get(slug=slug)
+        except self.model.DoesNotExist:
+            return None
+
+
 class DocumentPortal(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250)
@@ -39,6 +93,8 @@ class DocumentPortal(models.Model):
         blank=True, default=dict, validators=[validate_settings_schema]
     )
 
+    objects = DocumentPortalManager()
+
     class Meta:
         verbose_name = _("document portal")
         verbose_name_plural = _("document portals")
@@ -48,6 +104,15 @@ class DocumentPortal(models.Model):
 
     def get_absolute_url(self):
         return reverse("filingcabinet:document-portal", kwargs={"slug": self.slug})
+
+    def get_absolute_domain_url(self):
+        return getattr(settings, "SITE_URL", "") + self.get_absolute_url()
+
+    def get_absolute_domain_embed_url(self):
+        return getattr(settings, "SITE_URL", "") + reverse(
+            "filingcabinet:document-portal_embed",
+            kwargs={"slug": self.slug},
+        )
 
     def get_serializer_class(self):
         from .api_serializers import DocumentPortalSerializer
@@ -78,41 +143,6 @@ class DocumentPortal(models.Model):
 
     def can_write(self, request):
         return False
-
-
-class AuthQuerysetMixin:
-    def get_authenticated_queryset(self, request):
-        qs = self.get_queryset()
-        cond = models.Q(public=True)
-        if request.user.is_authenticated:
-            if request.user.is_superuser:
-                return qs
-            cond |= models.Q(user=request.user)
-        return qs.filter(cond)
-
-
-class OEmbedManagerMixin:
-    def get_public_via_url(self, url):
-        result = urllib.parse.urlparse(url)
-        try:
-            match = resolve(result.path)
-        except Resolver404:
-            return None
-        pk = match.kwargs.get("pk")
-        if pk is None:
-            return None
-        try:
-            # either listed or known by slug
-            return (
-                self.get_queryset()
-                .filter(
-                    models.Q(public=True, listed=True)
-                    | models.Q(public=True, slug=match.kwargs.get("slug", ""))
-                )
-                .get(id=pk)
-            )
-        except self.model.DoesNotExist:
-            return None
 
 
 class DocumentManager(OEmbedManagerMixin, AuthQuerysetMixin, models.Manager):

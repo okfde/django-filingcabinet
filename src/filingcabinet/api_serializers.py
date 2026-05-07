@@ -395,6 +395,10 @@ class CreatePageAnnotationSerializer(serializers.Serializer):
 
 
 class DocumentPortalSerializer(serializers.HyperlinkedModelSerializer):
+    resource_uri = serializers.HyperlinkedIdentityField(
+        view_name="api:documentportal-detail", lookup_field="pk"
+    )
+    site_url = serializers.CharField(source="get_absolute_domain_url", read_only=True)
     document_count = serializers.SerializerMethodField()
     documents = serializers.SerializerMethodField()
     document_directory_count = serializers.SerializerMethodField()
@@ -406,6 +410,8 @@ class DocumentPortalSerializer(serializers.HyperlinkedModelSerializer):
         model = DocumentPortal
         fields = (
             "id",
+            "resource_uri",
+            "site_url",
             "title",
             "description",
             "created_at",
