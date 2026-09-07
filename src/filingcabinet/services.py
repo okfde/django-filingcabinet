@@ -296,8 +296,10 @@ class DocumentStorer:
         return self.unpack_zip(upload.get_file())
 
     def unpack_zip(self, file_obj):
+        docs = []
+
         if not zipfile.is_zipfile(file_obj):
-            return
+            return docs
 
         with zipfile.ZipFile(file_obj, "r") as zf:
             zip_paths = []
@@ -313,7 +315,7 @@ class DocumentStorer:
                     zip_paths.append(path)
                 # TODO: recursive zip unpacking?
             if not zip_paths:
-                return
+                return docs
 
             doc_paths = remove_common_root_path(zip_paths)
             directories = get_existing_directories(self.collection)
@@ -324,7 +326,12 @@ class DocumentStorer:
 
                 directory = directories.get(doc_path.parent)
                 file_obj = BytesIO(zf.read(str(zip_path)))
-                self.create_from_file(file_obj, doc_path.name, directory=directory)
+                doc = self.create_from_file(
+                    file_obj, doc_path.name, directory=directory
+                )
+                docs.append(doc)
+
+        return docs
 
 
 def remove_common_root_path(paths):
