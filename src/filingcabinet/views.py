@@ -108,6 +108,7 @@ def get_js_config(request, obj=None, deep_urls=False):
             "showSearchbar": _("Show Searchbar"),
             "showAnnotations": _("Show Annotations"),
             "hideAnnotations": _("Hide Annotations"),
+            "documentPages": _("Document pages"),
         },
     }
 

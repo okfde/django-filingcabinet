@@ -3,6 +3,9 @@
     <RecycleScroller
       v-slot="{ item }"
       class="scroller"
+      :tabindex="isPageMode ? null : 0"
+      :role="isPageMode ? null : 'region'"
+      :aria-label="isPageMode ? null : i18n.documentPages"
       :items="pages"
       :page-mode="isPageMode"
       key-field="number"
@@ -88,6 +91,9 @@ export default {
     'currentpage'
   ],
   computed: {
+    i18n() {
+      return this.$root.config.i18n
+    },
     showText() {
       return this.preferences.showText
     },
