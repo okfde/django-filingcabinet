@@ -468,6 +468,10 @@ msgstr "Annotationen anzeigen"
 msgid "Hide Annotations"
 msgstr "Annotationen verstecken"
 
+#: src/filingcabinet/views.py:111
+msgid "Document pages"
+msgstr "Dokumentseiten"
+
 #: src/filingcabinet/views.py:383
 msgid "All documents"
 msgstr "Alle Dokumente"
