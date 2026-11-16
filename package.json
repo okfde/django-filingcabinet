@@ -33,5 +33,6 @@
     "sass": "^1.54.4",
     "vite": "^4.4.7"
   },
-  "prettier": "prettier-config-standard"
+  "prettier": "prettier-config-standard",
+  "packageManager": "pnpm@12.21.0"
 }
