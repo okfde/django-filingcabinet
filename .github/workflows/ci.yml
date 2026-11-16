@@ -10,18 +10,13 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v3
         with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
+          cache: true
       - name: Install dependencies
         run: pnpm install
-      - uses: j178/prek-action@v3.0.0
+      - uses: j178/prek-action@v3.1.1
 
   test:
     runs-on: ubuntu-latest
@@ -29,34 +24,18 @@ jobs:
       matrix:
         python-version: ['3.12', '3.13']
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v2
-        with:
-          enable-cache: true
-          cache-dependency-glob: |
-            uv.lock
-            pyproject.toml
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: actions/checkout@v7
       - name: Install system-level dependencies
         run: sudo apt-get update && sudo apt-get install python3-dev libmagic-dev libmagickwand-dev
-      - name: Setup venv
-        run: |
-          uv venv --python ${{ matrix.python-version }}
-          source .venv/bin/activate
-          echo PATH=$PATH >> $GITHUB_ENV
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v10.3.3
+        with:
+          activate-environment: true
+      - uses: pnpm/setup@v3
+        with:
+          cache: true
       - name: Install dependencies
-        run: |
-          uv sync --extra test --frozen
-          uv pip install -e . --no-deps
-          pnpm install
+        run: uv sync --extra test --frozen
       - name: Build frontend
         run: pnpm run build
       - name: Run tests
